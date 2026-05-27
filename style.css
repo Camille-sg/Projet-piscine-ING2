@@ -724,3 +724,207 @@ tbody tr:last-child td { border-bottom: none; }
   object-fit: cover;
   display: block;
 }
+
+/* ══════════════════════════════
+   PAGE INSCRIPTION
+   ══════════════════════════════ */
+
+.page-inscription {
+  min-height: 100vh;
+  background: var(--bleu-nuit);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Notes de musique en fond */
+.page-inscription::before {
+  content: '♩  ♪  ♫  ♬  ♩  ♪  ♫  ♬  ♩  ♪  ♫  ♬';
+  position: fixed;
+  top: 20%;
+  left: -5%;
+  font-size: 2rem;
+  color: rgba(255,255,255,.04);
+  white-space: nowrap;
+  letter-spacing: 2.5rem;
+  transform: rotate(-8deg);
+  width: 140%;
+  pointer-events: none;
+}
+
+.page-inscription::after {
+  content: '♬  ♫  ♪  ♩  ♬  ♫  ♪  ♩  ♬  ♫  ♪  ♩';
+  position: fixed;
+  bottom: 20%;
+  left: -5%;
+  font-size: 2rem;
+  color: rgba(255,255,255,.04);
+  white-space: nowrap;
+  letter-spacing: 2.5rem;
+  transform: rotate(-8deg);
+  width: 140%;
+  pointer-events: none;
+}
+
+/* Carte */
+.carte-inscription {
+  background: var(--blanc);
+  border-radius: 1.1rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* Bandeau haut */
+.bandeau-inscription {
+  background: linear-gradient(135deg, var(--bleu-marine), var(--bleu-nuit));
+  padding: 2rem 2rem 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.bandeau-inscription::after {
+  content: '♪';
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  color: rgba(214,194,138,.25);
+}
+
+.bandeau-inscription h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--blanc);
+  margin: 0 0 .2rem;
+}
+
+.bandeau-inscription h1 span {
+  color: var(--or);
+}
+
+.bandeau-inscription p {
+  font-size: .85rem;
+  color: var(--bleu-clair);
+  margin: 0;
+}
+
+/* Corps */
+.corps-inscription {
+  padding: 2rem;
+}
+
+/* Champs */
+.champ-inscription {
+  margin-bottom: 1.1rem;
+}
+
+.champ-inscription label {
+  display: block;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--bleu-marine);
+  margin-bottom: .4rem;
+}
+
+.champ-inscription input {
+  width: 100%;
+  padding: .72rem 1rem;
+  border: 1.5px solid var(--beige-bord);
+  border-radius: .5rem;
+  font-size: .9rem;
+  background: var(--beige-clair);
+  color: var(--texte);
+  box-sizing: border-box;
+  transition: .15s;
+  font-family: inherit;
+}
+
+.champ-inscription input:focus {
+  outline: none;
+  border-color: var(--bleu-vif);
+  background: var(--blanc);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+
+/* Bouton */
+.btn-inscription {
+  width: 100%;
+  padding: .85rem;
+  background: var(--bleu-vif);
+  color: var(--blanc);
+  border: none;
+  border-radius: .5rem;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: .5rem;
+  transition: .15s;
+  letter-spacing: .02em;
+}
+
+.btn-inscription:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Messages */
+.message-inscription {
+  display: none;
+  padding: .8rem 1rem;
+  border-radius: .45rem;
+  font-size: .88rem;
+  margin-bottom: 1rem;
+}
+
+.erreur-inscription {
+  background: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid var(--erreur);
+}
+
+.succes-inscription {
+  background: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid var(--succes);
+}
+
+/* Lien bas */
+.lien-bas-inscription {
+  text-align: center;
+  font-size: .87rem;
+  color: #64748b;
+  margin-top: 1.25rem;
+}
+
+.lien-bas-inscription a {
+  color: var(--bleu-vif);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.lien-bas-inscription a:hover {
+  text-decoration: underline;
+}
+
+/* Pied */
+.pied-inscription {
+  background: var(--bleu-nuit);
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: .78rem;
+  color: rgba(255,255,255,.4);
+  line-height: 1.8;
+}
+
+.pied-inscription strong {
+  color: var(--or);
+}
+
