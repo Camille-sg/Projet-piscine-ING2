@@ -1,39 +1,354 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CampusPlay</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>CampusPlay — Connexion</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: var(--bleu-nuit, #0d1b3e); margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Notes de musique en fond */
+    .page::before {
+      content: '♩  ♪  ♫  ♬  ♩  ♪  ♫  ♬  ♩  ♪  ♫  ♬';
+      position: fixed;
+      top: 20%;
+      left: -5%;
+      font-size: 2rem;
+      color: rgba(255,255,255,.04);
+      white-space: nowrap;
+      letter-spacing: 2.5rem;
+      transform: rotate(-8deg);
+      width: 140%;
+      pointer-events: none;
+    }
+    .page::after {
+      content: '♬  ♫  ♪  ♩  ♬  ♫  ♪  ♩  ♬  ♫  ♪  ♩';
+      position: fixed;
+      bottom: 20%;
+      left: -5%;
+      font-size: 2rem;
+      color: rgba(255,255,255,.04);
+      white-space: nowrap;
+      letter-spacing: 2.5rem;
+      transform: rotate(-8deg);
+      width: 140%;
+      pointer-events: none;
+    }
+
+    /* Carte centrale */
+    .carte-login {
+      background: white;
+      border-radius: 1.1rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Bandeau haut */
+    .bandeau {
+      background: linear-gradient(135deg, #1a3a6e, #0d1b3e);
+      padding: 2rem 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    .bandeau::after {
+      content: '♫';
+      position: absolute;
+      top: 50%;
+      right: 1.5rem;
+      transform: translateY(-50%);
+      font-size: 3rem;
+      color: rgba(201,168,76,.25);
+    }
+    .bandeau h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: white;
+      margin: 0 0 .2rem;
+    }
+    .bandeau h1 span { color: #c9a84c; }
+    .bandeau p {
+      font-size: .85rem;
+      color: #93c5fd;
+      margin: 0;
+    }
+
+    /* Corps formulaire */
+    .corps {
+      padding: 2rem;
+    }
+
+    /* Champs */
+    .champ { margin-bottom: 1.1rem; }
+    .champ label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 600;
+      color: #1a3a6e;
+      margin-bottom: .4rem;
+    }
+    .champ input {
+      width: 100%;
+      padding: .72rem 1rem;
+      border: 1.5px solid #e8ddd0;
+      border-radius: .5rem;
+      font-size: .9rem;
+      background: #fdfaf6;
+      color: #0d1b3e;
+      box-sizing: border-box;
+      transition: .15s;
+      font-family: inherit;
+    }
+    .champ input:focus {
+      outline: none;
+      border-color: #2563eb;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+
+    /* Bouton connexion */
+    .btn-login {
+      width: 100%;
+      padding: .85rem;
+      background: #c9a84c;
+      color: #0d1b3e;
+      border: none;
+      border-radius: .5rem;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: .5rem;
+      transition: .15s;
+      letter-spacing: .02em;
+    }
+    .btn-login:hover { background: #b8942e; transform: translateY(-1px); }
+
+    /* Message erreur */
+    .erreur {
+      display: none;
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid #dc2626;
+      padding: .8rem 1rem;
+      border-radius: .45rem;
+      font-size: .88rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Lien inscription */
+    .lien-bas {
+      text-align: center;
+      font-size: .87rem;
+      color: #64748b;
+      margin-top: 1.25rem;
+    }
+    .lien-bas a {
+      color: #2563eb;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .lien-bas a:hover { text-decoration: underline; }
+
+    /* Lien admin */
+    .lien-admin {
+      display: block;
+      text-align: center;
+      font-size: .82rem;
+      color: #94a3b8;
+      margin-top: .75rem;
+      text-decoration: none;
+      transition: .15s;
+    }
+    .lien-admin:hover { color: #2563eb; }
+
+    /* Comptes démo */
+    .demo-zone {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #e8ddd0;
+    }
+    .demo-titre {
+      font-size: .73rem;
+      color: #94a3b8;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: .6rem;
+    }
+    .demo-btn {
+      display: block;
+      width: 100%;
+      padding: .45rem;
+      background: #f5ede0;
+      border: 1px solid #e8ddd0;
+      border-radius: .4rem;
+      font-size: .78rem;
+      cursor: pointer;
+      margin-bottom: .4rem;
+      color: #0d1b3e;
+      transition: .12s;
+      font-family: inherit;
+    }
+    .demo-btn:hover { background: #e8ddd0; }
+
+    /* Footer */
+    .pied {
+      background: #0d1b3e;
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: .78rem;
+      color: rgba(255,255,255,.4);
+      line-height: 1.8;
+    }
+    .pied strong { color: #c9a84c; }
+  </style>
 </head>
 <body>
 
-<script src=""data.js"></script>
+<div class="page">
+  <div class="carte-login">
 
-<section class="hero">
-  <h1>🎓 Bienvenue sur CampusPlay</h1>
-  <p>La plateforme des associations et événements étudiants</p>
-  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-    <a href="evenements.html" class="btn" style="background:white;color:#4f46e5">Voir les événements</a>
-    <a href="inscription.html" class="btn" style="background:rgba(255,255,255,.2);color:white;border:2px solid rgba(255,255,255,.5)">Rejoindre CampusPlay</a>
+    <!-- Bandeau -->
+    <div class="bandeau">
+      <h1>Campus<span>Play</span></h1>
+      <p>Notifications et activités associatives ♪</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="corps">
+
+      <div class="erreur" id="msg-erreur">
+        ⚠️ Email ou mot de passe incorrect.
+      </div>
+
+      <form id="form-login">
+        <div class="champ">
+          <label>Adresse email</label>
+          <input type="email" id="email" placeholder="prenom.nom@campus.fr" required autocomplete="email">
+        </div>
+        <div class="champ">
+          <label>Mot de passe</label>
+          <input type="password" id="mdp" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-login">♪ &nbsp;Se connecter</button>
+      </form>
+
+      <div class="lien-bas">
+        Pas encore de compte ?
+        <a href="inscription.html">S'inscrire</a>
+      </div>
+
+      <a href="connexion-admin.html" class="lien-admin">
+        Êtes-vous administrateur / staff ? →
+      </a>
+
+      <!-- Comptes de démonstration -->
+      <div class="demo-zone">
+        <p class="demo-titre">Comptes de démonstration</p>
+        <button class="demo-btn" onclick="remplir('etudiant@campusplay.fr','password123')">
+          🎓 etudiant@campusplay.fr &nbsp;/&nbsp; password123
+        </button>
+        <button class="demo-btn" onclick="remplir('admin@campusplay.fr','password123')">
+          ⚙️ admin@campusplay.fr &nbsp;/&nbsp; password123
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Pied de la carte -->
+    <div class="pied">
+      <div><strong>Copyright</strong> © 2026 CampusPlay</div>
+      <div>contact@campusplay.fr &nbsp;·&nbsp; 01 23 45 67 89</div>
+      <div>123 Rue de l'École, 75000 Paris</div>
+    </div>
+
   </div>
-</section>
-
-<div class="conteneur">
-    <div class="grille-4" style="margin-bottom:3rem">
-        <div class="stat-carte">
-            <div class="chiffre" style="color:#4f46e5" id="nb-ev"></div>
-            <div class="label">Evenements à venir </div>
-        </div>
-        <div class="stat-carte">
-            <div class="label">Activites proposees</div>
-        </div>
-        <div class="stat-carte">
-      <div class="chiffre" style="color:#f59e0b" id="nb-res"></div>
-      <div class="label">Ressources disponibles</div>
-    </div>
-    <div class="stat-carte">
-      <div class="chiffre" style="color:#ef4444">100%</div>
-      <div class="label">Gratuit pour les étudiants</div>
-    </div>
 </div>
+
+<script>
+  /* ── Comptes de base ── */
+  var COMPTES_BASE = [
+    { email: 'admin@campusplay.fr',    mdp: 'password123', prenom: 'Alice', nom: 'Admin',   role: 'admin'   },
+    { email: 'manager@campusplay.fr',  mdp: 'password123', prenom: 'Marc',  nom: 'Manager', role: 'manager' },
+    { email: 'etudiant@campusplay.fr', mdp: 'password123', prenom: 'Emma',  nom: 'Dupont',  role: 'etudiant'},
+  ];
+
+  /* ── Si déjà connecté → page suivante ── */
+  try {
+    var sessionActuelle = localStorage.getItem('campusplay_user');
+    if (sessionActuelle) {
+      window.location.href = 'accueil.html';
+    }
+  } catch(e) {}
+
+  /* ── Remplissage auto depuis les boutons démo ── */
+  function remplir(email, mdp) {
+    document.getElementById('email').value = email;
+    document.getElementById('mdp').value   = mdp;
+    document.getElementById('msg-erreur').style.display = 'none';
+  }
+
+  /* ── Soumission du formulaire ── */
+  document.getElementById('form-login').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var email  = document.getElementById('email').value.trim().toLowerCase();
+    var mdp    = document.getElementById('mdp').value;
+    var erreur = document.getElementById('msg-erreur');
+
+    /* Récupérer aussi les comptes créés via inscription */
+    var comptesInscrits = [];
+    try {
+      comptesInscrits = JSON.parse(localStorage.getItem('cp_comptes') || '[]');
+    } catch(e) {}
+
+    var tousComptes = COMPTES_BASE.concat(comptesInscrits);
+
+    /* Chercher le compte correspondant */
+    var compte = null;
+    for (var i = 0; i < tousComptes.length; i++) {
+      if (tousComptes[i].email === email && tousComptes[i].mdp === mdp) {
+        compte = tousComptes[i];
+        break;
+      }
+    }
+
+    if (!compte) {
+      erreur.style.display = 'block';
+      document.getElementById('mdp').value = '';
+      document.getElementById('mdp').focus();
+      return;
+    }
+
+    /* Connexion réussie */
+    erreur.style.display = 'none';
+    var userSession = {
+      email:  compte.email,
+      prenom: compte.prenom,
+      nom:    compte.nom,
+      role:   compte.role
+    };
+    localStorage.setItem('campusplay_user', JSON.stringify(userSession));
+    localStorage.setItem('cp_flash', JSON.stringify({ msg: 'Bienvenue, ' + compte.prenom + ' ! ♪', type: 'succes' }));
+
+    /* → Redirection vers accueil.html */
+    window.location.href = 'accueil.html';
+  });
+</script>
+
+</body>
+</html>
