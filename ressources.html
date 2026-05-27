@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CampusPlay — Ressources</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+
+    /* ══ SPÉCIFIQUE PAGE RESSOURCES ══ */
+
+
+    /* Layout principal : liste + disponibilités */
+    .ressources-layout {
+      display: grid;
+      grid-template-columns: 1fr 230px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+
+    /* ── Filtres ── */
+    .barre-filtres-res {
+      background: var(--blanc);
+      border: 1px solid var(--beige-bord);
+      border-radius: .75rem;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      align-items: flex-end;
+    }
+    .filtre-res {
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+    }
+    .filtre-res label {
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--bleu-marine);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+    .filtre-res input,
+    .filtre-res select {
+      padding: .5rem .85rem;
+      border: 1.5px solid var(--beige-bord);
+      border-radius: .45rem;
+      font-size: .85rem;
+      font-family: inherit;
+      background: var(--beige-clair);
+      color: var(--texte);
+      transition: .15s;
+    }
+    .filtre-res input:focus,
+    .filtre-res select:focus {
+      outline: none;
+      border-color: var(--bleu-vif);
+      background: var(--blanc);
+    }
+    .filtre-res.large input { min-width: 200px; }
+
+
+    /* ── Carte ressource ── */
+    .liste-ressources {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+
+    .carte-ressource {
+      background: var(--blanc);
+      border: 1px solid var(--beige-bord);
+      border-radius: .75rem;
+      overflow: hidden;
+      display: flex;
+      transition: .2s;
+    }
+    .carte-ressource:hover {
+      box-shadow: 0 6px 24px rgba(13,27,62,.12);
+      transform: translateY(-2px);
+      border-color: var(--or);
+    }
+
+
+    .carte-bande { width: 5px; flex-shrink: 0; }
+
+
+    /* Photo */
+    .carte-res-photo {
+      width: 115px;
+      flex-shrink: 0;
+      background: var(--beige);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      border-right: 1px solid var(--beige-bord);
+      gap: .3rem;
+      padding: .75rem;
+    }
+    .carte-res-photo span {
+      font-size: .7rem;
+      color: var(--texte-pale);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+
+    /* Infos */
+    .carte-res-infos {
+      flex: 1;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+
+    .carte-res-infos h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--bleu-nuit);
+      margin-bottom: .3rem;
+    }
+
+
+    .carte-res-detail {
+      display: flex;
+      flex-direction: column;
+      gap: .18rem;
+      margin-bottom: .7rem;
+    }
+    .carte-res-detail span {
+      font-size: .83rem;
+      color: var(--texte-doux);
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      padding: .2rem .65rem;
+      border-radius: 9999px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .type-location { background: var(--bleu-pale); color: var(--bleu-marine); }
+    .type-achat    { background: var(--or-clair);  color: #92400e; }
+    .type-les-deux { background: #f3e8ff; color: #6b21a8; }
+
+
+    .carte-res-bas {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+
+    .btn-infos-res {
+      padding: .4rem 1rem;
+      background: var(--beige);
+      color: var(--bleu-marine);
+      border: 1.5px solid var(--beige-bord);
+      border-radius: .45rem;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .15s;
+    }
+    .btn-infos-res:hover {
+      background: var(--bleu-marine);
+      color: var(--blanc);
+    }
+
+
+    .stock-info {
+      font-size: .78rem;
+      color: var(--texte-pale);
+    }
+    .stock-info.ok   { color: var(--succes); font-weight: 600; }
+    .stock-info.low  { color: var(--attention); font-weight: 600; }
+    .stock-info.zero { color: var(--erreur); font-weight: 600; }
+
+
+    /* ── PANNEAU DISPONIBILITÉS ── */
+    .panel-dispos {
+      background: var(--blanc);
+      border: 1px solid var(--beige-bord);
+      border-radius: .75rem;
+      overflow: hidden;
+      position: sticky;
+      top: 1rem;
+    }
+
+
+    .panel-dispos-titre {
+      background: var(--bleu-nuit);
+      padding: .8rem 1rem;
+      color: var(--blanc);
+      font-size: .9rem;
+      font-weight: 700;
+      border-bottom: 2px solid var(--or);
+    }
+
+
+    .panel-dispos-corps { padding: 1rem; }
+
+
+    .dispo-label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--bleu-marine);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: .3rem;
+      display: block;
+    }
+
+
+    .dispo-select {
+      width: 100%;
+      padding: .5rem .75rem;
+      border: 1.5px solid var(--beige-bord);
+      border-radius: .45rem;
+      font-size: .82rem;
+      font-family: inherit;
+      background: var(--beige-clair);
+      margin-bottom: .85rem;
+    }
+    .dispo-select:focus { outline: none; border-color: var(--bleu-vif); }
+
+
+    .dispo-date-group {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin-bottom: .85rem;
+    }
+    .dispo-date-group input {
+      width: 100%;
+      padding: .5rem .75rem;
+      border: 1.5px solid var(--beige-bord);
+      border-radius: .45rem;
+      font-size: .82rem;
+      font-family: inherit;
+      background: var(--beige-clair);
+      box-sizing: border-box;
+    }
+    .dispo-date-group input:focus { outline: none; border-color: var(--bleu-vif); }
+
+
+    .btn-verif {
+      width: 100%;
+      padding: .55rem;
+      background: var(--bleu-vif);
+      color: var(--blanc);
+      border: none;
+      border-radius: .45rem;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .15s;
+      margin-bottom: .85rem;
+    }
+    .btn-verif:hover { background: #1d4ed8; }
+
+
+    .resultat-dispo {
+      display: none;
+      padding: .65rem .85rem;
+      border-radius: .45rem;
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .resultat-ok      { background: #d1fae5; color: #065f46; border-left: 3px solid var(--succes); }
+    .resultat-non     { background: #fee2e2; color: #991b1b; border-left: 3px solid var(--erreur); }
+
+
+    /* Mini légende stock */
+    .legende-stock {
+      margin-top: 1rem;
+      padding-top: .85rem;
+      border-top: 1px solid var(--beige-bord);
+    }
+    .legende-stock p {
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--bleu-marine);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: .5rem;
+    }
+    .legende-item {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .75rem;
+      color: var(--texte-doux);
+      margin-bottom: .3rem;
+    }
+    .leg-puce {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+
+    /* ── MODAL RESSOURCE ── */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(13,27,62,.55);
+      z-index: 400;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-bg.ouvert { display: flex; }
+
+
+    .modal-boite {
+      background: var(--blanc);
+      border-radius: .9rem;
+      width: 100%;
+      max-width: 560px;
+      margin: 1rem;
+      box-shadow: 0 20px 60px rgba(13,27,62,.3);
+      overflow: hidden;
+    }
+    .modal-entete {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-entete h2 { color: var(--blanc); font-size: 1rem; font-weight: 800; }
+    .modal-fermer {
+      background: none; border: none;
+      color: rgba(255,255,255,.65);
+      font-size: 1.4rem; cursor: pointer;
+    }
+    .modal-fermer:hover { color: var(--blanc); }
+
+
+    .modal-corps { padding: 1.5rem; }
+
+
+    .modal-ligne {
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      padding: .55rem 0;
+      border-bottom: 1px solid var(--beige-bord);
+      font-size: .87rem;
+    }
+    .modal-ligne:last-child { border-bottom: none; }
+    .modal-ligne .icone { width: 1.4rem; text-align: center; flex-shrink: 0; }
+    .modal-ligne strong {
+      display: block; font-size: .75rem;
+      text-transform: uppercase; letter-spacing: .05em;
+      color: var(--bleu-marine); margin-bottom: .1rem;
+    }
+    .modal-ligne span { color: var(--texte-doux); }
+
+
+    /* Formulaire de réservation dans le modal */
+    .form-resa { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--beige-bord); }
+    .form-resa h4 {
+      font-size: .88rem; font-weight: 800; color: var(--bleu-nuit);
+      margin-bottom: .85rem; display: flex; align-items: center; gap: .4rem;
+    }
+    .form-resa-grille {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+      margin-bottom: .85rem;
+    }
+    .form-resa-champ { display: flex; flex-direction: column; gap: .25rem; }
+    .form-resa-champ label {
+      font-size: .75rem; font-weight: 700; color: var(--bleu-marine);
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    .form-resa-champ input, .form-resa-champ select {
+      padding: .55rem .8rem;
+      border: 1.5px solid var(--beige-bord);
+      border-radius: .45rem;
+      font-size: .85rem;
+      font-family: inherit;
+      background: var(--beige-clair);
+    }
+    .form-resa-champ input:focus, .form-resa-champ select:focus {
+      outline: none; border-color: var(--bleu-vif);
+    }
+
+
+    .modal-pied {
+      padding: 1rem 1.5rem;
+      background: var(--beige);
+      display: flex;
+      gap: .75rem;
+      justify-content: flex-end;
+    }
+
+
+    @media (max-width: 760px) {
+      .ressources-layout { grid-template-columns: 1fr; }
+      .panel-dispos { position: static; }
+      .carte-res-photo { width: 80px; font-size: 2rem; }
+      .form-resa-grille { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+
+<script>
+  var sessionUser = null;
+  try { sessionUser = JSON.parse(localStorage.getItem('campusplay_user')); } catch(e) {}
+  if (!sessionUser) window.location.href = 'index.html';
+  function deconnecter() {
+    localStorage.removeItem('campusplay_user');
+    window.location.href = 'index.html';
+  }
+</script>
+
+
+<div class="page-wrapper">
+
+
+  <!-- ════ HEADER ════ -->
+  <header class="site-header">
+    <div class="logo-cercle">🎵</div>
+    <div class="site-header-centre">
+      <h1>CampusPlay</h1>
+      <p class="sous-titre">Réservations, emprunts et gestion des disponibilités</p>
+    </div>
+    <div class="header-user">
+      <span class="user-nom"  id="user-nom"></span>
+      <span class="user-role" id="user-role"></span>
+      <button class="btn-deconnexion" onclick="deconnecter()">Déconnexion</button>
+    </div>
+  </header>
+
+
+  <!-- ════ CORPS ════ -->
+  <div class="site-corps">
+
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <a href="accueil.html">
+        <span class="icone">🏠</span> Accueil
+      </a>
+      <a href="activites.html">
+        <span class="icone">🎵</span> Activités
+      </a>
+      <a href="evenements.html">
+        <span class="icone">📅</span> Évènements
+      </a>
+      <a href="ressources.html" class="actif">
+        <span class="icone">📦</span> Ressources
+      </a>
+      <a href="reservations.html">
+        <span class="icone">🔖</span> Réservations
+      </a>
+      <hr>
+      <a href="notifications.html">
+        <span class="icone">🔔</span> Notifications
+      </a>
+      <hr>
+      <a href="profil.html">
+        <span class="icone">👤</span> Mon profil
+      </a>
+      <a href="admin.html" id="lien-admin" style="display:none">
+        <span class="icone">⚙️</span> Admin
+      </a>
+    </nav>
+
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="site-contenu">
+
+
+      <h1 class="page-titre">📦 Ressources</h1>
+
+
+      <!-- FILTRES -->
+      <div class="barre-filtres-res">
+        <div class="filtre-res large">
+          <label>🔍 Rechercher</label>
+          <input type="text" id="recherche" placeholder="Guitare, enceinte, platines…">
+        </div>
+        <div class="filtre-res">
+          <label>Catégorie</label>
+          <select id="filtre-cat">
+            <option value="">Toutes</option>
+            <option value="Instrument">🎸 Instruments</option>
+            <option value="Enceinte">🔊 Enceintes</option>
+            <option value="Platine DJ">🎛️ Platines DJ</option>
+            <option value="Accessoire">🎵 Accessoires</option>
+          </select>
+        </div>
+        <div class="filtre-res">
+          <label>Type</label>
+          <select id="filtre-type">
+            <option value="">Tous</option>
+            <option value="location">📅 Location</option>
+            <option value="achat">🛒 Achat</option>
+          </select>
+        </div>
+        <div class="filtre-res">
+          <label>Disponibilité</label>
+          <select id="filtre-dispo">
+            <option value="">Toutes</option>
+            <option value="dispo">✅ Disponible</option>
+            <option value="indispo">❌ Épuisé</option>
+          </select>
+        </div>
+        <div class="filtre-res">
+          <label>Trier par</label>
+          <select id="tri">
+            <option value="nom">Nom A→Z</option>
+            <option value="prix-loc-asc">Prix loc. ↑</option>
+            <option value="prix-ach-asc">Prix achat ↑</option>
+            <option value="stock">Stock</option>
+          </select>
+        </div>
+      </div>
+
+
+      <p style="font-size:.82rem;color:var(--texte-pale);margin-bottom:1rem">
+        <span id="nb-res" style="color:var(--bleu-vif);font-weight:700">0</span> ressource(s) affichée(s)
+      </p>
+
+
+      <!-- Layout liste + disponibilités -->
+      <div class="ressources-layout">
+
+
+        <!-- LISTE -->
+        <div class="liste-ressources" id="liste-res"></div>
+
+
+        <!-- PANNEAU DISPONIBILITÉS -->
+        <div class="panel-dispos">
+          <div class="panel-dispos-titre">📅 Disponibilités</div>
+          <div class="panel-dispos-corps">
+
+
+            <label class="dispo-label">Matériel</label>
+            <select class="dispo-select" id="dispo-materiel">
+              <option value="">— Choisir —</option>
+            </select>
+
+
+            <div class="dispo-date-group">
+              <label class="dispo-label">Date de début</label>
+              <input type="date" id="dispo-debut">
+              <label class="dispo-label">Date de fin</label>
+              <input type="date" id="dispo-fin">
+            </div>
+
+
+            <button class="btn-verif" onclick="verifierDispo()">
+              Vérifier la disponibilité
+            </button>
+
+
+            <div class="resultat-dispo" id="resultat-dispo"></div>
+
+
+            <!-- Légende stock -->
+            <div class="legende-stock">
+              <p>Légende stock</p>
+              <div class="legende-item">
+                <div class="leg-puce" style="background:var(--succes)"></div>
+                Disponible (3+)
+              </div>
+              <div class="legende-item">
+                <div class="leg-puce" style="background:var(--attention)"></div>
+                Stock limité (1–2)
+              </div>
+              <div class="legende-item">
+                <div class="leg-puce" style="background:var(--erreur)"></div>
+                Épuisé
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+
+      </div>
+    </main>
+  </div>
+
+
+  <!-- ════ FOOTER ════ -->
+  <footer class="site-footer">
+    <strong>Copyright</strong> © 2026 CampusPlay &nbsp;·&nbsp;
+    contact@campusplay.fr &nbsp;·&nbsp; 01 23 45 67 89 &nbsp;·&nbsp;
+    123 Rue de l'École, 75000 Paris
+  </footer>
+
+
+</div>
+
+
+<!-- ════ MODAL RESSOURCE ════ -->
+<div class="modal-bg" id="modal" onclick="fermerModalSiDehors(event)">
+  <div class="modal-boite">
+    <div class="modal-entete" id="modal-entete">
+      <h2 id="modal-titre">Détails</h2>
+      <button class="modal-fermer" onclick="fermerModal()">✕</button>
+    </div>
+    <div class="modal-corps">
+      <div id="modal-infos"></div>
+
+
+      <!-- Formulaire de réservation / commande -->
+      <div class="form-resa" id="form-resa">
+        <h4>📋 Faire une demande</h4>
+        <div class="form-resa-grille">
+          <div class="form-resa-champ">
+            <label>Type de demande</label>
+            <select id="resa-type">
+              <option value="location">📅 Location</option>
+              <option value="achat">🛒 Achat</option>
+            </select>
+          </div>
+          <div class="form-resa-champ">
+            <label>Quantité</label>
+            <input type="number" id="resa-qte" min="1" value="1">
+          </div>
+          <div class="form-resa-champ" id="group-debut">
+            <label>Date de début</label>
+            <input type="date" id="resa-debut">
+          </div>
+          <div class="form-resa-champ" id="group-fin">
+            <label>Date de fin</label>
+            <input type="date" id="resa-fin">
+          </div>
+        </div>
+        <div class="form-resa-champ" style="margin-bottom:.75rem">
+          <label>Motif / Commentaire</label>
+          <input type="text" id="resa-motif" placeholder="Projet, cours, événement…">
+        </div>
+      </div>
+    </div>
+    <div class="modal-pied">
+      <button onclick="fermerModal()" class="btn btn-gris" style="font-size:.85rem">Annuler</button>
+      <button onclick="soumettreResa()" class="btn btn-or" style="font-size:.85rem" id="btn-resa">
+        Envoyer la demande
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ══════════════════════════════════
+   DONNÉES RESSOURCES
+   ══════════════════════════════════ */
+var RESSOURCES = [
+  /* INSTRUMENTS */
+  { id:1, nom:"Guitare acoustique Yamaha F310", cat:"Instrument",
+    desc:"Guitare acoustique dreadnought, idéale pour débutants et confirmés. Accordeur clip fourni.",
+    stock:5, prixLoc:"3 €/jour", prixLocNum:3, prixAch:"120 €", prixAchNum:120,
+    type:"les-deux", emoji:"🎸", couleur:"#4f46e5" },
+  { id:2, nom:"Guitare électrique Fender Stratocaster", cat:"Instrument",
+    desc:"Stratocaster American Standard + ampli Fender 15W. Câble jack, médiators inclus.",
+    stock:3, prixLoc:"5 €/jour", prixLocNum:5, prixAch:"280 €", prixAchNum:280,
+    type:"les-deux", emoji:"🎸", couleur:"#4f46e5" },
+  { id:3, nom:"Clavier numérique Roland FP-30 (88 touches)", cat:"Instrument",
+    desc:"Toucher lesté, son piano acoustique. Pédale sustain, casque Sony inclus.",
+    stock:2, prixLoc:"8 €/jour", prixLocNum:8, prixAch:"450 €", prixAchNum:450,
+    type:"les-deux", emoji:"🎹", couleur:"#1a3a6e" },
+  { id:4, nom:"Batterie acoustique Pearl", cat:"Instrument",
+    desc:"Kit 5 fûts, 2 cymbales. Local insonorisé fourni sur réservation.",
+    stock:1, prixLoc:"12 €/jour", prixLocNum:12, prixAch:null, prixAchNum:null,
+    type:"location", emoji:"🥁", couleur:"#7c3aed" },
+  { id:5, nom:"Batterie électronique Roland TD-07", cat:"Instrument",
+    desc:"Kit silencieux, parfait pour entraînement à domicile. Casque inclus.",
+    stock:2, prixLoc:"10 €/jour", prixLocNum:10, prixAch:"600 €", prixAchNum:600,
+    type:"les-deux", emoji:"🥁", couleur:"#7c3aed" },
+  { id:6, nom:"Violon 4/4 Stentor Student II", cat:"Instrument",
+    desc:"Archet, colophane, étui rigide fournis. Cordes changées récemment.",
+    stock:4, prixLoc:"4 €/jour", prixLocNum:4, prixAch:"150 €", prixAchNum:150,
+    type:"les-deux", emoji:"🎻", couleur:"#b45309" },
+  { id:7, nom:"Saxophone alto Yamaha YAS-280", cat:"Instrument",
+    desc:"Anches de remplacement fournies. Idéal pour débutant à intermédiaire.",
+    stock:2, prixLoc:"8 €/jour", prixLocNum:8, prixAch:"380 €", prixAchNum:380,
+    type:"les-deux", emoji:"🎷", couleur:"#059669" },
+  { id:8, nom:"Trompette Bach Stradivarius", cat:"Instrument",
+    desc:"Sourdine incluse, embouchure 3C. Entretien récent.",
+    stock:3, prixLoc:"5 €/jour", prixLocNum:5, prixAch:"320 €", prixAchNum:320,
+    type:"les-deux", emoji:"🎺", couleur:"#d97706" },
+
+
+  /* ENCEINTES */
+  { id:9, nom:"Enceinte Bluetooth JBL Charge 5", cat:"Enceinte",
+    desc:"20h d'autonomie, waterproof IPX7. Parfaite pour événements extérieurs jusqu'à 50 pers.",
+    stock:6, prixLoc:"5 €/jour", prixLocNum:5, prixAch:"180 €", prixAchNum:180,
+    type:"les-deux", emoji:"🔊", couleur:"#059669" },
+  { id:10, nom:"Système sono complet 400W", cat:"Enceinte",
+    desc:"2 × enceintes actives 200W + ampli + 2 micros filaires + câbles XLR. Concerts jusqu'à 200 pers.",
+    stock:1, prixLoc:"40 €/jour", prixLocNum:40, prixAch:"1200 €", prixAchNum:1200,
+    type:"les-deux", emoji:"🔊", couleur:"#059669" },
+  { id:11, nom:"Sono de studio Yamaha HS8", cat:"Enceinte",
+    desc:"Moniteur de studio de référence. Idéal pour enregistrement et mixage.",
+    stock:0, prixLoc:"15 €/jour", prixLocNum:15, prixAch:"400 €", prixAchNum:400,
+    type:"les-deux", emoji:"🔊", couleur:"#059669" },
+
+
+  /* PLATINES DJ */
+  { id:12, nom:"Platines Technics SL-1200 (paire)", cat:"Platine DJ",
+    desc:"Paire de platines vinyle professionnelles + table de mixage Pioneer DJM-450 + 20 vinyles.",
+    stock:2, prixLoc:"25 €/jour", prixLocNum:25, prixAch:"1800 €", prixAchNum:1800,
+    type:"les-deux", emoji:"🎛️", couleur:"#1d5ce4" },
+  { id:13, nom:"Contrôleur DJ Pioneer DDJ-400", cat:"Platine DJ",
+    desc:"Compatible Rekordbox. USB, 2 decks, effets intégrés. Parfait du débutant au confirmé.",
+    stock:3, prixLoc:"15 €/jour", prixLocNum:15, prixAch:"350 €", prixAchNum:350,
+    type:"les-deux", emoji:"🎛️", couleur:"#1d5ce4" },
+
+
+  /* ACCESSOIRES */
+  { id:14, nom:"Micro Shure SM58", cat:"Accessoire",
+    desc:"Micro dynamique cardioïde de scène. Standard professionnel. Câble XLR inclus.",
+    stock:8, prixLoc:"3 €/jour", prixLocNum:3, prixAch:"110 €", prixAchNum:110,
+    type:"les-deux", emoji:"🎙️", couleur:"#ec4899" },
+  { id:15, nom:"Câbles & adaptateurs (lot)", cat:"Accessoire",
+    desc:"Jack 6.35, Jack 3.5, XLR, RCA. Lot de 10 câbles variés.",
+    stock:10, prixLoc:"1 €/jour", prixLocNum:1, prixAch:"25 €", prixAchNum:25,
+    type:"les-deux", emoji:"🎵", couleur:"#94a3b8" },
+];
+
+
+var ressourceCourante = null;
+
+
+/* ══════════════════════════════════
+   AFFICHAGE UTILISATEUR
+   ══════════════════════════════════ */
+var rolesLabels = { admin:'Administrateur', manager:'Manager', membre:'Membre', etudiant:'Étudiant' };
+document.getElementById('user-nom').textContent  = sessionUser.prenom + ' ' + sessionUser.nom;
+document.getElementById('user-role').textContent = rolesLabels[sessionUser.role] || sessionUser.role;
+if (sessionUser.role === 'admin' || sessionUser.role === 'manager') {
+  document.getElementById('lien-admin').style.display = 'flex';
+}
+
+
+/* ══════════════════════════════════
+   REMPLIR SELECT DISPONIBILITÉS
+   ══════════════════════════════════ */
+function remplirSelectDispo() {
+  var sel = document.getElementById('dispo-materiel');
+  RESSOURCES.forEach(function(r) {
+    var o = document.createElement('option');
+    o.value = r.id;
+    o.textContent = r.emoji + ' ' + r.nom;
+    sel.appendChild(o);
+  });
+}
+
+
+/* ══════════════════════════════════
+   AFFICHER LES RESSOURCES
+   ══════════════════════════════════ */
+function afficherRessources() {
+  var rech  = document.getElementById('recherche').value.toLowerCase().trim();
+  var cat   = document.getElementById('filtre-cat').value;
+  var type  = document.getElementById('filtre-type').value;
+  var dispo = document.getElementById('filtre-dispo').value;
+  var tri   = document.getElementById('tri').value;
+
+
+  var filtrees = RESSOURCES.filter(function(r) {
+    if (rech && !r.nom.toLowerCase().includes(rech) && !r.desc.toLowerCase().includes(rech)) return false;
+    if (cat  && r.cat !== cat) return false;
+    if (type === 'location' && r.type === 'achat')    return false;
+    if (type === 'achat'    && r.type === 'location') return false;
+    if (dispo === 'dispo'   && r.stock === 0) return false;
+    if (dispo === 'indispo' && r.stock > 0)   return false;
+    return true;
+  });
+
+
+  filtrees.sort(function(a, b) {
+    if (tri === 'prix-loc-asc') return (a.prixLocNum || 999) - (b.prixLocNum || 999);
+    if (tri === 'prix-ach-asc') return (a.prixAchNum || 9999) - (b.prixAchNum || 9999);
+    if (tri === 'stock') return b.stock - a.stock;
+    return a.nom.localeCompare(b.nom);
+  });
+
+
+  document.getElementById('nb-res').textContent = filtrees.length;
+  var liste = document.getElementById('liste-res');
+
+
+  if (!filtrees.length) {
+    liste.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--texte-pale);font-style:italic">📦 Aucune ressource ne correspond.</div>';
+    return;
+  }
+
+
+  liste.innerHTML = filtrees.map(function(r) {
+    var stockClass = r.stock >= 3 ? 'ok' : (r.stock > 0 ? 'low' : 'zero');
+    var stockTxt   = r.stock === 0 ? 'Épuisé' : (r.stock === 1 ? '1 disponible' : r.stock + ' disponibles');
+
+
+    var typeBadge = '';
+    if (r.type === 'location') typeBadge = '<span class="type-badge type-location">📅 Location</span>';
+    else if (r.type === 'achat') typeBadge = '<span class="type-badge type-achat">🛒 Achat</span>';
+    else typeBadge = '<span class="type-badge type-location">📅 Location</span><span class="type-badge type-achat">🛒 Achat</span>';
+
+
+    var prixDetails = '';
+    if (r.prixLoc) prixDetails += '<span>📅 Location : <strong style="color:var(--bleu-vif)">' + r.prixLoc + '</strong></span>';
+    if (r.prixAch) prixDetails += '<span>🛒 Achat : <strong style="color:var(--attention)">' + r.prixAch + '</strong></span>';
+
+
+    return '<div class="carte-ressource">' +
+      '<div class="carte-bande" style="background:' + r.couleur + '"></div>' +
+      '<div class="carte-res-photo">' +
+        r.emoji +
+        '<span>' + r.cat + '</span>' +
+      '</div>' +
+      '<div class="carte-res-infos">' +
+        '<div>' +
+          '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.4rem">' + typeBadge + '</div>' +
+          '<h3>' + r.nom + '</h3>' +
+          '<div class="carte-res-detail">' + prixDetails + '</div>' +
+        '</div>' +
+        '<div class="carte-res-bas">' +
+          '<button class="btn-infos-res" onclick="ouvrirModal(' + r.id + ')">Informations</button>' +
+          '<span class="stock-info ' + stockClass + '">● ' + stockTxt + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+
+/* ══════════════════════════════════
+   VÉRIFIER DISPONIBILITÉ
+   ══════════════════════════════════ */
+function verifierDispo() {
+  var matId = document.getElementById('dispo-materiel').value;
+  var debut = document.getElementById('dispo-debut').value;
+  var fin   = document.getElementById('dispo-fin').value;
+  var res   = document.getElementById('resultat-dispo');
+
+
+  if (!matId || !debut || !fin) {
+    res.className = 'resultat-dispo resultat-non';
+    res.style.display = 'block';
+    res.textContent = '⚠️ Remplis tous les champs.';
+    return;
+  }
+  if (fin < debut) {
+    res.className = 'resultat-dispo resultat-non';
+    res.style.display = 'block';
+    res.textContent = '⚠️ La date de fin doit être après le début.';
+    return;
+  }
+
+
+  var materiel = RESSOURCES.find(function(r) { return r.id === parseInt(matId); });
+  if (!materiel) return;
+
+
+  res.style.display = 'block';
+  if (materiel.stock === 0) {
+    res.className = 'resultat-dispo resultat-non';
+    res.textContent = '❌ Épuisé — non disponible sur cette période.';
+  } else {
+    res.className = 'resultat-dispo resultat-ok';
+    res.textContent = '✅ Disponible ! ' + materiel.stock + ' unité(s) libre(s) sur cette période.';
+  }
+}
+
+
+/* ══════════════════════════════════
+   MODAL
+   ══════════════════════════════════ */
+function ouvrirModal(id) {
+  ressourceCourante = RESSOURCES.find(function(r) { return r.id === id; });
+  if (!ressourceCourante) return;
+  var r = ressourceCourante;
+
+
+  document.getElementById('modal-entete').style.background = r.couleur;
+  document.getElementById('modal-titre').textContent = r.emoji + ' ' + r.nom;
+
+
+  var prixInfo = '';
+  if (r.prixLoc) prixInfo += '📅 Location : ' + r.prixLoc;
+  if (r.prixLoc && r.prixAch) prixInfo += ' &nbsp;|&nbsp; ';
+  if (r.prixAch) prixInfo += '🛒 Achat : ' + r.prixAch;
+
+
+  document.getElementById('modal-infos').innerHTML =
+    '<div class="modal-ligne"><span class="icone">📦</span><div><strong>Catégorie</strong><span>' + r.cat + '</span></div></div>' +
+    '<div class="modal-ligne"><span class="icone">💬</span><div><strong>Description</strong><span>' + r.desc + '</span></div></div>' +
+    '<div class="modal-ligne"><span class="icone">💶</span><div><strong>Tarifs</strong><span>' + prixInfo + '</span></div></div>' +
+    '<div class="modal-ligne"><span class="icone">📊</span><div><strong>Stock disponible</strong><span>' + (r.stock > 0 ? r.stock + ' unité(s)' : 'Épuisé') + '</span></div></div>';
+
+
+  /* Adapter le select type selon la ressource */
+  var selType = document.getElementById('resa-type');
+  selType.innerHTML = '';
+  if (r.type !== 'achat') {
+    var o1 = document.createElement('option');
+    o1.value = 'location'; o1.textContent = '📅 Location';
+    selType.appendChild(o1);
+  }
+  if (r.type !== 'location') {
+    var o2 = document.createElement('option');
+    o2.value = 'achat'; o2.textContent = '🛒 Achat';
+    selType.appendChild(o2);
+  }
+
+
+  document.getElementById('resa-qte').max = r.stock;
+  document.getElementById('modal').classList.add('ouvert');
+}
+
+
+function fermerModal() {
+  document.getElementById('modal').classList.remove('ouvert');
+  ressourceCourante = null;
+}
+function fermerModalSiDehors(e) {
+  if (e.target.id === 'modal') fermerModal();
+}
+
+
+function soumettreResa() {
+  if (!ressourceCourante) return;
+  var type  = document.getElementById('resa-type').value;
+  var qte   = document.getElementById('resa-qte').value;
+  var debut = document.getElementById('resa-debut').value;
+  var fin   = document.getElementById('resa-fin').value;
+
+
+  if (!qte || qte < 1) { alert('Indique une quantité.'); return; }
+  if (type === 'location' && (!debut || !fin)) { alert('Indique les dates de location.'); return; }
+
+
+  var msg = type === 'achat'
+    ? '🛒 Demande d\'achat envoyée pour "' + ressourceCourante.nom + '" (x' + qte + '). Un responsable te contactera !'
+    : '📅 Demande de location envoyée pour "' + ressourceCourante.nom + '" du ' + debut + ' au ' + fin + '. En attente de validation !';
+
+
+  alert(msg);
+  fermerModal();
+}
+
+/* Filtres */
+['recherche','filtre-cat','filtre-type','filtre-dispo','tri'].forEach(function(id) {
+  var el = document.getElementById(id);
+  el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', afficherRessources);
+});
+
+/* ══ INIT ══ */
+remplirSelectDispo();
+afficherRessources();
+</script>
+
+</body>
+</html>
