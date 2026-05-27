@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CampusPlay — Réservations</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    body { background: white; }
+
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .site-header {
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid #333;
+      padding: 1rem 1.5rem;
+      gap: 1.5rem;
+    }
+    .logo-cercle {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      border: 2px dashed #94a3b8;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; color: #94a3b8; flex-shrink: 0;
+    }
+    .site-header-centre { flex: 1; text-align: center; }
+    .site-header-centre h1 { font-size: 2.2rem; font-weight: 800; color: #1e293b; margin-bottom: .2rem; }
+    .site-header-centre p  { font-size: .95rem; color: #64748b; }
+    .header-droite {
+      display: flex; flex-direction: column; align-items: flex-end; gap: .4rem; min-width: 120px;
+    }
+    .header-droite span { font-size: .82rem; color: #64748b; }
+
+    /* CORPS */
+    .site-corps { display: flex; flex: 1; border-bottom: 2px solid #333; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 150px; flex-shrink: 0;
+      border-right: 2px solid #333;
+      padding: 1.5rem 0;
+    }
+    .sidebar a {
+      display: block; padding: .65rem 1.25rem;
+      font-size: .92rem; color: #1e293b;
+      text-decoration: none; transition: .15s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar a:hover { background: #eef2ff; color: #4f46e5; border-left-color: #4f46e5; }
+    .sidebar a.actif  { font-weight: 800; color: #4f46e5; border-left-color: #4f46e5; background: #eef2ff; }
+
+    /* CONTENU 3 COLONNES */
+    .site-contenu { flex: 1; padding: 1.25rem 1.5rem; overflow: hidden; }
+
+    .colonnes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      height: calc(100vh - 185px);
+    }
+
+    .colonne {
+      display: flex; flex-direction: column;
+      border: 2px solid #333;
+      border-radius: .5rem;
+      overflow: hidden;
+    }
+    .colonne-header {
+      background: #f8fafc;
+      border-bottom: 2px solid #333;
+      padding: .7rem 1rem;
+      font-size: .92rem; font-weight: 700;
+      color: #1e293b; text-align: center;
+    }
+    .colonne-body {
+      flex: 1; overflow-y: auto;
+      padding: .75rem;
+      display: flex; flex-direction: column; gap: .75rem;
+    }
+
+    /* CARTES */
+    .item-carte {
+      border: 1.5px solid #e2e8f0;
+      border-radius: .5rem;
+      overflow: hidden;
+      background: white;
+      transition: .2s;
+    }
+    .item-carte:hover { border-color: #4f46e5; box-shadow: 0 2px 10px rgba(79,70,229,.12); }
+
+    .item-photo {
+      width: 100%; height: 90px;
+      background: #f1f5f9;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; border-bottom: 1px solid #e2e8f0;
+      position: relative;
+    }
+    .cat-badge {
+      position: absolute; top: .35rem; left: .35rem;
+      background: rgba(79,70,229,.85); color: white;
+      font-size: .65rem; font-weight: 700; padding: .1rem .4rem;
+      border-radius: 9999px;
+    }
+
+    .item-infos { padding: .6rem .75rem; }
+    .item-nom   { font-size: .88rem; font-weight: 700; color: #1e293b; margin-bottom: .4rem; }
+    .item-detail { display: flex; flex-direction: column; gap: .15rem; margin-bottom: .55rem; }
+    .item-detail span { font-size: .78rem; color: #64748b; }
+    .item-detail strong { color: #1e293b; }
+    .dispo   { color: #059669 !important; font-weight: 700; }
+    .limite  { color: #d97706 !important; font-weight: 700; }
+    .indispo { color: #dc2626 !important; font-weight: 700; }
+
+    .item-btn {
+      display: block; width: 100%; padding: .45rem;
+      font-size: .82rem; font-weight: 700;
+      border: none; border-radius: .35rem;
+      cursor: pointer; transition: .15s;
+    }
+    .btn-louer    { background: #4f46e5; color: white; }
+    .btn-louer:hover    { background: #4338ca; }
+    .btn-acheter  { background: #059669; color: white; }
+    .btn-acheter:hover  { background: #047857; }
+    .btn-participer { background: #f59e0b; color: white; }
+    .btn-participer:hover { background: #d97706; }
+    .item-btn:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+
+    /* MODAL */
+    .modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 300;
+      align-items: center; justify-content: center;
+    }
+    .modal-bg.open { display: flex; }
+    .modal-box {
+      background: white; border: 2px solid #333;
+      border-radius: .75rem; padding: 1.75rem;
+      width: 100%; max-width: 420px; margin: 1rem;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: .75rem; right: .75rem;
+      background: none; border: none; font-size: 1.3rem;
+      cursor: pointer; color: #94a3b8;
+    }
+    .modal-titre { font-size: 1.1rem; font-weight: 800; margin-bottom: 1.25rem; color: #1e293b; }
+    .info-row {
+      display: flex; justify-content: space-between;
+      padding: .55rem .7rem; background: #f8fafc;
+      border-radius: .4rem; margin-bottom: .4rem;
+    }
+    .info-row span { font-size: .82rem; color: #64748b; }
+    .info-row strong { font-size: .84rem; color: #1e293b; }
+
+    /* FOOTER */
+    .site-footer {
+      padding: .6rem 1.25rem;
+      text-align: center; font-size: .78rem;
+      color: #64748b; border-top: 2px solid #333;
+    }
+
+    @media (max-width: 700px) {
+      .site-corps { flex-direction: column; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 2px solid #333; display: flex; flex-wrap: wrap; padding: .5rem; }
+      .sidebar a { padding: .4rem .75rem; font-size: .82rem; }
+      .colonnes { grid-template-columns: 1fr; height: auto; }
+      .colonne-body { max-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+
+<script src="data.js"></script>
+<script>
+  if (!isConnecte()) { window.location.href = 'index.html'; }
+</script>
+
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="logo-cercle">logo</div>
+    <div class="site-header-centre">
+      <h1>CampusPlay</h1>
+      <p>Participation et inscriptions aux événements</p>
+    </div>
+    <div class="header-droite">
+      <span id="nom-header"></span>
+      <span id="role-header" style="font-size:.72rem;padding:.15rem .5rem;border-radius:9999px;background:#ede9fe;color:#5b21b6;font-weight:600"></span>
+      <button onclick="logout()" style="font-size:.75rem;padding:.3rem .65rem;border:1px solid #e2e8f0;border-radius:.4rem;background:white;cursor:pointer;color:#64748b">
+        Déconnexion
+      </button>
+    </div>
+  </header>
+
+  <!-- CORPS -->
+  <div class="site-corps">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <a href="menu-principal.html">Accueil</a>
+      <a href="activites.html">Activités</a>
+      <a href="evenements.html">Evènements</a>
+      <a href="ressources.html">Ressources</a>
+      <a href="reservations.html" class="actif">Réservations</a>
+      <a href="notifications.html">Notifications</a>
+    </nav>
+
+    <!-- 3 COLONNES -->
+    <main class="site-contenu">
+      <div id="flash-zone" style="margin-bottom:.5rem"></div>
+
+      <div class="colonnes">
+
+        <!-- COLONNE 1 : LOUER -->
+        <div class="colonne">
+          <div class="colonne-header">Louer matériel</div>
+          <div class="colonne-body" id="col-location"></div>
+        </div>
+
+        <!-- COLONNE 2 : ACHETER -->
+        <div class="colonne">
+          <div class="colonne-header">Achat matériel</div>
+          <div class="colonne-body" id="col-achat"></div>
+        </div>
+
+        <!-- COLONNE 3 : ÉVÉNEMENTS -->
+        <div class="colonne">
+          <div class="colonne-header">Participation à un évènement</div>
+          <div class="colonne-body" id="col-evenements"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    Copyright © 2026 CampusPlay &nbsp;·&nbsp; contact@campusplay.fr — 01 23 45 67 89 &nbsp;·&nbsp; 123 Rue de l'École, 75000 Paris
+  </footer>
+</div>
+
+<!-- ===== MODAL LOUER ===== -->
+<div class="modal-bg" id="modal-location">
+  <div class="modal-box">
+    <button class="modal-close" onclick="fermer('modal-location')">✕</button>
+    <p class="modal-titre" id="loc-nom">Louer</p>
+    <div class="info-row" style="margin-bottom:1rem">
+      <span>État</span>
+      <strong id="loc-etat"></strong>
+    </div>
+    <form id="form-location">
+      <div style="margin-bottom:.9rem">
+        <label style="display:block;font-weight:600;font-size:.88rem;margin-bottom:.3rem">Durée — Date de début *</label>
+        <input type="date" id="loc-debut" required style="width:100%;padding:.6rem;border:1.5px solid #e2e8f0;border-radius:.5rem;font-size:.9rem">
+      </div>
+      <div style="margin-bottom:.9rem">
+        <label style="display:block;font-weight:600;font-size:.88rem;margin-bottom:.3rem">Date de fin *</label>
+        <input type="date" id="loc-fin" required style="width:100%;padding:.6rem;border:1.5px solid #e2e8f0;border-radius:.5rem;font-size:.9rem">
+      </div>
+      <div style="margin-bottom:.9rem">
+        <label style="display:block;font-weight:600;font-size:.88rem;margin-bottom:.3rem">Quantité *</label>
+        <input type="number" id="loc-qte" min="1" value="1" required style="width:100%;padding:.6rem;border:1.5px solid #e2e8f0;border-radius:.5rem;font-size:.9rem">
+      </div>
+      <div style="background:#eef2ff;border-radius:.5rem;padding:.65rem;margin-bottom:1rem;display:flex;justify-content:space-between">
+        <span style="font-size:.85rem;color:#4f46e5">Prix estimé</span>
+        <strong id="loc-prix" style="font-size:.88rem;color:#4f46e5">—</strong>
+      </div>
+      <button type="submit" style="width:100%;padding:.65rem;background:#4f46e5;color:white;border:none;border-radius:.5rem;font-size:.9rem;font-weight:700;cursor:pointer">Louer</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== MODAL ACHETER ===== -->
+<div class="modal-bg" id="modal-achat">
+  <div class="modal-box">
+    <button class="modal-close" onclick="fermer('modal-achat')">✕</button>
+    <p class="modal-titre" id="ach-nom">Acheter</p>
+    <div style="background:#f8fafc;border-radius:.5rem;padding:.75rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <p style="font-size:.78rem;color:#64748b;margin-bottom:.2rem">État</p>
+        <strong id="ach-etat" style="font-size:.85rem"></strong>
+      </div>
+      <div style="text-align:right">
+        <p style="font-size:.78rem;color:#64748b;margin-bottom:.2rem">Prix unitaire</p>
+        <strong id="ach-prix-unit" style="font-size:1.1rem;color:#059669"></strong>
+      </div>
+    </div>
+    <form id="form-achat">
+      <div style="margin-bottom:.9rem">
+        <label style="display:block;font-weight:600;font-size:.88rem;margin-bottom:.3rem">Quantité *</label>
+        <input type="number" id="ach-qte" min="1" value="1" required style="width:100%;padding:.6rem;border:1.5px solid #e2e8f0;border-radius:.5rem;font-size:.9rem">
+      </div>
+      <div style="background:#f0fdf4;border-radius:.5rem;padding:.65rem;margin-bottom:1rem;display:flex;justify-content:space-between">
+        <span style="font-size:.85rem;color:#059669">Total</span>
+        <strong id="ach-total" style="font-size:.88rem;color:#059669">—</strong>
+      </div>
+      <button type="submit" style="width:100%;padding:.65rem;background:#059669;color:white;border:none;border-radius:.5rem;font-size:.9rem;font-weight:700;cursor:pointer">Acheter</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== MODAL PARTICIPER ===== -->
+<div class="modal-bg" id="modal-evenement">
+  <div class="modal-box">
+    <button class="modal-close" onclick="fermer('modal-evenement')">✕</button>
+    <p class="modal-titre" id="ev-nom">Participer</p>
+    <div style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem">
+      <div class="info-row"><span>Date</span>   <strong id="ev-date"></strong></div>
+      <div class="info-row"><span>Heure</span>  <strong id="ev-heure"></strong></div>
+      <div class="info-row"><span>Lieu</span>   <strong id="ev-lieu"></strong></div>
+      <div class="info-row"><span>Nombre de places</span><strong id="ev-places"></strong></div>
+    </div>
+    <p id="ev-desc" style="font-size:.83rem;color:#64748b;margin-bottom:1.1rem;line-height:1.5"></p>
+    <button onclick="confirmerParticipation()" id="btn-participer"
+      style="width:100%;padding:.65rem;background:#f59e0b;color:white;border:none;border-radius:.5rem;font-size:.9rem;font-weight:700;cursor:pointer">
+      Participer
+    </button>
+  </div>
+</div>
+
+<script>
+afficheFlash(document.getElementById('flash-zone'));
+
+const user = getUser();
+document.getElementById('nom-header').textContent  = user.prenom + ' ' + user.nom;
+document.getElementById('role-header').textContent =
+  ({ admin:'Administrateur', manager:'Manager', etudiant:'Étudiant' })[user.role] || user.role;
+
+// ─── Données ressources enrichies (emoji + prix) ────────
+const RESSOURCES_PLUS = [
+  { id:1, emoji:'📽️', prix_loc:15,  achetable:false },
+  { id:2, emoji:'🏫', prix_loc:0,   achetable:false },
+  { id:3, emoji:'📷', prix_loc:20,  achetable:true,  prix_achat:350 },
+  { id:4, emoji:'🤖', prix_loc:8,   achetable:true,  prix_achat:45  },
+  { id:5, emoji:'🏃', prix_loc:0,   achetable:false },
+];
+function extra(id) { return RESSOURCES_PLUS.find(x => x.id === id) || { emoji:'📦', prix_loc:10, achetable:false }; }
+
+function etatTexte(dispo) {
+  if (dispo >= 3) return { t:'● Disponible (' + dispo + ')', c:'dispo' };
+  if (dispo >= 1) return { t:'● Stock limité (' + dispo + ')', c:'limite' };
+  return { t:'● Indisponible', c:'indispo' };
+}
+
+// ─── Colonne LOUER ──────────────────────────────────────
+document.getElementById('col-location').innerHTML = RESSOURCES.map(r => {
+  const x  = extra(r.id);
+  const et = etatTexte(r.quantite_disponible);
+  const px = x.prix_loc === 0 ? 'Gratuit' : x.prix_loc + ' €/jour';
+  return `<div class="item-carte">
+    <div class="item-photo">
+      <span class="cat-badge">${e(r.categorie)}</span>${x.emoji}
+    </div>
+    <div class="item-infos">
+      <div class="item-nom">${e(r.nom)}</div>
+      <div class="item-detail">
+        <span>Etat : <strong class="${et.c}">${et.t}</strong></span>
+        <span>Durée : <strong>sur réservation</strong></span>
+        <span>Prix : <strong>${px}</strong></span>
+      </div>
+      <button class="item-btn ${r.quantite_disponible ? 'btn-louer' : ''}"
+        ${r.quantite_disponible ? 'onclick="ouvrirLouer(' + r.id + ')"' : 'disabled'}>
+        ${r.quantite_disponible ? 'Louer' : 'Indisponible'}
+      </button>
+    </div>
+  </div>`;
+}).join('');
+
+// ─── Colonne ACHETER ─────────────────────────────────────
+const achetables = RESSOURCES.filter(r => extra(r.id).achetable);
+document.getElementById('col-achat').innerHTML = achetables.length
+  ? achetables.map(r => {
+      const x  = extra(r.id);
+      const et = etatTexte(r.quantite_disponible);
+      return `<div class="item-carte">
+        <div class="item-photo">
+          <span class="cat-badge">${e(r.categorie)}</span>${x.emoji}
+        </div>
+        <div class="item-infos">
+          <div class="item-nom">${e(r.nom)}</div>
+          <div class="item-detail">
+            <span>Etat : <strong class="${et.c}">${et.t}</strong></span>
+            <span>Prix : <strong style="color:#059669">${x.prix_achat} €</strong></span>
+          </div>
+          <button class="item-btn ${r.quantite_disponible ? 'btn-acheter' : ''}"
+            ${r.quantite_disponible ? 'onclick="ouvrirAcheter(' + r.id + ')"' : 'disabled'}>
+            ${r.quantite_disponible ? 'Acheter' : 'Rupture de stock'}
+          </button>
+        </div>
+      </div>`;
+    }).join('')
+  : '<p style="color:#94a3b8;text-align:center;font-size:.82rem;margin-top:1rem">Aucun article à l\'achat.</p>';
+
+// ─── Colonne ÉVÉNEMENTS ──────────────────────────────────
+const ouverts = EVENEMENTS.filter(ev => ev.statut === 'approuve' && ev.places_prises < ev.places_max);
+document.getElementById('col-evenements').innerHTML = ouverts.length
+  ? ouverts.map(ev => {
+      const d       = new Date(ev.date_debut);
+      const date    = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+      const heure   = d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+      const restant = ev.places_max - ev.places_prises;
+      const inscrit = estInscrit(ev.id);
+      return `<div class="item-carte">
+        <div class="item-photo" style="background:linear-gradient(135deg,#fef9c3,#fef3c7);color:#92400e">📅</div>
+        <div class="item-infos">
+          <div class="item-nom">${e(ev.titre)}</div>
+          <div class="item-detail">
+            <span>Date : <strong>${date}</strong></span>
+            <span>Heure : <strong>${heure}</strong></span>
+            <span>Lieu : <strong>${e(ev.lieu)}</strong></span>
+            <span>Nombre de places : <strong class="${restant <= 3 ? 'limite' : 'dispo'}">${restant} restante${restant > 1 ? 's' : ''}</strong></span>
+          </div>
+          <button class="item-btn ${inscrit ? '' : 'btn-participer'}"
+            ${inscrit ? 'disabled' : 'onclick="ouvrirEvenement(' + ev.id + ')"'}>
+            ${inscrit ? '✓ Inscrit(e)' : 'Participer'}
+          </button>
+        </div>
+      </div>`;
+    }).join('')
+  : '<p style="color:#94a3b8;text-align:center;font-size:.82rem;margin-top:1rem">Aucun événement ouvert.</p>';
+
+// ─── Gestion modals ──────────────────────────────────────
+function ouvrir(id) { document.getElementById(id).classList.add('open'); }
+function fermer(id) { document.getElementById(id).classList.remove('open'); }
+window.fermer = fermer;
+document.querySelectorAll('.modal-bg').forEach(m =>
+  m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); })
+);
+
+// ─── Modal LOUER ─────────────────────────────────────────
+let locId = null;
+function ouvrirLouer(id) {
+  locId = id;
+  const r  = RESSOURCES.find(x => x.id === id);
+  const x  = extra(id);
+  const et = etatTexte(r.quantite_disponible);
+  document.getElementById('loc-nom').textContent    = 'Louer — ' + r.nom;
+  document.getElementById('loc-etat').innerHTML     = `<span class="${et.c}">${et.t}</span>`;
+  document.getElementById('loc-prix').textContent   = x.prix_loc === 0 ? 'Gratuit' : x.prix_loc + ' €/jour';
+  document.getElementById('loc-qte').max            = r.quantite_disponible;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('loc-debut').min = document.getElementById('loc-debut').value = today;
+  document.getElementById('loc-fin').min   = document.getElementById('loc-fin').value   = today;
+  ouvrir('modal-location');
+}
+window.ouvrirLouer = ouvrirLouer;
+
+['loc-debut','loc-fin','loc-qte'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () => {
+    const x     = extra(locId);
+    const debut = new Date(document.getElementById('loc-debut').value);
+    const fin   = new Date(document.getElementById('loc-fin').value);
+    const qte   = parseInt(document.getElementById('loc-qte').value) || 1;
+    const jours = Math.max(1, Math.ceil((fin - debut) / 86400000) + 1);
+    document.getElementById('loc-prix').textContent = x.prix_loc === 0
+      ? 'Gratuit'
+      : (x.prix_loc * jours * qte) + ' € (' + jours + ' j × ' + qte + ')';
+  })
+);
+
+document.getElementById('form-location').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const debut = document.getElementById('loc-debut').value;
+  const fin   = document.getElementById('loc-fin').value;
+  const qte   = parseInt(document.getElementById('loc-qte').value);
+  if (fin < debut) { alert('La date de fin doit être après le début.'); return; }
+  const r = RESSOURCES.find(x => x.id === locId);
+  if (!r || r.quantite_disponible < qte) { alert('Stock insuffisant.'); return; }
+  const ress = getReservations();
+  ress.push({ id: Date.now(), user_email: user.email, ressource_id: locId, type:'location', date_debut: debut, date_fin: fin, quantite: qte, statut:'en_attente' });
+  setReservations(ress);
+  r.quantite_disponible -= qte;
+  fermer('modal-location');
+  showFlash('Demande de location envoyée ! Elle sera validée par un administrateur ✅', 'succes');
+  this.reset();
+  location.reload();
+});
+
+// ─── Modal ACHETER ────────────────────────────────────────
+let achId = null;
+function ouvrirAcheter(id) {
+  achId = id;
+  const r  = RESSOURCES.find(x => x.id === id);
+  const x  = extra(id);
+  const et = etatTexte(r.quantite_disponible);
+  document.getElementById('ach-nom').textContent       = 'Acheter — ' + r.nom;
+  document.getElementById('ach-etat').innerHTML        = `<span class="${et.c}">${et.t}</span>`;
+  document.getElementById('ach-prix-unit').textContent = x.prix_achat + ' €';
+  document.getElementById('ach-total').textContent     = x.prix_achat + ' €';
+  document.getElementById('ach-qte').max               = r.quantite_disponible;
+  ouvrir('modal-achat');
+}
+window.ouvrirAcheter = ouvrirAcheter;
+
+document.getElementById('ach-qte').addEventListener('input', function() {
+  const x = extra(achId);
+  document.getElementById('ach-total').textContent = (x.prix_achat * (parseInt(this.value)||1)) + ' €';
+});
+
+document.getElementById('form-achat').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const qte = parseInt(document.getElementById('ach-qte').value);
+  const r   = RESSOURCES.find(x => x.id === achId);
+  if (!r || r.quantite_disponible < qte) { alert('Stock insuffisant.'); return; }
+  const ress = getReservations();
+  const today = new Date().toISOString().split('T')[0];
+  ress.push({ id: Date.now(), user_email: user.email, ressource_id: achId, type:'achat', date_debut: today, date_fin: today, quantite: qte, statut:'en_attente' });
+  setReservations(ress);
+  r.quantite_disponible -= qte;
+  fermer('modal-achat');
+  showFlash('Commande enregistrée ! Un administrateur va traiter votre achat 🛒', 'succes');
+  this.reset();
+  location.reload();
+});
+
+// ─── Modal PARTICIPER ────────────────────────────────────
+let evId = null;
+function ouvrirEvenement(id) {
+  evId    = id;
+  const ev = EVENEMENTS.find(x => x.id === id);
+  const d  = new Date(ev.date_debut);
+  const restant = ev.places_max - ev.places_prises;
+  document.getElementById('ev-nom').textContent    = ev.titre;
+  document.getElementById('ev-date').textContent   = d.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  document.getElementById('ev-heure').textContent  = d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('ev-lieu').textContent   = ev.lieu;
+  document.getElementById('ev-places').textContent = restant + ' place' + (restant > 1 ? 's' : '') + ' restante' + (restant > 1 ? 's' : '') + ' / ' + ev.places_max;
+  document.getElementById('ev-desc').textContent   = ev.description || '';
+  ouvrir('modal-evenement');
+}
+window.ouvrirEvenement = ouvrirEvenement;
+
+function confirmerParticipation() {
+  const ev = EVENEMENTS.find(x => x.id === evId);
+  if (!ev || ev.places_prises >= ev.places_max) { alert('Plus de places disponibles.'); return; }
+  if (estInscrit(evId)) { alert('Tu es déjà inscrit(e).'); return; }
+  const ins = getInscriptions();
+  ins.push({ id: Date.now(), user_email: user.email, evenement_id: evId, statut:'inscrit', date: new Date().toISOString() });
+  setInscriptions(ins);
+  ev.places_prises++;
+  fermer('modal-evenement');
+  showFlash('Inscription confirmée ! À bientôt pour "' + ev.titre + '" 🎉', 'succes');
+  location.reload();
+}
+window.confirmerParticipation = confirmerParticipation;
+
+// ─── Flash inline ─────────────────────────────────────────
+function showFlash(msg, type) {
+  flash(msg, type);
+  const fz = document.getElementById('flash-zone');
+  fz.innerHTML = `<div class="flash flash-${type}" style="margin-bottom:.75rem">${e(msg)}</div>`;
+  setTimeout(() => fz.innerHTML = '', 4000);
+}
+</script>
+
+</body>
+</html>
