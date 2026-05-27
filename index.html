@@ -236,14 +236,14 @@
         ⚠️ Email ou mot de passe incorrect.
       </div>
 
-      <form id="form-login">
+      <form id="form-login" action="connexion.php" method="POST">
         <div class="champ">
           <label>Adresse email</label>
-          <input type="email" id="email" placeholder="prenom.nom@campus.fr" required autocomplete="email">
+          <input type="email" id="email" name="email" placeholder="prenom.nom@campus.fr" required autocomplete="email">
         </div>
         <div class="champ">
           <label>Mot de passe</label>
-          <input type="password" id="mdp" placeholder="••••••••" required autocomplete="current-password">
+          <input type="password" id="mdp" name="mdp" placeholder="••••••••" required autocomplete="current-password">
         </div>
         <button type="submit" class="btn-login">♪ &nbsp;Se connecter</button>
       </form>
@@ -280,84 +280,3 @@
   </div>
 </div>
 
-<script>
-  /* ── Comptes de base ── */
-  var COMPTES_BASE = [
-    { email: 'admin@campusplay.fr',    mdp: 'password123', prenom: 'Alice', nom: 'Admin',   role: 'admin'   },
-    { email: 'manager@campusplay.fr',  mdp: 'password123', prenom: 'Marc',  nom: 'Manager', role: 'manager' },
-    { email: 'etudiant@campusplay.fr', mdp: 'password123', prenom: 'Emma',  nom: 'Dupont',  role: 'etudiant'},
-  ];
-
-  /* ── Si déjà connecté → page suivante ── */
-  try {
-    var sessionActuelle = localStorage.getItem('campusplay_user');
-    if (sessionActuelle) {
-      window.location.href = 'accueil.html';
-    }
-  } catch(e) {}
-
-  /* ── Remplissage auto depuis les boutons démo ── */
-  function remplir(email, mdp) {
-    document.getElementById('email').value = email;
-    document.getElementById('mdp').value   = mdp;
-    document.getElementById('msg-erreur').style.display = 'none';
-  }
-
-  /* ── Soumission du formulaire ── */
-  document.getElementById('form-login').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    var email  = document.getElementById('email').value.trim().toLowerCase();
-    var mdp    = document.getElementById('mdp').value;
-    var erreur = document.getElementById('msg-erreur');
-
-    /* Récupérer aussi les comptes créés via inscription */
-    var comptesInscrits = [];
-    try {
-      comptesInscrits = JSON.parse(localStorage.getItem('cp_comptes') || '[]');
-    } catch(e) {}
-
-    var tousComptes = COMPTES_BASE.concat(comptesInscrits);
-
-    /* Chercher le compte correspondant */
-    var compte = null;
-    for (var i = 0; i < tousComptes.length; i++) {
-      if (tousComptes[i].email === email && tousComptes[i].mdp === mdp) {
-        compte = tousComptes[i];
-        break;
-      }
-    }
-
-    if (!compte) {
-      erreur.style.display = 'block';
-      document.getElementById('mdp').value = '';
-      document.getElementById('mdp').focus();
-      return;
-    }
-
-    /* Connexion réussie */
-    erreur.style.display = 'none';
-    var userSession = {
-      email:  compte.email,
-      prenom: compte.prenom,
-      nom:    compte.nom,
-      role:   compte.role
-    };
-    localStorage.setItem('campusplay_user', JSON.stringify(userSession));
-    localStorage.setItem('cp_flash', JSON.stringify({ msg: 'Bienvenue, ' + compte.prenom + ' ! ♪', type: 'succes' }));
-
-    /* → Redirection vers accueil.html */
-    window.location.href = 'accueil.html';
-  });
-</script>
-
-</body>
-</html>
-=======
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VocalSanté — Dépistage vocal</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
->>>>>>> af524d4b9dc8f7b76f558bf3d79ff879c09d43be
