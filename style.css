@@ -705,3 +705,22 @@ tbody tr:last-child td { border-bottom: none; }
 @media (max-width: 480px) {
   .grille-3, .grille-4 { grid-template-columns: 1fr; }
 }
+
+/* Images des cartes de la page accueil */
+.carte-image {
+  width: 100%;
+  height: 170px;
+  background: linear-gradient(135deg, #dbeafe, #eef2ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 2px solid var(--bleu-vif);
+}
+
+.carte-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
