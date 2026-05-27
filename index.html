@@ -1,282 +1,154 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
   <meta charset="UTF-8">
   <title>CampusPlay — Connexion</title>
-  <link rel="stylesheet" href="style.css">
   <style>
-    body { background: var(--bleu-nuit, #0d1b3e); margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-
-    .page {
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-      position: relative;
-      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
+      font-family: system-ui, sans-serif;
     }
-
-    /* Notes de musique en fond */
-    .page::before {
-      content: '♩  ♪  ♫  ♬  ♩  ♪  ♫  ♬  ♩  ♪  ♫  ♬';
-      position: fixed;
-      top: 20%;
-      left: -5%;
-      font-size: 2rem;
-      color: rgba(255,255,255,.04);
-      white-space: nowrap;
-      letter-spacing: 2.5rem;
-      transform: rotate(-8deg);
-      width: 140%;
-      pointer-events: none;
+    .card {
+      background: white; border-radius: 1.25rem;
+      padding: 2.5rem 2.25rem; width: 100%; max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
     }
-    .page::after {
-      content: '♬  ♫  ♪  ♩  ♬  ♫  ♪  ♩  ♬  ♫  ♪  ♩';
-      position: fixed;
-      bottom: 20%;
-      left: -5%;
-      font-size: 2rem;
-      color: rgba(255,255,255,.04);
-      white-space: nowrap;
-      letter-spacing: 2.5rem;
-      transform: rotate(-8deg);
-      width: 140%;
-      pointer-events: none;
+    .logo { text-align: center; margin-bottom: 1.75rem; }
+    .logo .ico { font-size: 2.75rem; }
+    .logo h1 { font-size: 1.65rem; font-weight: 800; color: #1e293b; margin: .35rem 0 .2rem; }
+    .logo p  { color: #64748b; font-size: .88rem; }
+    .tabs { display: flex; background: #f1f5f9; border-radius: .6rem; padding: .2rem; margin-bottom: 1.5rem; }
+    .tab  { flex: 1; text-align: center; padding: .45rem; border-radius: .45rem;
+            cursor: pointer; font-size: .85rem; font-weight: 600; color: #64748b; transition: .15s; }
+    .tab.actif { background: white; color: #4f46e5; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+    label { display: block; font-size: .82rem; font-weight: 600; color: #374151; margin-bottom: .3rem; }
+    input {
+      width: 100%; padding: .65rem .85rem;
+      border: 1.5px solid #e2e8f0; border-radius: .5rem;
+      font-size: .9rem; margin-bottom: 1rem; transition: border .15s;
     }
-
-    /* Carte centrale */
-    .carte-login {
-      background: white;
-      border-radius: 1.1rem;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.4);
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
+    input:focus { outline: none; border-color: #4f46e5; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    .btn-submit {
+      width: 100%; padding: .75rem; background: #4f46e5; color: white;
+      border: none; border-radius: .6rem; font-size: .95rem;
+      font-weight: 700; cursor: pointer; transition: background .15s;
     }
-
-    /* Bandeau haut */
-    .bandeau {
-      background: linear-gradient(135deg, #1a3a6e, #0d1b3e);
-      padding: 2rem 2rem 1.5rem;
-      text-align: center;
-      position: relative;
-    }
-    .bandeau::after {
-      content: '♫';
-      position: absolute;
-      top: 50%;
-      right: 1.5rem;
-      transform: translateY(-50%);
-      font-size: 3rem;
-      color: rgba(201,168,76,.25);
-    }
-    .bandeau h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: white;
-      margin: 0 0 .2rem;
-    }
-    .bandeau h1 span { color: #c9a84c; }
-    .bandeau p {
-      font-size: .85rem;
-      color: #93c5fd;
-      margin: 0;
-    }
-
-    /* Corps formulaire */
-    .corps {
-      padding: 2rem;
-    }
-
-    /* Champs */
-    .champ { margin-bottom: 1.1rem; }
-    .champ label {
-      display: block;
-      font-size: .85rem;
-      font-weight: 600;
-      color: #1a3a6e;
-      margin-bottom: .4rem;
-    }
-    .champ input {
-      width: 100%;
-      padding: .72rem 1rem;
-      border: 1.5px solid #e8ddd0;
-      border-radius: .5rem;
-      font-size: .9rem;
-      background: #fdfaf6;
-      color: #0d1b3e;
-      box-sizing: border-box;
-      transition: .15s;
-      font-family: inherit;
-    }
-    .champ input:focus {
-      outline: none;
-      border-color: #2563eb;
-      background: white;
-      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
-    }
-
-    /* Bouton connexion */
-    .btn-login {
-      width: 100%;
-      padding: .85rem;
-      background: #c9a84c;
-      color: #0d1b3e;
-      border: none;
-      border-radius: .5rem;
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      margin-top: .5rem;
-      transition: .15s;
-      letter-spacing: .02em;
-    }
-    .btn-login:hover { background: #b8942e; transform: translateY(-1px); }
-
-    /* Message erreur */
+    .btn-submit:hover { background: #3730a3; }
+    .btn-submit:disabled { background: #a5b4fc; cursor: not-allowed; }
     .erreur {
-      display: none;
-      background: #fee2e2;
-      color: #991b1b;
-      border-left: 4px solid #dc2626;
-      padding: .8rem 1rem;
-      border-radius: .45rem;
-      font-size: .88rem;
-      margin-bottom: 1rem;
+      background: #fee2e2; color: #991b1b;
+      border: 1px solid #fecaca; border-radius: .5rem;
+      padding: .6rem .9rem; font-size: .85rem;
+      margin-bottom: 1rem; display: none;
     }
-
-    /* Lien inscription */
-    .lien-bas {
-      text-align: center;
-      font-size: .87rem;
-      color: #64748b;
-      margin-top: 1.25rem;
-    }
-    .lien-bas a {
-      color: #2563eb;
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .lien-bas a:hover { text-decoration: underline; }
-
-    /* Lien admin */
-    .lien-admin {
-      display: block;
-      text-align: center;
-      font-size: .82rem;
-      color: #94a3b8;
-      margin-top: .75rem;
-      text-decoration: none;
-      transition: .15s;
-    }
-    .lien-admin:hover { color: #2563eb; }
-
-    /* Comptes démo */
-    .demo-zone {
-      margin-top: 1.5rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid #e8ddd0;
-    }
-    .demo-titre {
-      font-size: .73rem;
-      color: #94a3b8;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: .6rem;
-    }
-    .demo-btn {
-      display: block;
-      width: 100%;
-      padding: .45rem;
-      background: #f5ede0;
-      border: 1px solid #e8ddd0;
-      border-radius: .4rem;
-      font-size: .78rem;
-      cursor: pointer;
-      margin-bottom: .4rem;
-      color: #0d1b3e;
-      transition: .12s;
-      font-family: inherit;
-    }
-    .demo-btn:hover { background: #e8ddd0; }
-
-    /* Footer */
-    .pied {
-      background: #0d1b3e;
-      padding: 1rem 2rem;
-      text-align: center;
-      font-size: .78rem;
-      color: rgba(255,255,255,.4);
-      line-height: 1.8;
-    }
-    .pied strong { color: #c9a84c; }
+    .hint { text-align:center; font-size:.75rem; color:#94a3b8; margin-top:1.25rem; line-height:1.6; }
+    code { background:#f1f5f9; padding:.1rem .3rem; border-radius:.25rem; font-size:.78rem; }
   </style>
 </head>
 <body>
 
-<div class="page">
-  <div class="carte-login">
-
-    <!-- Bandeau -->
-    <div class="bandeau">
-      <h1>Campus<span>Play</span></h1>
-      <p>Notifications et activités associatives ♪</p>
-    </div>
-
-    <!-- Formulaire -->
-    <div class="corps">
-
-      <div class="erreur" id="msg-erreur">
-        ⚠️ Email ou mot de passe incorrect.
-      </div>
-
-      <form id="form-login" action="connexion.php" method="POST">
-        <div class="champ">
-          <label>Adresse email</label>
-          <input type="email" id="email" name="email" placeholder="prenom.nom@campus.fr" required autocomplete="email">
-        </div>
-        <div class="champ">
-          <label>Mot de passe</label>
-          <input type="password" id="mdp" name="mdp" placeholder="••••••••" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn-login">♪ &nbsp;Se connecter</button>
-      </form>
-
-      <div class="lien-bas">
-        Pas encore de compte ?
-        <a href="inscription.html">S'inscrire</a>
-      </div>
-
-      <a href="connexion-admin.html" class="lien-admin">
-        Êtes-vous administrateur / staff ? →
-      </a>
-
-      <!-- Comptes de démonstration -->
-      <div class="demo-zone">
-        <p class="demo-titre">Comptes de démonstration</p>
-        <button class="demo-btn" onclick="remplir('etudiant@campusplay.fr','password123')">
-          🎓 etudiant@campusplay.fr &nbsp;/&nbsp; password123
-        </button>
-        <button class="demo-btn" onclick="remplir('admin@campusplay.fr','password123')">
-          ⚙️ admin@campusplay.fr &nbsp;/&nbsp; password123
-        </button>
-      </div>
-
-    </div>
-
-    <!-- Pied de la carte -->
-    <div class="pied">
-      <div><strong>Copyright</strong> © 2026 CampusPlay</div>
-      <div>contact@campusplay.fr &nbsp;·&nbsp; 01 23 45 67 89</div>
-      <div>123 Rue de l'École, 75000 Paris</div>
-    </div>
-
+<div class="card">
+  <div class="logo">
+    <div class="ico">🎵</div>
+    <h1>CampusPlay</h1>
+    <p>La plateforme musicale de ton campus</p>
   </div>
+
+  <div class="tabs">
+    <div class="tab actif" onclick="showTab('login')">Se connecter</div>
+    <div class="tab"       onclick="showTab('register')">S'inscrire</div>
+  </div>
+
+  <div class="erreur" id="err"></div>
+
+  <!-- ── Formulaire connexion ── -->
+  <form id="form-login" onsubmit="doLogin(event)">
+    <label>Adresse e-mail</label>
+    <input type="email" id="l-email" placeholder="prenom@exemple.fr" required autocomplete="email">
+    <label>Mot de passe</label>
+    <input type="password" id="l-mdp" placeholder="••••••••" required autocomplete="current-password">
+    <button type="submit" class="btn-submit" id="btn-login">🔓 Se connecter</button>
+  </form>
+
+  <!-- ── Formulaire inscription ── -->
+  <form id="form-register" style="display:none" onsubmit="doRegister(event)">
+    <div class="grid2">
+      <div><label>Prénom</label><input type="text"     id="r-prenom" placeholder="Sophie"           required></div>
+      <div><label>Nom</label>   <input type="text"     id="r-nom"    placeholder="Martin"            required></div>
+    </div>
+    <label>Adresse e-mail</label>
+    <input type="email"    id="r-email" placeholder="prenom@exemple.fr"         required>
+    <label>Mot de passe <span style="font-weight:400;color:#94a3b8">(6 caractères min.)</span></label>
+    <input type="password" id="r-mdp"   placeholder="Choisir un mot de passe"   required minlength="6">
+    <button type="submit" class="btn-submit" id="btn-register">✨ Créer mon compte</button>
+  </form>
+
+  <p class="hint">
+    Comptes démo :<br>
+    <code>admin@campusplay.fr</code> / <code>admin123</code>
+  </p>
 </div>
 
+<script src="data.js"></script>
+<script>
+function showTab(t) {
+  document.querySelectorAll('.tab').forEach((el,i) =>
+    el.classList.toggle('actif', (t==='login'&&i===0)||(t==='register'&&i===1))
+  );
+  document.getElementById('form-login').style.display    = t==='login'    ? '' : 'none';
+  document.getElementById('form-register').style.display = t==='register' ? '' : 'none';
+  document.getElementById('err').style.display = 'none';
+}
+
+function setErreur(msg) {
+  const z = document.getElementById('err');
+  z.textContent = msg;
+  z.style.display = 'block';
+}
+
+async function doLogin(ev) {
+  ev.preventDefault();
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true; btn.textContent = 'Connexion…';
+  try {
+    const res = await connexion(
+      document.getElementById('l-email').value.trim(),
+      document.getElementById('l-mdp').value
+    );
+    if (res.succes) { 
+        localStorage.setItem('campusplay_user', JSON.stringify(res.user || res));
+        window.location.href = 'accueil.html'; }
+    else            { setErreur(res.erreur || 'Email ou mot de passe incorrect.'); }
+  } catch(e) {
+    setErreur('Impossible de joindre le serveur. Vérifie que MAMP est lancé.');
+  } finally {
+    btn.disabled = false; btn.textContent = '🔓 Se connecter';
+  }
+}
+
+async function doRegister(ev) {
+  ev.preventDefault();
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true; btn.textContent = 'Création…';
+  try {
+    const res = await inscription(
+      document.getElementById('r-prenom').value.trim(),
+      document.getElementById('r-nom').value.trim(),
+      document.getElementById('r-email').value.trim(),
+      document.getElementById('r-mdp').value
+    );
+    if (res.succes) { window.location.href = 'accueil.html'; }
+    else            { setErreur(res.erreur || "Erreur lors de l'inscription."); }
+  } catch(e) {
+    setErreur('Impossible de joindre le serveur. Vérifie que MAMP est lancé.');
+  } finally {
+    btn.disabled = false; btn.textContent = '✨ Créer mon compte';
+  }
+}
+</script>
+</body>
+</html>

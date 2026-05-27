@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CampusPlay — Notifications</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .notif-item {
+      background: white;
+      border: 1px solid var(--bordure);
+      border-radius: .75rem;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: .6rem;
+      transition: box-shadow .15s;
+      cursor: pointer;
+      position: relative;
+    }
+    .notif-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,.09); }
+    .notif-item.non-lue {
+      background: #eef2ff;
+      border-color: #c7d2fe;
+    }
+    .notif-item.non-lue::before {
+      content: '';
+      position: absolute;
+      left: -.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 60%;
+      background: #4f46e5;
+      border-radius: 0 4px 4px 0;
+    }
+    .notif-icone {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+    .notif-corps    { flex: 1; min-width: 0; }
+    .notif-titre    { font-size: .9rem;  font-weight: 700; color: #1e293b; margin-bottom: .2rem; }
+    .notif-desc     { font-size: .82rem; color: #64748b;   line-height: 1.5; }
+    .notif-meta     { font-size: .75rem; color: #94a3b8;   margin-top: .3rem; }
+    .notif-action   { margin-top: .5rem; }
+    .dot-lue        { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #4f46e5; margin-left: .35rem; vertical-align: middle; }
+    .btn-lu-rapide  { background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 1rem; padding: .25rem; flex-shrink: 0; transition: color .15s; }
+    .btn-lu-rapide:hover { color: #4f46e5; }
+    .vide-notif     { text-align: center; padding: 3rem; color: #64748b; }
+    .vide-notif .vide-ico { font-size: 2.5rem; margin-bottom: .75rem; }
+  </style>
+</head>
+<body>
+
+<script src="data.js"></script>
+<script>
+  if (!isConnecte()) { window.location.href = 'connexion.html'; }
+  renderNavbar('');
+</script>
+
+<div class="conteneur">
+  <div id="flash-zone"></div>
+
+  <!-- En-tête -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.75rem;flex-wrap:wrap;gap:1rem">
+    <h1 style="font-size:1.8rem;font-weight:700">🔔 Notifications</h1>
+    <button onclick="toutMarquerLu()" class="btn btn-gris" style="font-size:.85rem">✓ Tout marquer comme lu</button>
+  </div>
+
+  <!-- Filtres -->
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
+    <button onclick="filtrer('toutes')"       class="btn btn-primaire filtre-btn" data-filtre="toutes"       style="font-size:.82rem">Toutes</button>
+    <button onclick="filtrer('non-lues')"     class="btn btn-gris     filtre-btn" data-filtre="non-lues"     style="font-size:.82rem">
+      Non lues <span id="badge-non-lues" style="display:none;background:#ef4444;color:white;border-radius:9999px;padding:.05rem .4rem;font-size:.72rem;font-weight:700;margin-left:.3rem"></span>
+    </button>
+    <button onclick="filtrer('evenements')"   class="btn btn-gris     filtre-btn" data-filtre="evenements"   style="font-size:.82rem">🎵 Événements</button>
+    <button onclick="filtrer('reservations')" class="btn btn-gris     filtre-btn" data-filtre="reservations" style="font-size:.82rem">📦 Réservations</button>
+    <button onclick="filtrer('systeme')"      class="btn btn-gris     filtre-btn" data-filtre="systeme"      style="font-size:.82rem">⚙️ Système</button>
+  </div>
+
+  <!-- Liste -->
+  <div id="liste-notifs"></div>
+</div>
+
+<footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
+  © 2026 CampusPlay — Tous droits réservés
+</footer>
+
+<script>
+afficheFlash(document.getElementById('flash-zone'));
+
+const user = getUser();
+
+/* ── Génération des notifications ──────────────────────── */
+function genererNotifications() {
+  const sauvegardees = JSON.parse(localStorage.getItem('cp_notifs_' + user.email) || 'null');
+  if (sauvegardees !== null) return sauvegardees;
+
+  const liste = [];
+  const now   = new Date();
+  let   idx   = 1;
+
+  /* --- Notifications basées sur les inscriptions --- */
+  const mesInscrits = getInscriptions().filter(i => i.user_email === user.email);
+  mesInscrits.forEach(i => {
+    const ev = EVENEMENTS.find(x => x.id === i.evenement_id);
+    if (!ev) return;
+    const dateEv   = new Date(ev.date_debut);
+    const diffJour = Math.ceil((dateEv - now) / 86400000);
+    const passe    = diffJour < 0;
+
+    // Confirmation
+    liste.push({
+      id: idx++, type: 'evenements', lue: false,
+      icone: '📅', couleur: '#dcfce7',
+      titre: 'Inscription confirmée',
+      desc:  `Tu es inscrit(e) à "${ev.titre}" le ${dateEv.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long' })}.`,
+      meta:  'Il y a quelques instants',
+      lien:  'evenements.html',
+    });
+
+    // Rappel (dans les 3 jours)
+    if (diffJour >= 0 && diffJour <= 3) {
+      liste.push({
+        id: idx++, type: 'evenements', lue: false,
+        icone: '⏰', couleur: '#fef3c7',
+        titre: `Rappel — "${ev.titre}"`,
+        desc: diffJour === 0
+          ? `C'est aujourd'hui ! Ton événement est à ${dateEv.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}. Lieu : ${ev.lieu}.`
+          : `L'événement commence dans ${diffJour} jour${diffJour>1?'s':''}. Lieu : ${ev.lieu}.`,
+        meta:  'Rappel automatique',
+        lien:  'evenements.html',
+      });
+    }
+
+    // Passé
+    if (passe) {
+      liste.push({
+        id: idx++, type: 'evenements', lue: true,
+        icone: '✅', couleur: '#dbeafe',
+        titre: 'Événement terminé',
+        desc:  `"${ev.titre}" s'est tenu le ${dateEv.toLocaleDateString('fr-FR')}. Merci d'y avoir participé ! 🎶`,
+        meta:  new Date(ev.date_fin).toLocaleDateString('fr-FR'),
+        lien:  null,
+      });
+    }
+  });
+
+  /* --- Notifications basées sur les réservations --- */
+  const mesRes = getReservations().filter(r => r.user_email === user.email);
+  mesRes.forEach(r => {
+    const res    = RESSOURCES.find(x => x.id === r.ressource_id);
+    const statut = r.statut || 'en_attente';
+    const map = {
+      en_attente: { icone:'⏳', couleur:'#fef3c7', lue: false,
+        titre: 'Réservation en attente de validation',
+        desc:  `Ta demande de "${res?.nom??'?'}" est en cours d'examen par l'équipe.` },
+      approuve:   { icone:'✅', couleur:'#dcfce7', lue: true,
+        titre: 'Réservation approuvée !',
+        desc:  `Bonne nouvelle ! Ta réservation de "${res?.nom??'?'}" a été acceptée. À récupérer dès le ${new Date(r.date_debut).toLocaleDateString('fr-FR')}.` },
+      refuse:     { icone:'❌', couleur:'#fee2e2', lue: true,
+        titre: 'Réservation refusée',
+        desc:  `Ta demande de "${res?.nom??'?'}" a été refusée. Contacte un responsable pour plus d'infos.` },
+      annule:     { icone:'🚫', couleur:'#f1f5f9', lue: true,
+        titre: 'Réservation annulée',
+        desc:  `Ta réservation de "${res?.nom??'?'}" a bien été annulée.` },
+    };
+    const m = map[statut] || map.en_attente;
+    liste.push({
+      id: idx++, type: 'reservations',
+      lue: m.lue, icone: m.icone, couleur: m.couleur,
+      titre: m.titre, desc: m.desc,
+      meta:  new Date(r.date_debut).toLocaleDateString('fr-FR'),
+      lien:  'reservations.html',
+    });
+  });
+
+  /* --- Notifications système --- */
+  liste.push(
+    {
+      id: idx++, type: 'systeme', lue: true,
+      icone: '🎉', couleur: '#ede9fe',
+      titre: 'Bienvenue sur CampusPlay !',
+      desc:  `Bonjour ${e(user.prenom)} ! Découvre toutes les activités musicales et événements de ton campus. N'hésite pas à t'inscrire et à réserver du matériel ! 🎵`,
+      meta:  'Équipe CampusPlay',
+      lien:  'index.html',
+    },
+    {
+      id: idx++, type: 'systeme', lue: true,
+      icone: '🎸', couleur: '#f0fdf4',
+      titre: 'Nouvelles activités musicales disponibles',
+      desc:  'De nouveaux créneaux pour la guitare, le piano et la batterie ont été ajoutés. Consulte le catalogue des activités !',
+      meta:  'Il y a 2 jours',
+      lien:  'activites.html',
+    },
+    {
+      id: idx++, type: 'systeme', lue: true,
+      icone: '🎤', couleur: '#fff7ed',
+      titre: 'Soirée Karaoké — Inscriptions ouvertes',
+      desc:  'La prochaine soirée karaoké géante est planifiée. Les places partent vite, inscris-toi dès maintenant depuis la page Événements !',
+      meta:  'Il y a 5 jours',
+      lien:  'evenements.html',
+    }
+  );
+
+  // Non lues en premier, puis par ID croissant
+  liste.sort((a, b) => a.lue === b.lue ? a.id - b.id : a.lue ? 1 : -1);
+  return liste;
+}
+
+let NOTIFS        = genererNotifications();
+let filtreActuel  = 'toutes';
+
+/* ── Affichage ─────────────────────────────────────────── */
+function afficher() {
+  const filtrées = filtreActuel === 'toutes'    ? NOTIFS
+                 : filtreActuel === 'non-lues'  ? NOTIFS.filter(n => !n.lue)
+                 : NOTIFS.filter(n => n.type === filtreActuel);
+
+  // Badge non-lues
+  const nbNL  = NOTIFS.filter(n => !n.lue).length;
+  const badge = document.getElementById('badge-non-lues');
+  if (nbNL > 0) { badge.style.display = 'inline'; badge.textContent = nbNL; }
+  else           { badge.style.display = 'none'; }
+
+  const zone = document.getElementById('liste-notifs');
+
+  if (!filtrées.length) {
+    zone.innerHTML = `
+      <div class="vide-notif">
+        <div class="vide-ico">🔕</div>
+        <p>Aucune notification dans cette catégorie.</p>
+      </div>`;
+    return;
+  }
+
+  zone.innerHTML = filtrées.map(n => `
+    <div class="notif-item ${n.lue ? '' : 'non-lue'}" onclick="marquerLu(${n.id})" id="notif-${n.id}">
+      <div class="notif-icone" style="background:${n.couleur}">${n.icone}</div>
+      <div class="notif-corps">
+        <div class="notif-titre">
+          ${e(n.titre)}
+          ${!n.lue ? '<span class="dot-lue"></span>' : ''}
+        </div>
+        <div class="notif-desc">${e(n.desc)}</div>
+        <div class="notif-meta">${e(n.meta)}</div>
+        ${n.lien ? `<div class="notif-action"><a href="${n.lien}" class="btn btn-gris" style="font-size:.78rem;padding:.25rem .6rem" onclick="event.stopPropagation()">Voir →</a></div>` : ''}
+      </div>
+      ${!n.lue ? `<button class="btn-lu-rapide" title="Marquer comme lu" onclick="marquerLu(${n.id});event.stopPropagation()">✓</button>` : ''}
+    </div>`).join('');
+}
+
+/* ── Marquer comme lu ──────────────────────────────────── */
+function marquerLu(id) {
+  const n = NOTIFS.find(x => x.id === id);
+  if (n && !n.lue) { n.lue = true; sauvegarder(); afficher(); }
+}
+window.marquerLu = marquerLu;
+
+function toutMarquerLu() {
+  NOTIFS.forEach(n => n.lue = true);
+  sauvegarder();
+  afficher();
+  flash('Toutes les notifications ont été marquées comme lues. ✓', 'succes');
+  afficheFlash(document.getElementById('flash-zone'));
+}
+window.toutMarquerLu = toutMarquerLu;
+
+function sauvegarder() {
+  localStorage.setItem('campusplayer_notifs_' + user.email, JSON.stringify(NOTIFS));
+}
+
+/* ── Filtres ───────────────────────────────────────────── */
+function filtrer(val) {
+  filtreActuel = val;
+  document.querySelectorAll('.filtre-btn').forEach(b => {
+    b.classList.toggle('btn-primaire', b.dataset.filtre === val);
+    b.classList.toggle('btn-gris',     b.dataset.filtre !== val);
+  });
+  afficher();
+}
+window.filtrer = filtrer;
+
+/* ── Init ──────────────────────────────────────────────── */
+afficher();
+</script>
+
+</body>
+</html>

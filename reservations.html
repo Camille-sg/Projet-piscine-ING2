@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="style.css">
   <style>
 
-
     /* ══ 3 COLONNES ══ */
     .reservations-layout {
       display: grid;
@@ -14,7 +13,6 @@
       gap: 1.5rem;
       align-items: start;
     }
-
 
     .colonne-titre {
       font-size: .8rem;
@@ -26,7 +24,6 @@
       border-bottom: 2px solid var(--or);
       margin-bottom: 1rem;
     }
-
 
     /* ── Carte matériel ── */
     .carte-mat {
@@ -43,9 +40,7 @@
       border-color: var(--bleu-clair);
     }
 
-
     .mat-bande { height: 5px; flex-shrink: 0; }
-
 
     .mat-photo {
       height: 90px;
@@ -64,10 +59,8 @@
       padding: .1rem .45rem; border-radius: 9999px;
     }
 
-
     .mat-body { padding: .75rem .9rem .85rem; }
     .mat-nom  { font-size: .9rem; font-weight: 800; color: var(--bleu-nuit); margin-bottom: .45rem; }
-
 
     .mat-detail {
       display: flex; flex-direction: column;
@@ -78,7 +71,6 @@
       display: flex; align-items: center; gap: .35rem;
     }
 
-
     .mat-bas {
       display: flex; align-items: center;
       justify-content: space-between;
@@ -88,7 +80,6 @@
     .mat-prix-loc { font-size: .92rem; font-weight: 800; color: var(--bleu-vif); }
     .mat-prix-ach { font-size: .92rem; font-weight: 800; color: var(--succes); }
     .mat-prix-grat { font-size: .92rem; font-weight: 800; color: var(--succes); }
-
 
     .btn-mat {
       padding: .38rem .95rem;
@@ -106,7 +97,6 @@
     .btn-participer { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
     .btn-participer:hover { background: #92400e; color: var(--blanc); }
     .btn-complet   { background: var(--beige); color: var(--texte-pale); border-color: var(--beige-bord); cursor: not-allowed; }
-
 
     /* ── Filtres ── */
     .barre-filtres {
@@ -139,7 +129,6 @@
     .filtre-gr select:focus { outline: none; border-color: var(--bleu-vif); background: var(--blanc); }
     .filtre-gr.large input { min-width: 210px; }
 
-
     /* ── Modal ── */
     .modal-bg {
       display: none; position: fixed; inset: 0;
@@ -148,7 +137,6 @@
       backdrop-filter: blur(2px);
     }
     .modal-bg.ouvert { display: flex; }
-
 
     .modal-boite {
       background: var(--blanc); border-radius: .9rem;
@@ -166,7 +154,6 @@
     }
     .modal-fermer:hover { color: var(--blanc); }
 
-
     .modal-contenu { padding: 1.5rem; }
     .modal-ligne {
       display: flex; gap: .75rem; align-items: flex-start;
@@ -177,12 +164,10 @@
     .modal-ligne strong { color: var(--bleu-nuit); display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
     .modal-ligne span   { color: var(--texte-doux); }
 
-
     .modal-pied {
       padding: 1rem 1.5rem; background: var(--beige);
       display: flex; gap: .75rem; justify-content: flex-end;
     }
-
 
     /* Champs formulaire dans modal */
     .champ { margin-bottom: .85rem; }
@@ -199,7 +184,6 @@
     }
     .champ input:focus, .champ select:focus { outline: none; border-color: var(--bleu-vif); background: var(--blanc); }
 
-
     .prix-estime {
       display: flex; justify-content: space-between; align-items: center;
       background: var(--beige); border-radius: .5rem;
@@ -209,12 +193,10 @@
     .prix-estime span { color: var(--texte-doux); }
     .prix-estime b    { color: var(--bleu-vif); font-size: .95rem; }
 
-
     @media (max-width: 900px) { .reservations-layout { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-
 
 <script>
   var sessionUser = null;
@@ -226,9 +208,7 @@
   }
 </script>
 
-
 <div class="page-wrapper">
-
 
   <!-- ════ HEADER ════ -->
   <header class="site-header">
@@ -244,10 +224,8 @@
     </div>
   </header>
 
-
   <!-- ════ CORPS ════ -->
   <div class="site-corps">
-
 
     <!-- SIDEBAR -->
     <nav class="sidebar">
@@ -279,13 +257,10 @@
       </a>
     </nav>
 
-
     <!-- CONTENU -->
     <main class="site-contenu">
 
-
       <h1 class="page-titre">🔖 Réservations</h1>
-
 
       <!-- FILTRES -->
       <div class="barre-filtres">
@@ -318,15 +293,12 @@
         </div>
       </div>
 
-
       <p style="font-size:.82rem;color:var(--texte-pale);margin-bottom:1.25rem">
         <span id="nb-res" style="color:var(--bleu-vif);font-weight:700">0</span> élément(s) affiché(s)
       </p>
 
-
       <!-- 3 COLONNES -->
       <div class="reservations-layout">
-
 
         <!-- COLONNE 1 : LOUER -->
         <div>
@@ -334,13 +306,11 @@
           <div id="col-location"></div>
         </div>
 
-
         <!-- COLONNE 2 : ACHETER -->
         <div>
           <div class="colonne-titre">🛒 Achat matériel</div>
           <div id="col-achat"></div>
         </div>
-
 
         <!-- COLONNE 3 : PARTICIPER -->
         <div>
@@ -348,22 +318,17 @@
           <div id="col-evenements"></div>
         </div>
 
-
       </div>
-
 
     </main>
   </div>
-
 
   <!-- ════ FOOTER ════ -->
   <footer class="site-footer">
     <strong>Copyright</strong> © 2026 CampusPlay &nbsp;·&nbsp; contact@campusplay.fr &nbsp;·&nbsp; 01 23 45 67 89 &nbsp;·&nbsp; 123 Rue de l'École, 75000 Paris
   </footer>
 
-
 </div>
-
 
 <!-- ════ MODAL LOUER ════ -->
 <div class="modal-bg" id="modal-louer" onclick="fermerSiDehors(event,'modal-louer')">
@@ -380,7 +345,6 @@
   </div>
 </div>
 
-
 <!-- ════ MODAL ACHETER ════ -->
 <div class="modal-bg" id="modal-acheter" onclick="fermerSiDehors(event,'modal-acheter')">
   <div class="modal-boite">
@@ -395,7 +359,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- ════ MODAL PARTICIPER ════ -->
 <div class="modal-bg" id="modal-part" onclick="fermerSiDehors(event,'modal-part')">
@@ -412,7 +375,6 @@
   </div>
 </div>
 
-
 <script>
 /* ══════════════════════════════════════════════
    AFFICHAGE UTILISATEUR
@@ -423,7 +385,6 @@ document.getElementById('user-role').textContent = rolesLabels[sessionUser.role]
 if (sessionUser.role === 'admin' || sessionUser.role === 'manager') {
   document.getElementById('lien-admin').style.display = 'flex';
 }
-
 
 /* ══════════════════════════════════════════════
    DONNÉES MATÉRIEL — LOCATION
@@ -467,7 +428,6 @@ var LOCATION = [
     desc:'Micro dynamique cardioïde professionnel. Standard de l\'industrie. Câble XLR 6m inclus.' },
 ];
 
-
 /* ══════════════════════════════════════════════
    DONNÉES MATÉRIEL — ACHAT
 ══════════════════════════════════════════════ */
@@ -505,7 +465,6 @@ var ACHAT = [
     stock:3, prix:85,
     desc:'Casque professionnel studio. Réponse 10Hz–20kHz, câble 3m.' },
 ];
-
 
 /* ══════════════════════════════════════════════
    DONNÉES ÉVÈNEMENTS
@@ -553,10 +512,8 @@ var PART_EVENEMENTS = [
     desc:'Jam session jazz en plein air. Musiciens de tous niveaux bienvenus.' },
 ];
 
-
 var itemCourant = null;
 var typeCourant = null; // 'location' | 'achat' | 'evenement'
-
 
 /* ══════════════════════════════════════════════
    RENDU DES COLONNES
@@ -576,13 +533,11 @@ function formaterDate(dateStr) {
   return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 }
 
-
 function afficher() {
   var rech  = document.getElementById('recherche').value.toLowerCase().trim();
   var cat   = document.getElementById('filtre-cat').value;
   var dispo = document.getElementById('filtre-dispo').value;
   var total = 0;
-
 
   /* ── Colonne LOCATION ── */
   var filtLoc = LOCATION.filter(function(m) {
@@ -621,7 +576,6 @@ function afficher() {
       }).join('')
     : '<div style="text-align:center;padding:2rem;color:var(--texte-pale);font-style:italic">Aucun résultat.</div>';
 
-
   /* ── Colonne ACHAT ── */
   var filtAch = ACHAT.filter(function(m) {
     if (rech && !m.nom.toLowerCase().includes(rech)) return false;
@@ -657,7 +611,6 @@ function afficher() {
         '</div>';
       }).join('')
     : '<div style="text-align:center;padding:2rem;color:var(--texte-pale);font-style:italic">Aucun résultat.</div>';
-
 
   /* ── Colonne ÉVÉNEMENTS ── */
   var filtEv = PART_EVENEMENTS.filter(function(ev) {
@@ -702,10 +655,8 @@ function afficher() {
       }).join('')
     : '<div style="text-align:center;padding:2rem;color:var(--texte-pale);font-style:italic">Aucun résultat.</div>';
 
-
   document.getElementById('nb-res').textContent = total;
 }
-
 
 /* ══════════════════════════════════════════════
    MODALS — UTILITAIRES
@@ -713,7 +664,6 @@ function afficher() {
 function ouvrirModal(id) { document.getElementById(id).classList.add('ouvert'); }
 function fermerModal(id) { document.getElementById(id).classList.remove('ouvert'); }
 function fermerSiDehors(e, id) { if (e.target.id === id) fermerModal(id); }
-
 
 /* ══════════════════════════════════════════════
    MODAL LOUER
@@ -723,10 +673,8 @@ function ouvrirLouer(id) {
   if (!itemCourant) return;
   typeCourant = 'location';
 
-
   document.getElementById('ml-entete').style.background = itemCourant.couleur;
   document.getElementById('ml-titre').textContent = itemCourant.emoji + ' ' + itemCourant.nom;
-
 
   var today = new Date().toISOString().split('T')[0];
   document.getElementById('ml-corps').innerHTML =
@@ -748,7 +696,6 @@ function ouvrirLouer(id) {
     '</div>' +
     '<div class="prix-estime"><span>💰 Prix estimé</span><b id="loc-prix">' + (itemCourant.prix_j === 0 ? 'Gratuit' : itemCourant.prix_j + ' €') + '</b></div>';
 
-
   // Calcul prix dynamique
   setTimeout(function() {
     var inputs = ['loc-debut','loc-fin','loc-qte'];
@@ -758,10 +705,8 @@ function ouvrirLouer(id) {
     });
   }, 50);
 
-
   ouvrirModal('modal-louer');
 }
-
 
 function majPrixLocation() {
   if (!itemCourant || itemCourant.prix_j === 0) return;
@@ -773,7 +718,6 @@ function majPrixLocation() {
   if (el) el.textContent = (itemCourant.prix_j * jours * qte) + ' € (' + jours + ' j × ' + qte + ')';
 }
 
-
 function validerLocation() {
   var debut = document.getElementById('loc-debut').value;
   var fin   = document.getElementById('loc-fin').value;
@@ -782,18 +726,15 @@ function validerLocation() {
   if (fin < debut)    { alert('La date de fin doit être après la date de début.'); return; }
   if (qte > itemCourant.dispo) { alert('Quantité supérieure au stock disponible.'); return; }
 
-
   var ress = JSON.parse(localStorage.getItem('cp_reservations') || '[]');
   ress.push({ id:Date.now(), user_email:sessionUser.email, nom:itemCourant.nom, type:'location', date_debut:debut, date_fin:fin, quantite:qte, statut:'en_attente' });
   localStorage.setItem('cp_reservations', JSON.stringify(ress));
   itemCourant.dispo -= qte;
 
-
   fermerModal('modal-louer');
   alert('Demande de location envoyée ! ✅\nElle sera validée par un administrateur.');
   afficher();
 }
-
 
 /* ══════════════════════════════════════════════
    MODAL ACHETER
@@ -803,10 +744,8 @@ function ouvrirAcheter(id) {
   if (!itemCourant) return;
   typeCourant = 'achat';
 
-
   document.getElementById('ma-entete').style.background = itemCourant.couleur;
   document.getElementById('ma-titre').textContent = itemCourant.emoji + ' ' + itemCourant.nom;
-
 
   document.getElementById('ma-corps').innerHTML =
     '<div class="modal-ligne"><span class="icone">📦</span><div><strong>Article</strong><span>' + itemCourant.nom + '</span></div></div>' +
@@ -819,7 +758,6 @@ function ouvrirAcheter(id) {
     '</div>' +
     '<div class="prix-estime" style="background:#dcfce7"><span style="color:#166534">🛒 Total à payer</span><b id="ach-total" style="color:#166534">' + itemCourant.prix + ' €</b></div>';
 
-
   setTimeout(function() {
     var el = document.getElementById('ach-qte');
     if (el) el.addEventListener('input', function() {
@@ -828,15 +766,12 @@ function ouvrirAcheter(id) {
     });
   }, 50);
 
-
   ouvrirModal('modal-acheter');
 }
-
 
 function validerAchat() {
   var qte = parseInt(document.getElementById('ach-qte').value);
   if (qte > itemCourant.stock) { alert('Stock insuffisant.'); return; }
-
 
   var ress  = JSON.parse(localStorage.getItem('cp_reservations') || '[]');
   var today = new Date().toISOString().split('T')[0];
@@ -844,12 +779,10 @@ function validerAchat() {
   localStorage.setItem('cp_reservations', JSON.stringify(ress));
   itemCourant.stock -= qte;
 
-
   fermerModal('modal-acheter');
   alert('Commande de ' + qte + '× "' + itemCourant.nom + '" enregistrée ! 🛒\nUn administrateur va traiter votre achat.');
   afficher();
 }
-
 
 /* ══════════════════════════════════════════════
    MODAL PARTICIPER
@@ -859,14 +792,11 @@ function ouvrirEvenement(id) {
   if (!itemCourant) return;
   typeCourant = 'evenement';
 
-
   var plein    = itemCourant.inscrits >= itemCourant.places;
   var restants = itemCourant.places - itemCourant.inscrits;
 
-
   document.getElementById('mp-entete').style.background = itemCourant.couleur;
   document.getElementById('mp-titre').textContent = itemCourant.emoji + ' ' + itemCourant.titre;
-
 
   document.getElementById('mp-corps').innerHTML =
     '<div class="modal-ligne"><span class="icone">📅</span><div><strong>Date</strong><span>' + formaterDate(itemCourant.date) + '</span></div></div>' +
@@ -875,23 +805,20 @@ function ouvrirEvenement(id) {
     '<div class="modal-ligne"><span class="icone">👥</span><div><strong>Nombre de places</strong><span>' + itemCourant.inscrits + ' inscrit(s) sur ' + itemCourant.places + ' — ' + (plein ? 'Complet' : restants + ' place(s) restante(s)') + '</span></div></div>' +
     '<div class="modal-ligne"><span class="icone">💬</span><div><strong>Description</strong><span>' + itemCourant.desc + '</span></div></div>';
 
-
   var btn = document.getElementById('btn-inscrire');
   btn.textContent = plein ? 'Liste d\'attente' : 'S\'inscrire';
   btn.className   = plein ? 'btn btn-gris' : 'btn btn-primaire';
   btn.style.fontSize = '.85rem';
 
-
   ouvrirModal('modal-part');
 }
-
 
 function sInscrire() {
   if (!itemCourant) return;
   var plein = itemCourant.inscrits >= itemCourant.places;
   var ins   = JSON.parse(localStorage.getItem('cp_inscriptions') || '[]');
   ins.push({ id:Date.now(), user_email:sessionUser.email, evenement_id:itemCourant.id, titre:itemCourant.titre, statut: plein ? 'liste_attente' : 'inscrit', date:new Date().toISOString() });
-  localStorage.setItem('cp_inscriptions', JSON.stringify(ins));
+  localStorage.setItem('campusplay_inscriptions', JSON.stringify(ins));
   if (!plein) itemCourant.inscrits++;
   fermerModal('modal-part');
   alert(plein
@@ -899,7 +826,6 @@ function sInscrire() {
     : 'Inscription confirmée pour "' + itemCourant.titre + '" ! 🎉');
   afficher();
 }
-
 
 /* ══════════════════════════════════════════════
    FILTRES & INIT
@@ -911,15 +837,12 @@ function reinitFiltres() {
   afficher();
 }
 
-
 document.getElementById('recherche').addEventListener('input', afficher);
 document.getElementById('filtre-cat').addEventListener('change', afficher);
 document.getElementById('filtre-dispo').addEventListener('change', afficher);
 
-
 afficher();
 </script>
-
 
 </body>
 </html>

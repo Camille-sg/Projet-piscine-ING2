@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CampusPlay — Administration</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .table-admin {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+    }
+    .table-admin th {
+      background: var(--beige);
+      padding: .6rem 1rem;
+      text-align: left;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--bleu-marine);
+      border-bottom: 2px solid var(--beige-bord);
+    }
+    .table-admin td {
+      padding: .65rem 1rem;
+      border-bottom: 1px solid var(--beige-bord);
+      color: var(--texte-doux);
+      vertical-align: middle;
+    }
+    .table-admin tr:hover td { background: var(--beige-clair); }
+    .table-admin td strong   { color: var(--texte); }
+
+    .badge-statut {
+      display: inline-block;
+      padding: .15rem .55rem;
+      border-radius: 9999px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .s-approuve  { background: #dcfce7; color: #166534; }
+    .s-attente   { background: #fef3c7; color: #92400e; }
+    .s-refuse    { background: #fee2e2; color: #991b1b; }
+    .s-etudiant  { background: #dbeafe; color: #1e40af; }
+    .s-manager   { background: #ede9fe; color: #5b21b6; }
+    .s-admin     { background: #fce7f3; color: #9d174d; }
+
+    .actions-td  { display: flex; gap: .4rem; flex-wrap: wrap; }
+
+    .btn-xs {
+      padding: .25rem .65rem;
+      font-size: .75rem;
+      border-radius: .35rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: .15s;
+    }
+    .btn-xs-vert  { background: #dcfce7; color: #166534; }
+    .btn-xs-vert:hover  { background: #166534; color: white; }
+    .btn-xs-rouge { background: #fee2e2; color: #991b1b; }
+    .btn-xs-rouge:hover { background: #991b1b; color: white; }
+    .btn-xs-bleu  { background: var(--bleu-pale); color: var(--bleu-marine); }
+    .btn-xs-bleu:hover  { background: var(--bleu-marine); color: white; }
+    .btn-xs-gris  { background: #f1f5f9; color: #475569; }
+    .btn-xs-gris:hover  { background: #475569; color: white; }
+
+    /* Stat cartes */
+    .stats-grille {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: var(--blanc);
+      border: 1px solid var(--beige-bord);
+      border-radius: .75rem;
+      padding: 1.1rem 1.25rem;
+      text-align: center;
+    }
+    .stat-card .chiffre { font-size: 2rem; font-weight: 800; margin-bottom: .15rem; }
+    .stat-card .libelle { font-size: .78rem; color: var(--texte-pale); text-transform: uppercase; letter-spacing: .05em; }
+
+    /* Formulaire création événement */
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .champ-form { margin-bottom: .9rem; }
+    .champ-form label { display: block; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--bleu-marine); margin-bottom: .3rem; }
+    .champ-form input,
+    .champ-form select,
+    .champ-form textarea {
+      width: 100%; padding: .55rem .85rem;
+      border: 1.5px solid var(--beige-bord); border-radius: .45rem;
+      font-size: .88rem; font-family: inherit;
+      background: var(--beige-clair); color: var(--texte);
+    }
+    .champ-form input:focus,
+    .champ-form select:focus,
+    .champ-form textarea:focus { outline: none; border-color: var(--bleu-vif); background: var(--blanc); }
+
+    /* Onglets */
+    .onglets-admin {
+      display: flex; gap: 0;
+      border-bottom: 2px solid var(--beige-bord);
+      margin-bottom: 1.5rem;
+    }
+    .onglet-btn {
+      padding: .65rem 1.25rem;
+      background: none; border: none;
+      font-size: .88rem; font-weight: 600;
+      color: var(--texte-pale); cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px; transition: .15s;
+      font-family: inherit;
+    }
+    .onglet-btn:hover  { color: var(--bleu-vif); }
+    .onglet-btn.actif  { color: var(--bleu-vif); border-bottom-color: var(--bleu-vif); }
+
+    .panneau { display: none; }
+    .panneau.actif { display: block; }
+
+    /* Section en attente */
+    .alerte-attente {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-left: 4px solid #f59e0b;
+      border-radius: .5rem;
+      padding: .85rem 1.1rem;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: .75rem; gap: 1rem; flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .stats-grille { grid-template-columns: repeat(2, 1fr); }
+      .form-grid-2  { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  var sessionUser = null;
+  try { sessionUser = JSON.parse(localStorage.getItem('campusplay_user')); } catch(e) {}
+  if (!sessionUser || (sessionUser.role !== 'admin' && sessionUser.role !== 'manager')) {
+    alert('Accès réservé aux administrateurs.');
+    window.location.href = 'index.html';
+  }
+  function deconnecter() {
+    localStorage.removeItem('campusplay_user');
+    window.location.href = 'index.html';
+  }
+</script>
+<script src="data.js"></script>
+
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="logo-cercle">🎵</div>
+    <div class="site-header-centre">
+      <h1>CampusPlay</h1>
+      <p class="sous-titre">Panneau d'administration</p>
+    </div>
+    <div class="header-user">
+      <span class="user-nom"  id="user-nom"></span>
+      <span class="user-role" id="user-role"></span>
+      <button class="btn-deconnexion" onclick="deconnecter()">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- CORPS -->
+  <div class="site-corps">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <a href="accueil.html"><span class="icone">🏠</span> Accueil</a>
+      <a href="activites.html"><span class="icone">🎵</span> Activités</a>
+      <a href="evenements.html"><span class="icone">📅</span> Évènements</a>
+      <a href="ressources.html"><span class="icone">📦</span> Ressources</a>
+      <a href="reservations.html"><span class="icone">🔖</span> Réservations</a>
+      <hr>
+      <a href="notifications.html"><span class="icone">🔔</span> Notifications</a>
+      <hr>
+      <a href="profil.html"><span class="icone">👤</span> Mon profil</a>
+      <a href="admin.html" class="actif"><span class="icone">⚙️</span> Admin</a>
+    </nav>
+
+    <!-- CONTENU -->
+    <main class="site-contenu">
+
+      <h1 class="page-titre">⚙️ Administration</h1>
+      <div id="flash-zone"></div>
+
+      <!-- STATS -->
+      <div class="stats-grille">
+        <div class="stat-card">
+          <div class="chiffre" id="s-users" style="color:var(--bleu-vif)">0</div>
+          <div class="libelle">Comptes inscrits</div>
+        </div>
+        <div class="stat-card">
+          <div class="chiffre" id="s-ev" style="color:var(--succes)">0</div>
+          <div class="libelle">Évènements actifs</div>
+        </div>
+        <div class="stat-card">
+          <div class="chiffre" id="s-attente" style="color:var(--attention)">0</div>
+          <div class="libelle">En attente</div>
+        </div>
+        <div class="stat-card">
+          <div class="chiffre" id="s-res" style="color:var(--erreur)">0</div>
+          <div class="libelle">Réservations</div>
+        </div>
+      </div>
+
+      <!-- ONGLETS -->
+      <div class="onglets-admin">
+        <button class="onglet-btn actif" onclick="changerOnglet('evenements', this)">📅 Événements</button>
+        <button class="onglet-btn"       onclick="changerOnglet('creer',      this)">➕ Créer un évènement</button>
+        <button class="onglet-btn"       onclick="changerOnglet('reservations',this)">📦 Réservations</button>
+        <button class="onglet-btn"       onclick="changerOnglet('utilisateurs',this)">👥 Utilisateurs</button>
+      </div>
+
+      <!-- ══ ONGLET ÉVÉNEMENTS ══ -->
+      <div class="panneau actif" id="panneau-evenements">
+
+        <h2 style="font-size:1rem;font-weight:700;color:var(--attention);margin-bottom:.75rem">⏳ En attente de validation</h2>
+        <div id="zone-attente" style="margin-bottom:1.5rem"></div>
+
+        <h2 style="font-size:1rem;font-weight:700;color:var(--bleu-nuit);margin-bottom:.75rem">📅 Tous les évènements</h2>
+        <div class="carte" style="overflow-x:auto">
+          <table class="table-admin" id="table-evenements"></table>
+        </div>
+      </div>
+
+      <!-- ══ ONGLET CRÉER ÉVÈNEMENT ══ -->
+      <div class="panneau" id="panneau-creer">
+        <div style="max-width:640px">
+          <h2 style="font-size:1rem;font-weight:700;color:var(--bleu-nuit);margin-bottom:1.25rem">➕ Créer un nouvel évènement</h2>
+          <div class="carte">
+            <form id="form-creer-ev" onsubmit="soumettreCreerEv(event)">
+              <div class="champ-form">
+                <label>Titre de l'évènement *</label>
+                <input type="text" id="nv-titre" required placeholder="Ex : Concert de jazz de printemps">
+              </div>
+              <div class="form-grid-2">
+                <div class="champ-form">
+                  <label>Activité liée</label>
+                  <select id="nv-activite">
+                    <option value="0">— Aucune —</option>
+                  </select>
+                </div>
+                <div class="champ-form">
+                  <label>Type</label>
+                  <select id="nv-type">
+                    <option value="concert">🎤 Concert</option>
+                    <option value="battle">🥊 Battle</option>
+                    <option value="cours">🎸 Cours</option>
+                    <option value="dj">🎧 DJ</option>
+                    <option value="karaoke">🎶 Karaoké</option>
+                    <option value="autre">📌 Autre</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-grid-2">
+                <div class="champ-form">
+                  <label>Date *</label>
+                  <input type="date" id="nv-date" required>
+                </div>
+                <div class="champ-form">
+                  <label>Horaires *</label>
+                  <input type="text" id="nv-heure" required placeholder="Ex : 19h00 – 21h00">
+                </div>
+              </div>
+              <div class="form-grid-2">
+                <div class="champ-form">
+                  <label>Lieu *</label>
+                  <input type="text" id="nv-lieu" required placeholder="Ex : Salle polyvalente B">
+                </div>
+                <div class="champ-form">
+                  <label>Nombre de places *</label>
+                  <input type="number" id="nv-places" required min="1" placeholder="20">
+                </div>
+              </div>
+              <div class="champ-form">
+                <label>Description</label>
+                <textarea id="nv-desc" rows="3" placeholder="Description de l'évènement…"></textarea>
+              </div>
+              <div class="form-grid-2">
+                <div class="champ-form">
+                  <label>Tarif</label>
+                  <select id="nv-gratuit">
+                    <option value="true">Gratuit</option>
+                    <option value="false">Payant</option>
+                  </select>
+                </div>
+                <div class="champ-form" id="champ-prix" style="display:none">
+                  <label>Prix (ex : 5 €)</label>
+                  <input type="text" id="nv-prix" placeholder="5 €">
+                </div>
+              </div>
+              <div class="champ-form">
+                <label>Statut initial</label>
+                <select id="nv-statut">
+                  <option value="approuve">✅ Approuvé directement</option>
+                  <option value="en_attente">⏳ En attente de validation</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:.75rem;margin-top:.25rem">
+                <button type="submit" class="btn btn-primaire" style="flex:1;padding:.7rem">Créer l'évènement</button>
+                <button type="button" onclick="document.getElementById('form-creer-ev').reset()" class="btn btn-gris" style="padding:.7rem">Réinitialiser</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ONGLET RÉSERVATIONS ══ -->
+      <div class="panneau" id="panneau-reservations">
+        <h2 style="font-size:1rem;font-weight:700;color:var(--bleu-nuit);margin-bottom:.75rem">📦 Demandes de réservation</h2>
+        <div class="carte" style="overflow-x:auto">
+          <table class="table-admin" id="table-reservations"></table>
+        </div>
+      </div>
+
+      <!-- ══ ONGLET UTILISATEURS ══ -->
+      <div class="panneau" id="panneau-utilisateurs">
+        <h2 style="font-size:1rem;font-weight:700;color:var(--bleu-nuit);margin-bottom:.75rem">👥 Comptes utilisateurs</h2>
+        <div class="carte" style="overflow-x:auto">
+          <table class="table-admin" id="table-utilisateurs"></table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <strong>Copyright</strong> © 2026 CampusPlay &nbsp;·&nbsp; contact@campusplay.fr &nbsp;·&nbsp; 01 23 45 67 89 &nbsp;·&nbsp; 123 Rue de l'École, 75000 Paris
+  </footer>
+</div>
+
+<script>
+/* ── Infos header ── */
+var rolesLabels = { admin:'Administrateur', manager:'Manager', etudiant:'Étudiant' };
+document.getElementById('user-nom').textContent  = sessionUser.prenom + ' ' + sessionUser.nom;
+document.getElementById('user-role').textContent = rolesLabels[sessionUser.role] || sessionUser.role;
+afficheFlash(document.getElementById('flash-zone'));
+
+/* ── Onglets ── */
+function changerOnglet(id, btn) {
+  document.querySelectorAll('.panneau').forEach(function(p)    { p.classList.remove('actif'); });
+  document.querySelectorAll('.onglet-btn').forEach(function(b) { b.classList.remove('actif'); });
+  document.getElementById('panneau-' + id).classList.add('actif');
+  btn.classList.add('actif');
+  chargerOnglet(id);
+}
+function chargerOnglet(id) {
+  if      (id === 'evenements')   { chargerEvenements(); }
+  else if (id === 'reservations') { chargerReservations(); }
+  else if (id === 'utilisateurs') { chargerUtilisateurs(); }
+  else if (id === 'creer')        { chargerSelectActivites(); }
+}
+
+/* ── Statistiques ── */
+function majStats() {
+  document.getElementById('s-users').textContent   = getComptes().length;
+  document.getElementById('s-ev').textContent      = getEvenements().filter(function(e) { return e.statut === 'approuve'; }).length;
+  document.getElementById('s-attente').textContent = getEvenements().filter(function(e) { return e.statut === 'en_attente'; }).length;
+  document.getElementById('s-res').textContent     = getReservations().filter(function(r) { return r.statut === 'en_attente'; }).length;
+}
+
+/* ══ ONGLET ÉVÉNEMENTS ══ */
+function chargerEvenements() {
+  majStats();
+  var evs      = getEvenements();
+  var attente  = evs.filter(function(e) { return e.statut === 'en_attente'; });
+  var zone     = document.getElementById('zone-attente');
+  var statuts  = { approuve:'s-approuve', en_attente:'s-attente', refuse:'s-refuse' };
+  var libelles = { approuve:'Approuvé', en_attente:'En attente', refuse:'Refusé' };
+
+  if (!attente.length) {
+    zone.innerHTML = '<div class="flash flash-succes" style="display:inline-block">✅ Aucun évènement en attente de validation.</div>';
+  } else {
+    zone.innerHTML = attente.map(function(ev) {
+      return '<div class="alerte-attente">' +
+        '<div>' +
+          '<strong style="font-size:.92rem">' + ev.titre + '</strong>' +
+          '<p style="font-size:.8rem;color:var(--texte-pale);margin-top:.2rem">📅 ' + formaterDate(ev.date) + ' — 📍 ' + ev.lieu + '</p>' +
+        '</div>' +
+        '<div style="display:flex;gap:.5rem">' +
+          '<button onclick="actionEv(' + ev.id + ',\'approuver\')" class="btn-xs btn-xs-vert">✔ Approuver</button>' +
+          '<button onclick="actionEv(' + ev.id + ',\'refuser\')"   class="btn-xs btn-xs-rouge">✖ Refuser</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  document.getElementById('table-evenements').innerHTML =
+    '<thead><tr><th>Titre</th><th>Date</th><th>Lieu</th><th>Places</th><th>Statut</th><th>Actions</th></tr></thead>' +
+    '<tbody>' + evs.map(function(ev) {
+      return '<tr>' +
+        '<td><strong>' + ev.titre + '</strong></td>' +
+        '<td>' + ev.date + '</td>' +
+        '<td>' + ev.lieu + '</td>' +
+        '<td>' + ev.inscrits + ' / ' + ev.places + '</td>' +
+        '<td><span class="badge-statut ' + statuts[ev.statut] + '">' + libelles[ev.statut] + '</span></td>' +
+        '<td><div class="actions-td">' +
+          (ev.statut !== 'approuve' ? '<button onclick="actionEv(' + ev.id + ',\'approuver\')" class="btn-xs btn-xs-vert">✔</button>' : '') +
+          (ev.statut !== 'refuse'   ? '<button onclick="actionEv(' + ev.id + ',\'refuser\')"   class="btn-xs btn-xs-rouge">✖</button>' : '') +
+          '<button onclick="supprimerEv(' + ev.id + ')" class="btn-xs btn-xs-gris">🗑</button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('') + '</tbody>';
+}
+
+function actionEv(id, action) {
+  if (action === 'approuver') approuverEvenement(id);
+  else if (action === 'refuser') refuserEvenement(id);
+  chargerEvenements();
+}
+
+function supprimerEv(id) {
+  var ev = getEvenements().find(function(e) { return e.id === id; });
+  if (!ev) return;
+  if (!confirm('Supprimer "' + ev.titre + '" ? Cette action est irréversible.')) return;
+  supprimerEvenement(id);
+  chargerEvenements();
+}
+window.actionEv   = actionEv;
+window.supprimerEv = supprimerEv;
+
+/* ══ CRÉER ÉVÉNEMENT ══ */
+function chargerSelectActivites() {
+  var sel = document.getElementById('nv-activite');
+  sel.innerHTML = '<option value="0">— Aucune —</option>';
+  getActivites().forEach(function(a) {
+    sel.innerHTML += '<option value="' + a.id + '">' + a.emoji + ' ' + a.titre + '</option>';
+  });
+}
+document.getElementById('nv-gratuit').addEventListener('change', function() {
+  document.getElementById('champ-prix').style.display = this.value === 'false' ? 'block' : 'none';
+});
+function soumettreCreerEv(e) {
+  e.preventDefault();
+  var nouvel = creerEvenement({
+    titre:       document.getElementById('nv-titre').value,
+    activite_id: document.getElementById('nv-activite').value,
+    date:        document.getElementById('nv-date').value,
+    heure:       document.getElementById('nv-heure').value,
+    lieu:        document.getElementById('nv-lieu').value,
+    places:      document.getElementById('nv-places').value,
+    desc:        document.getElementById('nv-desc').value,
+    gratuit:     document.getElementById('nv-gratuit').value,
+    prix:        document.getElementById('nv-prix').value || null,
+    statut:      document.getElementById('nv-statut').value,
+  });
+  flash('Évènement "' + nouvel.titre + '" créé avec succès ! ✅');
+  document.getElementById('form-creer-ev').reset();
+  document.getElementById('champ-prix').style.display = 'none';
+  afficheFlash(document.getElementById('flash-zone'));
+  majStats();
+}
+window.soumettreCreerEv = soumettreCreerEv;
+
+/* ══ RÉSERVATIONS ══ */
+function chargerReservations() {
+  majStats();
+  var ress     = getReservations();
+  var statuts  = { en_attente:'s-attente', approuve:'s-approuve', refuse:'s-refuse', annule:'s-refuse' };
+  var libelles = { en_attente:'En attente', approuve:'Approuvée', refuse:'Refusée', annule:'Annulée' };
+
+  document.getElementById('table-reservations').innerHTML = ress.length
+    ? '<thead><tr><th>Demandeur</th><th>Article</th><th>Type</th><th>Dates</th><th>Qté</th><th>Statut</th><th>Actions</th></tr></thead>' +
+      '<tbody>' + ress.map(function(r) {
+        return '<tr>' +
+          '<td>' + (r.user_nom || r.user_email) + '</td>' +
+          '<td><strong>' + (r.nom_item || '—') + '</strong></td>' +
+          '<td>' + r.type + '</td>' +
+          '<td>' + r.date_debut + (r.type === 'location' ? ' → ' + r.date_fin : '') + '</td>' +
+          '<td>' + r.quantite + '</td>' +
+          '<td><span class="badge-statut ' + (statuts[r.statut]||'s-attente') + '">' + (libelles[r.statut]||r.statut) + '</span></td>' +
+          '<td><div class="actions-td">' +
+            (r.statut === 'en_attente' ? '<button onclick="actionRes(' + r.id + ',\'approuver\')" class="btn-xs btn-xs-vert">✔</button>' : '') +
+            (r.statut === 'en_attente' ? '<button onclick="actionRes(' + r.id + ',\'refuser\')"   class="btn-xs btn-xs-rouge">✖</button>' : '') +
+          '</div></td>' +
+        '</tr>';
+      }).join('') + '</tbody>'
+    : '<thead><tr><th>Aucune réservation</th></tr></thead><tbody><tr><td style="text-align:center;padding:2rem;color:var(--texte-pale)">Aucune demande de réservation.</td></tr></tbody>';
+}
+
+function actionRes(id, action) {
+  if (action === 'approuver') approuverReservation(id);
+  else if (action === 'refuser') refuserReservation(id);
+  chargerReservations();
+}
+window.actionRes = actionRes;
+
+/* ══ UTILISATEURS ══ */
+function chargerUtilisateurs() {
+  majStats();
+  var comptes  = getComptes();
+  var roles    = { admin:'s-admin', manager:'s-manager', etudiant:'s-etudiant' };
+  var labRoles = { admin:'Admin', manager:'Manager', etudiant:'Étudiant' };
+
+  document.getElementById('table-utilisateurs').innerHTML =
+    '<thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Rôle</th><th>Actions</th></tr></thead>' +
+    '<tbody>' + comptes.map(function(c) {
+      var isMe = sessionUser && sessionUser.id === c.id;
+      return '<tr>' +
+        '<td><strong>' + c.prenom + '</strong></td>' +
+        '<td>' + c.nom + '</td>' +
+        '<td style="font-size:.8rem">' + c.email + '</td>' +
+        '<td><span class="badge-statut ' + (roles[c.role]||'s-etudiant') + '">' + (labRoles[c.role]||c.role) + '</span></td>' +
+        '<td><div class="actions-td">' +
+          (!isMe && sessionUser.role === 'admin' ? '<button onclick="changerRole(' + c.id + ',\'manager\')" class="btn-xs btn-xs-bleu" title="Passer Manager">Manager</button>' : '') +
+          (!isMe && sessionUser.role === 'admin' ? '<button onclick="changerRole(' + c.id + ',\'etudiant\')" class="btn-xs btn-xs-gris" title="Passer Étudiant">Étudiant</button>' : '') +
+          (!isMe ? '<button onclick="supprimerUser(' + c.id + ')" class="btn-xs btn-xs-rouge">🗑</button>' : '<span style="font-size:.75rem;color:var(--texte-pale)">(vous)</span>') +
+        '</div></td>' +
+      '</tr>';
+    }).join('') + '</tbody>';
+}
+
+function changerRole(id, role) {
+  modifierRoleCompte(id, role);
+  chargerUtilisateurs();
+}
+function supprimerUser(id) {
+  var c = getComptes().find(function(x) { return x.id === id; });
+  if (!c) return;
+  if (!confirm('Supprimer le compte de ' + c.prenom + ' ' + c.nom + ' ?')) return;
+  supprimerCompte(id);
+  chargerUtilisateurs();
+}
+window.changerRole   = changerRole;
+window.supprimerUser = supprimerUser;
+
+/* ── Init ── */
+chargerEvenements();
+majStats();
+</script>
+
+</body>
+</html>
