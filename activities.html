@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CampusPlay — Activités & Ressources</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+
+    /* ══ SPÉCIFIQUE PAGE ACTIVITÉS ══ */
+
+
+    /* Barre de recherche + filtres */
+    .barre-filtres {
+      background: var(--blanc);
+      border: 1px solid var(--beige-bord);
+      border-radius: .75rem;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    .filtre-groupe {
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+    }
+    .filtre-groupe label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--bleu-marine);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+    .filtre-groupe input,
+    .filtre-groupe select {
+      padding: .55rem .9rem;
+      border: 1.5px solid var(--beige-bord);
+      border-radius: .5rem;
+      font-size: .88rem;
+      font-family: inherit;
+      background: var(--beige-clair);
+      color: var(--texte);
+      transition: .15s;
+      cursor: pointer;
+    }
+    .filtre-groupe input:focus,
+    .filtre-groupe select:focus {
+      outline: none;
+      border-color: var(--bleu-vif);
+      background: var(--blanc);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+    .filtre-groupe.large input { min-width: 240px; }
+
+
+    .btn-reset {
+      padding: .55rem 1rem;
+      background: var(--beige);
+      border: 1px solid var(--beige-bord);
+      border-radius: .5rem;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--texte-doux);
+      cursor: pointer;
+      transition: .15s;
+      align-self: flex-end;
+    }
+    .btn-reset:hover { background: var(--beige-bord); }
+
+
+    /* Compteur résultats */
+    .compteur {
+      font-size: .82rem;
+      color: var(--texte-pale);
+      margin-bottom: 1rem;
+    }
+    .compteur span { color: var(--bleu-vif); font-weight: 700; }
+
+
+    /* ── Cartes activité ── */
+    .grille-activites {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+
+    .carte-activite {
+      background: var(--blanc);
+      border: 1px solid var(--beige-bord);
+      border-radius: .75rem;
+      overflow: hidden;
+      transition: .2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .carte-activite:hover {
+      box-shadow: 0 6px 24px rgba(13,27,62,.12);
+      transform: translateY(-3px);
+      border-color: var(--bleu-clair);
+    }
+
+
+    /* Bandeau couleur en haut de chaque carte */
+    .carte-bandeau {
+      height: 7px;
+    }
+
+
+    .carte-activite-corps {
+      padding: 1.1rem 1.2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+
+    .carte-meta {
+      display: flex;
+      gap: .4rem;
+      flex-wrap: wrap;
+      margin-bottom: .65rem;
+    }
+
+
+    .carte-activite h3 {
+      font-size: .97rem;
+      font-weight: 700;
+      color: var(--bleu-nuit);
+      margin-bottom: .45rem;
+      line-height: 1.3;
+    }
+
+
+    .carte-activite p {
+      font-size: .82rem;
+      color: var(--texte-doux);
+      line-height: 1.55;
+      flex: 1;
+      margin-bottom: .85rem;
+    }
+
+
+    .carte-pied {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: .75rem;
+      border-top: 1px solid var(--beige-bord);
+      margin-top: auto;
+    }
+    .carte-pied .niveau {
+      font-size: .75rem;
+      color: var(--texte-pale);
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
+    .carte-pied .prix {
+      font-size: .9rem;
+      font-weight: 800;
+      color: var(--bleu-marine);
+    }
+    .carte-pied .prix.gratuit { color: var(--succes); }
+
+
+    /* Icone niveau */
+    .niveau-point {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+
+    /* ── Section ressources ── */
+    .section-titre {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--bleu-nuit);
+      margin-bottom: 1.25rem;
+      padding-bottom: .6rem;
+      border-bottom: 2px solid var(--beige-bord);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+
+    .grille-ressources {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+
+    .carte-ressource {
+      background: var(--blanc);
+      border: 1px solid var(--beige-bord);
+      border-radius: .75rem;
+      overflow: hidden;
+      transition: .2s;
+    }
+    .carte-ressource:hover {
+      box-shadow: 0 6px 24px rgba(13,27,62,.1);
+      transform: translateY(-2px);
+      border-color: var(--or);
+    }
+
+
+    .res-bandeau {
+      height: 6px;
+      background: linear-gradient(90deg, var(--or), var(--bleu-clair));
+    }
+
+
+    .carte-ressource-corps {
+      padding: 1rem 1.1rem;
+    }
+
+
+    .carte-ressource h3 {
+      font-size: .92rem;
+      font-weight: 700;
+      color: var(--bleu-nuit);
+      margin-bottom: .3rem;
+    }
+
+
+    .carte-ressource p {
+      font-size: .8rem;
+      color: var(--texte-doux);
+      line-height: 1.5;
+      margin-bottom: .75rem;
+    }
+
+
+    .res-actions {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+    }
+
+
+    .res-btn {
+      padding: .35rem .8rem;
+      border-radius: .4rem;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: .15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .res-btn-louer {
+      background: var(--bleu-pale);
+      color: var(--bleu-marine);
+    }
+    .res-btn-louer:hover { background: var(--bleu-clair); color: var(--bleu-nuit); }
+    .res-btn-acheter {
+      background: var(--or-clair);
+      color: #92400e;
+    }
+    .res-btn-acheter:hover { background: var(--or); color: var(--bleu-nuit); }
+
+
+    .res-dispo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .6rem;
+    }
+    .res-stock {
+      font-size: .75rem;
+      color: var(--texte-pale);
+    }
+    .res-prix-loue {
+      font-size: .78rem;
+      color: var(--bleu-vif);
+      font-weight: 600;
+    }
+    .res-prix-achat {
+      font-size: .78rem;
+      color: var(--attention);
+      font-weight: 600;
+    }
+
+
+    /* Aucun résultat */
+    .aucun-resultat {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      color: var(--texte-pale);
+      font-style: italic;
+    }
+    .aucun-resultat .emoji { font-size: 2.5rem; display: block; margin-bottom: .75rem; }
+
+
+    /* Recommandations */
+    .recommandation-bande {
+      background: linear-gradient(135deg, var(--bleu-nuit), var(--bleu-marine));
+      border-radius: .75rem;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .recommandation-bande .icone { font-size: 2rem; flex-shrink: 0; }
+    .recommandation-bande h4 { color: var(--blanc); font-size: .95rem; font-weight: 700; margin-bottom: .2rem; }
+    .recommandation-bande p  { color: var(--bleu-clair); font-size: .82rem; }
+
+
+    @media (max-width: 900px) {
+      .grille-activites, .grille-ressources { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .grille-activites, .grille-ressources { grid-template-columns: 1fr; }
+      .filtre-groupe.large input { min-width: 180px; }
+    }
+  </style>
+</head>
+<body>
+
+
+<script>
+  /* ── Vérification connexion ── */
+  var sessionUser = null;
+  try {
+    var raw = localStorage.getItem('campusplay_user');
+    if (raw) sessionUser = JSON.parse(raw);
+  } catch(e) {}
+  if (!sessionUser) window.location.href = 'index.html';
+
+
+  function deconnecter() {
+    localStorage.removeItem('campusplay_user');
+    window.location.href = 'index.html';
+  }
+</script>
+
+
+<div class="page-wrapper">
+
+
+  <!-- ════ HEADER ════ -->
+  <header class="site-header">
+    <div class="logo-cercle">🎵</div>
+
+
+    <div class="site-header-centre">
+      <h1>CampusPlay</h1>
+      <p class="sous-titre">Notifications et activités associatives</p>
+    </div>
+
+
+    <div class="header-user">
+      <span class="user-nom"  id="user-nom"></span>
+      <span class="user-role" id="user-role"></span>
+      <button class="btn-deconnexion" onclick="deconnecter()">Déconnexion</button>
+    </div>
+  </header>
+
+
+  <!-- ════ CORPS ════ -->
+  <div class="site-corps">
+
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <a href="accueil.html">
+        <span class="icone">🏠</span> Accueil
+      </a>
+      <a href="activites.html" class="actif">
+        <span class="icone">🎵</span> Activités
+      </a>
+      <a href="evenements.html">
+        <span class="icone">📅</span> Évènements
+      </a>
+      <a href="ressources.html">
+        <span class="icone">📦</span> Ressources
+      </a>
+      <a href="reservations.html">
+        <span class="icone">🔖</span> Réservations
+      </a>
+      <hr>
+      <a href="notifications.html">
+        <span class="icone">🔔</span> Notifications
+      </a>
+      <hr>
+      <a href="profil.html">
+        <span class="icone">👤</span> Mon profil
+      </a>
+      <a href="admin.html" id="lien-admin" style="display:none">
+        <span class="icone">⚙️</span> Admin
+      </a>
+    </nav>
+
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="site-contenu">
+
+
+      <h1 class="page-titre">🎵 Activités &amp; Ressources</h1>
+
+
+      <!-- RECOMMANDATION -->
+      <div class="recommandation-bande">
+        <span class="icone">✨</span>
+        <div>
+          <h4>Nouveauté — Battle de rap ce vendredi !</h4>
+          <p>Inscris-toi avant le 30 mai pour participer au Battle mensuel. Ouvert à tous les niveaux.</p>
+        </div>
+        <a href="evenements.html" class="btn btn-or" style="margin-left:auto;flex-shrink:0;font-size:.82rem">
+          Voir →
+        </a>
+      </div>
+
+
+      <!-- ── FILTRES ── -->
+      <div class="barre-filtres">
+        <div class="filtre-groupe large">
+          <label>🔍 Rechercher</label>
+          <input type="text" id="recherche" placeholder="Guitare, DJ, concert, battle…">
+        </div>
+        <div class="filtre-groupe">
+          <label>Catégorie</label>
+          <select id="filtre-cat">
+            <option value="">Toutes</option>
+            <option value="cours">🎸 Cours</option>
+            <option value="dj">🎧 DJ</option>
+            <option value="concert">🎤 Concert</option>
+            <option value="karaoke">🎶 Karaoké</option>
+            <option value="battle">🥊 Battle</option>
+          </select>
+        </div>
+        <div class="filtre-groupe">
+          <label>Niveau</label>
+          <select id="filtre-niveau">
+            <option value="">Tous</option>
+            <option value="debutant">Débutant</option>
+            <option value="intermediaire">Intermédiaire</option>
+            <option value="avance">Avancé</option>
+          </select>
+        </div>
+        <div class="filtre-groupe">
+          <label>Trier par</label>
+          <select id="tri">
+            <option value="nom">Nom A → Z</option>
+            <option value="prix-asc">Prix croissant</option>
+            <option value="prix-desc">Prix décroissant</option>
+            <option value="niveau">Niveau</option>
+          </select>
+        </div>
+        <button class="btn-reset" onclick="reinitFiltres()">✕ Réinitialiser</button>
+      </div>
+
+
+      <!-- Compteur -->
+      <p class="compteur" id="compteur">Affichage de <span id="nb-resultats">0</span> activité(s)</p>
+
+
+      <!-- ── GRILLE ACTIVITÉS ── -->
+      <div class="grille-activites" id="grille-activites"></div>
+
+
+      <!-- ══════════════════════════
+           SECTION RESSOURCES
+           ══════════════════════════ -->
+      <h2 class="section-titre">🎸 Location &amp; Achat de matériel</h2>
+
+
+      <div class="grille-ressources" id="grille-ressources"></div>
+
+
+    </main>
+  </div>
+
+
+  <!-- ════ FOOTER ════ -->
+  <footer class="site-footer">
+    <strong>Copyright</strong> © 2026 CampusPlay &nbsp;·&nbsp; contact@campusplay.fr &nbsp;·&nbsp; 01 23 45 67 89 &nbsp;·&nbsp; 123 Rue de l'École, 75000 Paris
+  </footer>
+
+
+</div>
+
+
+<script>
+/* ══════════════════════════════════
+   DONNÉES
+   ══════════════════════════════════ */
+
+
+var ACTIVITES = [
+  /* COURS D'INSTRUMENTS */
+  { id:1, titre:"Cours de guitare", cat:"cours", niveau:"debutant",
+    desc:"Apprends les accords de base, le strumming et tes premières chansons. Acoustique ou électrique.",
+    prix:15, prixLabel:"15 €/séance", couleur:"#4f46e5", emoji:"🎸", places:12 },
+  { id:2, titre:"Cours de piano", cat:"cours", niveau:"tous",
+    desc:"Du solfège à l'improvisation. Cours individuel ou en petit groupe selon ton niveau.",
+    prix:18, prixLabel:"18 €/séance", couleur:"#1a3a6e", emoji:"🎹", places:8 },
+  { id:3, titre:"Cours de batterie", cat:"cours", niveau:"intermediaire",
+    desc:"Travail du rythme, coordination et techniques de jeu. Baguettes fournies.",
+    prix:15, prixLabel:"15 €/séance", couleur:"#7c3aed", emoji:"🥁", places:6 },
+  { id:4, titre:"Cours de violon", cat:"cours", niveau:"debutant",
+    desc:"Initiation à l'archet, lecture de partitions et morceaux classiques.",
+    prix:20, prixLabel:"20 €/séance", couleur:"#b45309", emoji:"🎻", places:6 },
+  { id:5, titre:"Cours de saxophone", cat:"cours", niveau:"intermediaire",
+    desc:"Jazz, blues ou musique classique. Maîtrise du souffle et de la technique.",
+    prix:18, prixLabel:"18 €/séance", couleur:"#059669", emoji:"🎷", places:5 },
+  { id:6, titre:"Cours de trompette", cat:"cours", niveau:"debutant",
+    desc:"Les fondamentaux du cuivre, du son à la première mélodie.",
+    prix:16, prixLabel:"16 €/séance", couleur:"#d97706", emoji:"🎺", places:4 },
+
+
+  /* DJ */
+  { id:7, titre:"Cours de DJ — Initiation", cat:"dj", niveau:"debutant",
+    desc:"Découvre les platines, le mixage et les techniques de base. Platines Technics disponibles.",
+    prix:20, prixLabel:"20 €/séance", couleur:"#1d5ce4", emoji:"🎧", places:8 },
+  { id:8, titre:"Cours de DJ — Avancé", cat:"dj", niveau:"avance",
+    desc:"Scratch, harmonic mixing, effets et gestion de set live. Pour DJs confirmés.",
+    prix:25, prixLabel:"25 €/séance", couleur:"#1d5ce4", emoji:"🎧", places:4 },
+
+
+  /* CONCERTS */
+  { id:9, titre:"Concert acoustique mensuel", cat:"concert", niveau:"tous",
+    desc:"Scène ouverte chaque premier vendredi du mois. Inscris-toi pour jouer ou viens écouter !",
+    prix:0, prixLabel:"Gratuit", couleur:"#ec4899", emoji:"🎤", places:50 },
+  { id:10, titre:"Concert de fin d'année", cat:"concert", niveau:"tous",
+    desc:"Grand concert annuel avec les élèves et artistes invités. Ambiance festive garantie.",
+    prix:5, prixLabel:"5 € (entrée)", couleur:"#ec4899", emoji:"🎤", places:200 },
+
+
+  /* KARAOKÉ */
+  { id:11, titre:"Soirée Karaoké", cat:"karaoke", niveau:"tous",
+    desc:"Chaque jeudi soir, micro ouvert à tous ! Catalogue de plus de 500 chansons.",
+    prix:0, prixLabel:"Gratuit", couleur:"#10b981", emoji:"🎶", places:30 },
+  { id:12, titre:"Karaoké Battle", cat:"karaoke", niveau:"tous",
+    desc:"Compétition amicale de karaoké. Vote du public, lots à gagner.",
+    prix:2, prixLabel:"2 € (inscription)", couleur:"#10b981", emoji:"🎶", places:20 },
+
+
+  /* BATTLES */
+  { id:13, titre:"Battle de Rap", cat:"battle", niveau:"intermediaire",
+    desc:"Freestyle ou texte écrit, tout est permis. Jury composé de membres de l'asso.",
+    prix:0, prixLabel:"Gratuit", couleur:"#dc2626", emoji:"🥊", places:16 },
+  { id:14, titre:"Battle de Beatbox", cat:"battle", niveau:"tous",
+    desc:"Percussions vocales, basses et effets. Débutants et confirmés bienvenus.",
+    prix:0, prixLabel:"Gratuit", couleur:"#dc2626", emoji:"🎙️", places:12 },
+  { id:15, titre:"Battle de Dance", cat:"battle", niveau:"avance",
+    desc:"Hip-hop, break, popping. Duels en 1 contre 1, format tournoi.",
+    prix:0, prixLabel:"Gratuit", couleur:"#dc2626", emoji:"💃", places:24 },
+];
+
+
+var RESSOURCES = [
+  /* INSTRUMENTS */
+  { id:1, nom:"Guitare acoustique", cat:"Instrument",
+    desc:"Yamaha F310. Accordeur inclus. Idéale pour débutants et confirmés.",
+    stock:5, prixLocation:"3 €/jour", prixAchat:"120 €", emoji:"🎸", couleur:"#4f46e5" },
+  { id:2, nom:"Guitare électrique", cat:"Instrument",
+    desc:"Fender Stratocaster + ampli. Câble jack fourni.",
+    stock:3, prixLocation:"5 €/jour", prixAchat:"280 €", emoji:"🎸", couleur:"#4f46e5" },
+  { id:3, nom:"Clavier numérique 88 touches", cat:"Instrument",
+    desc:"Roland FP-30. Lesté, toucher piano acoustique. Sustain inclus.",
+    stock:2, prixLocation:"8 €/jour", prixAchat:"450 €", emoji:"🎹", couleur:"#1a3a6e" },
+  { id:4, nom:"Batterie électronique", cat:"Instrument",
+    desc:"Roland TD-07. Silencieuse, idéale pour entraînement. Casque fourni.",
+    stock:2, prixLocation:"10 €/jour", prixAchat:"600 €", emoji:"🥁", couleur:"#7c3aed" },
+  { id:5, nom:"Violon 4/4", cat:"Instrument",
+    desc:"Stentor Student II + archet + colophane + étui.",
+    stock:4, prixLocation:"4 €/jour", prixAchat:"150 €", emoji:"🎻", couleur:"#b45309" },
+  /* ENCEINTES */
+  { id:6, nom:"Enceinte Bluetooth portable", cat:"Enceinte",
+    desc:"JBL Charge 5. 20h d'autonomie, waterproof. Idéale pour événements extérieurs.",
+    stock:6, prixLocation:"5 €/jour", prixAchat:"180 €", emoji:"🔊", couleur:"#059669" },
+  { id:7, nom:"Système sono complet", cat:"Enceinte",
+    desc:"2 enceintes 400W + ampli + câbles. Pour concerts et soirées jusqu'à 200 pers.",
+    stock:1, prixLocation:"40 €/jour", prixAchat:"1200 €", emoji:"🔊", couleur:"#059669" },
+  /* PLATINES */
+  { id:8, nom:"Platines DJ Technics SL-1200", cat:"Platine DJ",
+    desc:"Paire de platines vinyle professionnelles + table de mixage Pioneer DJM-450.",
+    stock:2, prixLocation:"25 €/jour", prixAchat:"1800 €", emoji:"🎛️", couleur:"#1d5ce4" },
+  { id:9, nom:"Contrôleur DJ Numérique", cat:"Platine DJ",
+    desc:"Pioneer DDJ-400. Compatible Rekordbox. Parfait pour DJ débutant à confirmé.",
+    stock:3, prixLocation:"15 €/jour", prixAchat:"350 €", emoji:"🎛️", couleur:"#1d5ce4" },
+];
+
+
+/* ══════════════════════════════════
+   AFFICHAGE UTILISATEUR
+   ══════════════════════════════════ */
+var rolesLabels = { admin:'Administrateur', manager:'Manager', membre:'Membre', etudiant:'Étudiant' };
+document.getElementById('user-nom').textContent  = sessionUser.prenom + ' ' + sessionUser.nom;
+document.getElementById('user-role').textContent = rolesLabels[sessionUser.role] || sessionUser.role;
+if (sessionUser.role === 'admin' || sessionUser.role === 'manager') {
+  document.getElementById('lien-admin').style.display = 'flex';
+}
+
+
+/* ══════════════════════════════════
+   NIVEAUX
+   ══════════════════════════════════ */
+var niveauConfig = {
+  debutant:      { label:'Débutant',      couleur:'#059669', classBadge:'badge-vert'  },
+  intermediaire: { label:'Intermédiaire', couleur:'#d97706', classBadge:'badge-jaune' },
+  avance:        { label:'Avancé',        couleur:'#dc2626', classBadge:'badge-rouge' },
+  tous:          { label:'Tous niveaux',  couleur:'#2563eb', classBadge:'badge-bleu'  },
+};
+
+
+/* ══════════════════════════════════
+   RENDU DES ACTIVITÉS
+   ══════════════════════════════════ */
+function afficherActivites() {
+  var rech   = document.getElementById('recherche').value.toLowerCase().trim();
+  var cat    = document.getElementById('filtre-cat').value;
+  var niveau = document.getElementById('filtre-niveau').value;
+  var tri    = document.getElementById('tri').value;
+
+
+  var filtrees = ACTIVITES.filter(function(a) {
+    if (rech && !a.titre.toLowerCase().includes(rech) && !a.desc.toLowerCase().includes(rech)) return false;
+    if (cat    && a.cat !== cat) return false;
+    if (niveau && a.niveau !== niveau && a.niveau !== 'tous') return false;
+    return true;
+  });
+
+
+  /* Tri */
+  filtrees.sort(function(a, b) {
+    if (tri === 'prix-asc')  return a.prix - b.prix;
+    if (tri === 'prix-desc') return b.prix - a.prix;
+    if (tri === 'niveau') {
+      var ordre = { debutant:0, tous:1, intermediaire:2, avance:3 };
+      return (ordre[a.niveau]||0) - (ordre[b.niveau]||0);
+    }
+    return a.titre.localeCompare(b.titre);
+  });
+
+
+  document.getElementById('nb-resultats').textContent = filtrees.length;
+  var grille = document.getElementById('grille-activites');
+
+
+  if (!filtrees.length) {
+    grille.innerHTML = '<div class="aucun-resultat"><span class="emoji">🎵</span>Aucune activité ne correspond à ta recherche.</div>';
+    return;
+  }
+
+
+  grille.innerHTML = filtrees.map(function(a) {
+    var niv = niveauConfig[a.niveau] || niveauConfig['tous'];
+    return '<div class="carte-activite">' +
+      '<div class="carte-bandeau" style="background:' + a.couleur + '"></div>' +
+      '<div class="carte-activite-corps">' +
+        '<div class="carte-meta">' +
+          '<span class="badge ' + niv.classBadge + '">' + niv.label + '</span>' +
+          '<span class="badge badge-beige">' + a.places + ' places</span>' +
+        '</div>' +
+        '<h3>' + a.emoji + ' ' + a.titre + '</h3>' +
+        '<p>' + a.desc + '</p>' +
+        '<div class="carte-pied">' +
+          '<span class="niveau">' +
+            '<span class="niveau-point" style="background:' + niv.couleur + '"></span>' +
+            niv.label +
+          '</span>' +
+          '<span class="prix' + (a.prix === 0 ? ' gratuit' : '') + '">' + a.prixLabel + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+
+/* ══════════════════════════════════
+   RENDU DES RESSOURCES
+   ══════════════════════════════════ */
+function afficherRessources() {
+  var grille = document.getElementById('grille-ressources');
+  grille.innerHTML = RESSOURCES.map(function(r) {
+    var dispo = r.stock > 0;
+    return '<div class="carte-ressource">' +
+      '<div class="res-bandeau"></div>' +
+      '<div class="carte-ressource-corps">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">' +
+          '<span class="badge badge-bleu" style="font-size:.7rem">' + r.cat + '</span>' +
+          '<span class="badge ' + (dispo ? 'badge-vert' : 'badge-rouge') + '" style="font-size:.7rem">' +
+            (dispo ? r.stock + ' dispo' : 'Épuisé') +
+          '</span>' +
+        '</div>' +
+        '<h3>' + r.emoji + ' ' + r.nom + '</h3>' +
+        '<p>' + r.desc + '</p>' +
+        '<div class="res-dispo">' +
+          '<span class="res-prix-loue">📅 Location : ' + r.prixLocation + '</span>' +
+          '<span class="res-prix-achat">🛒 Achat : ' + r.prixAchat + '</span>' +
+        '</div>' +
+        '<div class="res-actions">' +
+          (dispo
+            ? '<button class="res-btn res-btn-louer" onclick="alert(\'Réservation de location envoyée !\')">Louer</button>' +
+              '<button class="res-btn res-btn-acheter" onclick="alert(\'Demande d\\\'achat envoyée !\')">Acheter</button>'
+            : '<button class="res-btn" style="background:#fee2e2;color:#991b1b;cursor:not-allowed" disabled>Indisponible</button>'
+          ) +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+
+/* ══════════════════════════════════
+   FILTRES & ÉVÉNEMENTS
+   ══════════════════════════════════ */
+function reinitFiltres() {
+  document.getElementById('recherche').value   = '';
+  document.getElementById('filtre-cat').value  = '';
+  document.getElementById('filtre-niveau').value = '';
+  document.getElementById('tri').value         = 'nom';
+  afficherActivites();
+}
+
+
+document.getElementById('recherche').addEventListener('input',  afficherActivites);
+document.getElementById('filtre-cat').addEventListener('change', afficherActivites);
+document.getElementById('filtre-niveau').addEventListener('change', afficherActivites);
+document.getElementById('tri').addEventListener('change', afficherActivites);
+
+
+/* ══ INIT ══ */
+afficherActivites();
+afficherRessources();
+</script>
+
+
+</body>
+</html>
+
