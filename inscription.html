@@ -23,27 +23,27 @@
       <div class="message-inscription erreur-inscription" id="message-erreur"></div>
       <div class="message-inscription succes-inscription" id="message-succes"></div>
 
-      <form id="form-inscription">
+      <form id="form-inscription" action="inscription.php" method="POST">
 
         <div class="champ-inscription">
-          <label for="nom">Nom</label>
-          <input type="text" id="nom" placeholder="Ex : Dupont" required>
-        </div>
+  <label for="nom">Nom</label>
+  <input type="text" id="nom" name="nom" placeholder="Ex : Dupont" required>
+</div>
 
-        <div class="champ-inscription">
-          <label for="prenom">Prénom</label>
-          <input type="text" id="prenom" placeholder="Ex : Emma" required>
-        </div>
+<div class="champ-inscription">
+  <label for="prenom">Prénom</label>
+  <input type="text" id="prenom" name="prenom" placeholder="Ex : Emma" required>
+</div>
 
-        <div class="champ-inscription">
-          <label for="email">Adresse email</label>
-          <input type="email" id="email" placeholder="prenom.nom@campus.fr" required>
-        </div>
+<div class="champ-inscription">
+  <label for="email">Adresse email</label>
+  <input type="email" id="email" name="email" placeholder="prenom.nom@campus.fr" required>
+</div>
 
-        <div class="champ-inscription">
-          <label for="mdp">Mot de passe</label>
-          <input type="password" id="mdp" placeholder="Minimum 6 caractères" required>
-        </div>
+<div class="champ-inscription">
+  <label for="mdp">Mot de passe</label>
+  <input type="password" id="mdp" name="mdp" placeholder="Minimum 6 caractères" required>
+</div>
 
         <button type="submit" class="btn-inscription">
           Créer mon compte
@@ -67,83 +67,7 @@
   </div>
 </div>
 
-<script>
-  function genererID() {
-    return 'USER-' + Math.floor(100000 + Math.random() * 900000);
-  }
 
-  function afficherErreur(message) {
-    const erreur = document.getElementById('message-erreur');
-    const succes = document.getElementById('message-succes');
-
-    succes.style.display = 'none';
-    erreur.textContent = message;
-    erreur.style.display = 'block';
-  }
-
-  function afficherSucces(message) {
-    const erreur = document.getElementById('message-erreur');
-    const succes = document.getElementById('message-succes');
-
-    erreur.style.display = 'none';
-    succes.textContent = message;
-    succes.style.display = 'block';
-  }
-
-  document.getElementById('form-inscription').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const nom = document.getElementById('nom').value.trim();
-    const prenom = document.getElementById('prenom').value.trim();
-    const email = document.getElementById('email').value.trim().toLowerCase();
-    const mdp = document.getElementById('mdp').value;
-
-    if (nom === '' || prenom === '' || email === '' || mdp === '') {
-      afficherErreur('Tous les champs doivent être remplis.');
-      return;
-    }
-
-    if (mdp.length < 6) {
-      afficherErreur('Le mot de passe doit contenir au moins 6 caractères.');
-      return;
-    }
-
-    let comptes = [];
-
-    try {
-      comptes = JSON.parse(localStorage.getItem('cp_comptes') || '[]');
-    } catch(e) {
-      comptes = [];
-    }
-
-    const emailExiste = comptes.some(function(compte) {
-      return compte.email === email;
-    });
-
-    if (emailExiste) {
-      afficherErreur('Un compte existe déjà avec cette adresse email.');
-      return;
-    }
-
-    const nouvelUtilisateur = {
-      id: genererID(),
-      nom: nom,
-      prenom: prenom,
-      email: email,
-      mdp: mdp,
-      role: 'etudiant'
-    };
-
-    comptes.push(nouvelUtilisateur);
-    localStorage.setItem('cp_comptes', JSON.stringify(comptes));
-
-    afficherSucces('Compte créé avec succès ! Redirection vers la connexion...');
-
-    setTimeout(function() {
-      window.location.href = 'index.html';
-    }, 1500);
-  });
-</script>
 
 </body>
 </html>
