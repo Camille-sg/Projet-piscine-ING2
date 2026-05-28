@@ -2,10 +2,12 @@
 require 'config.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
-$user   = $_SESSION['user'] ?? null;
 
 if ($method === 'GET') {
+    $body = [];
+    $user = getAuthUser($pdo, $body);
     if (!$user) { echo json_encode([]); exit; }
+
     if (in_array($user['role'], ['admin', 'manager'])) {
         $stmt = $pdo->query(
             "SELECT r.*, rs.nom AS ressource_nom FROM reservations r
@@ -19,19 +21,22 @@ if ($method === 'GET') {
         );
         $stmt->execute([$user['email']]);
     }
-    echo json_encode($stmt->fetchAll());
+    $rows = $stmt->fetchAll();
+    foreach ($rows as &$row) { $row['id'] = (int)$row['id']; $row['ressource_id'] = (int)$row['ressource_id']; $row['quantite'] = (int)$row['quantite']; }
+    echo json_encode($rows);
     exit;
 }
 
 if ($method === 'POST') {
-    if (!$user) { http_response_code(401); echo json_encode(['succes' => false]); exit; }
     $data   = json_decode(file_get_contents('php://input'), true) ?? [];
+    $user   = getAuthUser($pdo, $data);
+    if (!$user) { http_response_code(401); echo json_encode(['succes' => false, 'erreur' => 'Non connecté.']); exit; }
     $action = $data['action'] ?? '';
 
     switch ($action) {
         case 'creer':
-            $res_id  = (int)($data['ressource_id'] ?? 0);
-            $qte     = max(1, (int)($data['quantite'] ?? 1));
+            $res_id = (int)($data['ressource_id'] ?? 0);
+            $qte    = max(1, (int)($data['quantite'] ?? 1));
 
             $stmt = $pdo->prepare("SELECT * FROM ressources WHERE id = ?");
             $stmt->execute([$res_id]);
@@ -52,6 +57,23 @@ if ($method === 'POST') {
             echo json_encode(['succes' => true]);
             break;
 
+        case 'annuler':
+            $id = (int)($data['id'] ?? 0);
+            $stmt = $pdo->prepare("SELECT * FROM reservations WHERE id = ?");
+            $stmt->execute([$id]);
+            $r = $stmt->fetch();
+            if (!$r) { echo json_encode(['succes' => false, 'erreur' => 'Réservation introuvable.']); exit; }
+            if ($r['user_email'] !== $user['email'] && !in_array($user['role'], ['admin', 'manager'])) {
+                http_response_code(403); echo json_encode(['succes' => false, 'erreur' => 'Non autorisé.']); exit;
+            }
+            if (!in_array($r['statut'], ['refuse', 'annule'])) {
+                $pdo->prepare("UPDATE ressources SET quantite_disponible = quantite_disponible + ? WHERE id = ?")
+                    ->execute([$r['quantite'], $r['ressource_id']]);
+            }
+            $pdo->prepare("DELETE FROM reservations WHERE id = ?")->execute([$id]);
+            echo json_encode(['succes' => true]);
+            break;
+
         case 'statut':
             if (!in_array($user['role'], ['admin', 'manager'])) {
                 http_response_code(403); echo json_encode(['succes' => false]); exit;
@@ -60,7 +82,6 @@ if ($method === 'POST') {
             $ok     = ['approuve', 'refuse', 'annule', 'en_attente'];
             $statut = in_array($data['statut'] ?? '', $ok) ? $data['statut'] : 'en_attente';
 
-            // Si refus/annulation → restituer la quantité
             if (in_array($statut, ['refuse', 'annule'])) {
                 $stmt = $pdo->prepare("SELECT ressource_id, quantite, statut FROM reservations WHERE id = ?");
                 $stmt->execute([$id]);
@@ -74,5 +95,8 @@ if ($method === 'POST') {
             $pdo->prepare("UPDATE reservations SET statut = ? WHERE id = ?")->execute([$statut, $id]);
             echo json_encode(['succes' => true]);
             break;
+
+        default:
+            echo json_encode(['succes' => false, 'erreur' => 'Action inconnue.']);
     }
 }

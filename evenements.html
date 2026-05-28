@@ -2,731 +2,104 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>CampusPlay — Évènements</title>
+  <title>CampusPlay — Événements</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-
-    /* ══ SPÉCIFIQUE PAGE ÉVÈNEMENTS ══ */
-
-    /* Corps : liste + calendrier côte à côte */
-    .evenements-layout {
-      display: grid;
-      grid-template-columns: 1fr 220px;
-      gap: 1.5rem;
-      align-items: start;
-    }
-
-    /* ── Liste des évènements ── */
-    .liste-evenements {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .carte-evenement {
-      background: var(--blanc);
-      border: 1px solid var(--beige-bord);
-      border-radius: .75rem;
-      overflow: hidden;
-      display: flex;
-      gap: 0;
-      transition: .2s;
-    }
-    .carte-evenement:hover {
-      box-shadow: 0 6px 24px rgba(13,27,62,.12);
-      transform: translateY(-2px);
-      border-color: var(--bleu-clair);
-    }
-
-    /* Bande couleur gauche */
-    .carte-couleur {
-      width: 5px;
-      flex-shrink: 0;
-    }
-
-    /* Photo */
-    .carte-photo {
-      width: 120px;
-      flex-shrink: 0;
-      background: var(--beige);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.8rem;
-      border-right: 1px solid var(--beige-bord);
-      min-height: 120px;
-    }
-
-    /* Infos */
-    .carte-infos {
-      flex: 1;
-      padding: 1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .carte-infos-haut h3 {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--bleu-nuit);
-      margin-bottom: .4rem;
-    }
-
-    .carte-detail {
-      display: flex;
-      flex-direction: column;
-      gap: .2rem;
-      margin-bottom: .75rem;
-    }
-    .carte-detail span {
-      font-size: .83rem;
-      color: var(--texte-doux);
-      display: flex;
-      align-items: center;
-      gap: .4rem;
-    }
-
-    .carte-bas {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: .5rem;
-    }
-
-    .btn-infos {
-      padding: .4rem 1rem;
-      background: var(--bleu-pale);
-      color: var(--bleu-marine);
-      border: 1.5px solid var(--bleu-clair);
-      border-radius: .45rem;
-      font-size: .82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: .15s;
-      text-decoration: none;
-    }
-    .btn-infos:hover {
-      background: var(--bleu-marine);
-      color: var(--blanc);
-      border-color: var(--bleu-marine);
-    }
-
-    .places-restantes {
-      font-size: .78rem;
-      color: var(--texte-pale);
-    }
-    .places-restantes.rouge { color: var(--erreur); font-weight: 600; }
-    .places-restantes.vert  { color: var(--succes); }
-
-    /* ── MODAL INFORMATIONS ── */
-    .modal-bg {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(13,27,62,.55);
-      z-index: 400;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(2px);
-    }
-    .modal-bg.ouvert { display: flex; }
-
-    .modal-boite {
-      background: var(--blanc);
-      border-radius: .9rem;
-      width: 100%;
-      max-width: 520px;
-      margin: 1rem;
-      box-shadow: 0 20px 60px rgba(13,27,62,.3);
-      overflow: hidden;
-    }
-    .modal-entete {
-      padding: 1.25rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-entete h2 {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--blanc);
-    }
-    .modal-fermer {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,.65);
-      font-size: 1.4rem;
-      cursor: pointer;
-    }
-    .modal-fermer:hover { color: var(--blanc); }
-
-    .modal-contenu { padding: 1.5rem; }
-    .modal-ligne {
-      display: flex;
-      gap: .75rem;
-      align-items: flex-start;
-      padding: .55rem 0;
-      border-bottom: 1px solid var(--beige-bord);
-      font-size: .88rem;
-    }
-    .modal-ligne:last-child { border-bottom: none; }
-    .modal-ligne .icone { width: 1.4rem; text-align: center; flex-shrink: 0; }
-    .modal-ligne strong { color: var(--bleu-nuit); display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
-    .modal-ligne span   { color: var(--texte-doux); }
-
-    .modal-pied {
-      padding: 1rem 1.5rem;
-      background: var(--beige);
-      display: flex;
-      gap: .75rem;
-      justify-content: flex-end;
-    }
-
-    /* ── CALENDRIER ── */
-    .calendrier {
-      background: var(--blanc);
-      border: 1px solid var(--beige-bord);
-      border-radius: .75rem;
-      overflow: hidden;
-      position: sticky;
-      top: 1rem;
-    }
-
-    .cal-entete {
-      background: var(--bleu-nuit);
-      padding: .75rem 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .cal-entete h3 {
-      color: var(--blanc);
-      font-size: .9rem;
-      font-weight: 700;
-    }
-    .cal-nav {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,.6);
-      font-size: 1rem;
-      cursor: pointer;
-      padding: .1rem .3rem;
-      border-radius: .3rem;
-      transition: .12s;
-    }
-    .cal-nav:hover { color: var(--blanc); background: rgba(255,255,255,.1); }
-
-    .cal-jours-semaine {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      background: var(--beige);
-      border-bottom: 1px solid var(--beige-bord);
-    }
-    .cal-jours-semaine span {
-      text-align: center;
-      font-size: .65rem;
-      font-weight: 700;
-      color: var(--texte-pale);
-      text-transform: uppercase;
-      padding: .4rem 0;
-    }
-
-    .cal-grille {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      padding: .25rem;
-      gap: 1px;
-    }
-
-    .cal-jour {
-      text-align: center;
-      padding: .35rem .1rem;
-      font-size: .78rem;
-      border-radius: .3rem;
-      cursor: default;
-      color: var(--texte-doux);
-      position: relative;
-    }
-    .cal-jour.vide { color: transparent; }
-    .cal-jour.aujourd-hui {
-      background: var(--bleu-vif);
-      color: var(--blanc);
-      font-weight: 800;
-      border-radius: 50%;
-    }
-    .cal-jour.a-evenement {
-      color: var(--bleu-nuit);
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .cal-jour.a-evenement::after {
-      content: '';
-      display: block;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--or);
-      margin: 1px auto 0;
-    }
-    .cal-jour.a-evenement:hover { background: var(--bleu-pale); }
-
-    /* Légende calendrier */
-    .cal-legende {
-      padding: .6rem 1rem;
-      border-top: 1px solid var(--beige-bord);
-      font-size: .72rem;
-      color: var(--texte-pale);
-      display: flex;
-      align-items: center;
-      gap: .4rem;
-    }
-    .cal-legende::before {
-      content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--or);
-      flex-shrink: 0;
-    }
-
-    /* Filtres */
-    .barre-filtres-ev {
-      background: var(--blanc);
-      border: 1px solid var(--beige-bord);
-      border-radius: .75rem;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.25rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: .75rem;
-      align-items: flex-end;
-    }
-    .filtre-ev {
-      display: flex;
-      flex-direction: column;
-      gap: .25rem;
-    }
-    .filtre-ev label {
-      font-size: .7rem;
-      font-weight: 700;
-      color: var(--bleu-marine);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-    }
-    .filtre-ev input,
-    .filtre-ev select {
-      padding: .5rem .85rem;
-      border: 1.5px solid var(--beige-bord);
-      border-radius: .45rem;
-      font-size: .85rem;
-      font-family: inherit;
-      background: var(--beige-clair);
-      color: var(--texte);
-      transition: .15s;
-    }
-    .filtre-ev input:focus,
-    .filtre-ev select:focus {
-      outline: none;
-      border-color: var(--bleu-vif);
-      background: var(--blanc);
-    }
-    .filtre-ev.large input { min-width: 210px; }
-
-    @media (max-width: 760px) {
-      .evenements-layout { grid-template-columns: 1fr; }
-      .calendrier { position: static; }
-      .carte-photo { width: 80px; font-size: 2rem; }
-    }
-  </style>
 </head>
 <body>
 
-<script>
-  var sessionUser = null;
-  try { sessionUser = JSON.parse(localStorage.getItem('campusplay_user')); } catch(e) {}
-  if (!sessionUser) window.location.href = 'index.html';
-  function deconnecter() {
-    localStorage.removeItem('campusplay_user');
-    window.location.href = 'index.html';
-  }
-</script>
+<script src="data.js"></script>
+<script>renderNavbar('evenements');</script>
 
-<div class="page-wrapper">
+<div class="conteneur">
+  <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem">📅 Événements</h1>
 
-  <!-- ════ HEADER ════ -->
-  <header class="site-header">
-    <div class="logo-cercle">🎵</div>
-    <div class="site-header-centre">
-      <h1>CampusPlay</h1>
-      <p class="sous-titre">Évènements associatifs et organisation des activités</p>
+  <!-- Filtres -->
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;background:white;border:1px solid var(--bordure);border-radius:.75rem;padding:1rem">
+    <div style="flex:1;min-width:200px">
+      <input type="text" id="recherche" placeholder="🔍 Rechercher un événement…"
+             style="width:100%;padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
     </div>
-    <div class="header-user">
-      <span class="user-nom"  id="user-nom"></span>
-      <span class="user-role" id="user-role"></span>
-      <button class="btn-deconnexion" onclick="deconnecter()">Déconnexion</button>
-    </div>
-  </header>
-
-  <!-- ════ CORPS ════ -->
-  <div class="site-corps">
-
-    <!-- SIDEBAR -->
-    <nav class="sidebar">
-      <a href="accueil.html">
-        <span class="icone">🏠</span> Accueil
-      </a>
-      <a href="activites.html">
-        <span class="icone">🎵</span> Activités
-      </a>
-      <a href="evenements.html" class="actif">
-        <span class="icone">📅</span> Évènements
-      </a>
-      <a href="ressources.html">
-        <span class="icone">📦</span> Ressources
-      </a>
-      <a href="reservations.html">
-        <span class="icone">🔖</span> Réservations
-      </a>
-      <hr>
-      <a href="notifications.html">
-        <span class="icone">🔔</span> Notifications
-      </a>
-      <hr>
-      <a href="profil.html">
-        <span class="icone">👤</span> Mon profil
-      </a>
-      <a href="admin.html" id="lien-admin" style="display:none">
-        <span class="icone">⚙️</span> Admin
-      </a>
-    </nav>
-
-    <!-- CONTENU PRINCIPAL -->
-    <main class="site-contenu">
-
-      <h1 class="page-titre">📅 Évènements</h1>
-
-      <!-- FILTRES -->
-      <div class="barre-filtres-ev">
-        <div class="filtre-ev large">
-          <label>🔍 Rechercher</label>
-          <input type="text" id="recherche" placeholder="Concert, battle, DJ…">
-        </div>
-        <div class="filtre-ev">
-          <label>Type</label>
-          <select id="filtre-type">
-            <option value="">Tous</option>
-            <option value="concert">🎤 Concert</option>
-            <option value="battle">🥊 Battle</option>
-            <option value="cours">🎸 Cours</option>
-            <option value="dj">🎧 DJ</option>
-            <option value="karaoke">🎶 Karaoké</option>
-          </select>
-        </div>
-        <div class="filtre-ev">
-          <label>Mois</label>
-          <select id="filtre-mois">
-            <option value="">Tous</option>
-            <option value="6">Juin 2026</option>
-            <option value="7">Juillet 2026</option>
-          </select>
-        </div>
-        <div class="filtre-ev">
-          <label>Places</label>
-          <select id="filtre-places">
-            <option value="">Toutes</option>
-            <option value="dispo">Disponibles</option>
-            <option value="plein">Complet</option>
-          </select>
-        </div>
-      </div>
-
-      <p style="font-size:.82rem;color:var(--texte-pale);margin-bottom:1rem">
-        <span id="nb-ev" style="color:var(--bleu-vif);font-weight:700">0</span> évènement(s) affiché(s)
-      </p>
-
-      <!-- Layout : liste + calendrier -->
-      <div class="evenements-layout">
-
-        <!-- LISTE -->
-        <div class="liste-evenements" id="liste-ev"></div>
-
-        <!-- CALENDRIER -->
-        <div class="calendrier">
-          <div class="cal-entete">
-            <button class="cal-nav" onclick="changerMois(-1)">‹</button>
-            <h3 id="cal-titre">Juin 2026</h3>
-            <button class="cal-nav" onclick="changerMois(1)">›</button>
-          </div>
-          <div class="cal-jours-semaine">
-            <span>Lu</span><span>Ma</span><span>Me</span>
-            <span>Je</span><span>Ve</span><span>Sa</span><span>Di</span>
-          </div>
-          <div class="cal-grille" id="cal-grille"></div>
-          <div class="cal-legende">Jour avec évènement</div>
-        </div>
-
-      </div>
-
-    </main>
+    <select id="filtre-activite" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
+      <option value="">Toutes les activités</option>
+    </select>
+    <select id="filtre-places" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
+      <option value="">Toutes les places</option>
+      <option value="dispo">Places disponibles</option>
+      <option value="plein">Complet</option>
+    </select>
   </div>
 
-  <!-- ════ FOOTER ════ -->
-  <footer class="site-footer">
-    <strong>Copyright</strong> © 2026 CampusPlay &nbsp;·&nbsp; contact@campusplay.fr &nbsp;·&nbsp; 01 23 45 67 89 &nbsp;·&nbsp; 123 Rue de l'École, 75000 Paris
-  </footer>
-
+  <div class="grille-3" id="liste-evenements"></div>
+  <p id="aucun" style="display:none;color:#64748b;text-align:center;padding:2rem">Aucun événement trouvé.</p>
 </div>
 
-<!-- ════ MODAL INFORMATIONS ════ -->
-<div class="modal-bg" id="modal" onclick="fermerModalSiDehors(event)">
-  <div class="modal-boite">
-    <div class="modal-entete" id="modal-entete" style="background:var(--bleu-nuit)">
-      <h2 id="modal-titre">Détails de l'évènement</h2>
-      <button class="modal-fermer" onclick="fermerModal()">✕</button>
-    </div>
-    <div class="modal-contenu" id="modal-corps"></div>
-    <div class="modal-pied">
-      <button onclick="fermerModal()" class="btn btn-gris" style="font-size:.85rem">Fermer</button>
-      <button onclick="sInscrire()" class="btn btn-primaire" style="font-size:.85rem" id="btn-inscrire">
-        S'inscrire
-      </button>
-    </div>
-  </div>
-</div>
+<footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
+  © 2026 CampusPlay — Tous droits réservés
+</footer>
 
 <script>
-/* ══════════════════════════════════
-   DONNÉES ÉVÈNEMENTS
-   ══════════════════════════════════ */
-var EVENEMENTS = [
-  { id:1, titre:"Concert acoustique mensuel", type:"concert",
-    date:"2026-06-06", heure:"19h00 – 22h00", lieu:"Salle des fêtes — Campus B",
-    desc:"Scène ouverte à tous les musiciens. Guitare, voix, piano. Ambiance intimiste garantie.",
-    places:50, inscrits:28, emoji:"🎤", couleur:"#ec4899", gratuit:true  },
-  { id:2, titre:"Battle de Rap — Édition Juin", type:"battle",
-    date:"2026-06-13", heure:"18h30 – 21h00", lieu:"Amphi 200 — Bâtiment C",
-    desc:"Freestyle ou texte écrit. Jury de 3 membres. Lots pour les 3 premiers. Inscriptions obligatoires.",
-    places:16, inscrits:12, emoji:"🥊", couleur:"#dc2626", gratuit:true  },
-  { id:3, titre:"Soirée Karaoké", type:"karaoke",
-    date:"2026-06-19", heure:"20h00 – 23h00", lieu:"Foyer étudiant — RDC",
-    desc:"Catalogue de + de 500 titres. Boissons au bar. Micro ouvert toute la soirée.",
-    places:30, inscrits:30, emoji:"🎶", couleur:"#10b981", gratuit:false, prix:"2 €" },
-  { id:4, titre:"Masterclass DJ — Pioneer DDJ", type:"dj",
-    date:"2026-06-21", heure:"14h00 – 17h00", lieu:"Studio musique — Salle 12",
-    desc:"Atelier animé par DJ Marco. Techniques de mix, harmonic mixing et gestion de set live.",
-    places:10, inscrits:7, emoji:"🎧", couleur:"#1d5ce4", gratuit:false, prix:"15 €" },
-  { id:5, titre:"Concert de fin d'année", type:"concert",
-    date:"2026-06-27", heure:"17h00 – 22h00", lieu:"Auditorium principal",
-    desc:"Grand concert annuel avec tous les élèves des cours. Artistes invités surprise. Entrée libre.",
-    places:200, inscrits:143, emoji:"🎤", couleur:"#ec4899", gratuit:false, prix:"5 €" },
-  { id:6, titre:"Cours de guitare — Démo gratuite", type:"cours",
-    date:"2026-07-02", heure:"10h00 – 11h30", lieu:"Salle de musique — A108",
-    desc:"Séance de découverte ouverte à tous. Guitares prêtées sur place. Sans engagement.",
-    places:12, inscrits:4, emoji:"🎸", couleur:"#4f46e5", gratuit:true  },
-  { id:7, titre:"Battle Beatbox", type:"battle",
-    date:"2026-07-10", heure:"19h00 – 21h00", lieu:"Foyer étudiant — RDC",
-    desc:"Percussions vocales, basses et effets. Format 1 vs 1, tirage au sort. Jury public.",
-    places:12, inscrits:5, emoji:"🎙️", couleur:"#7c3aed", gratuit:true  },
-  { id:8, titre:"Scène ouverte — Jam Session Jazz", type:"concert",
-    date:"2026-07-17", heure:"18h30 – 21h30", lieu:"Cour intérieure — Bâtiment A",
-    desc:"Jam session jazz en plein air. Musiciens de tous niveaux bienvenus. Partitions disponibles.",
-    places:40, inscrits:18, emoji:"🎷", couleur:"#b45309", gratuit:true  },
-];
+// Remplir le filtre activités
+const sel = document.getElementById('filtre-activite');
+ACTIVITES.forEach(a => {
+  const o = document.createElement('option');
+  o.value = a.id;
+  o.textContent = a.titre;
+  sel.appendChild(o);
+});
 
-var evenementCourant = null;
+function afficher() {
+  const recherche  = document.getElementById('recherche').value.toLowerCase();
+  const filtreAct  = document.getElementById('filtre-activite').value;
+  const filtrePl   = document.getElementById('filtre-places').value;
+  const isAdmin    = getRole() === 'admin' || getRole() === 'manager';
 
-/* ══════════════════════════════════
-   AFFICHAGE UTILISATEUR
-   ══════════════════════════════════ */
-var rolesLabels = { admin:'Administrateur', manager:'Manager', membre:'Membre', etudiant:'Étudiant' };
-document.getElementById('user-nom').textContent  = sessionUser.prenom + ' ' + sessionUser.nom;
-document.getElementById('user-role').textContent = rolesLabels[sessionUser.role] || sessionUser.role;
-if (sessionUser.role === 'admin' || sessionUser.role === 'manager') {
-  document.getElementById('lien-admin').style.display = 'flex';
-}
-
-/* ══════════════════════════════════
-   FORMATER LA DATE
-   ══════════════════════════════════ */
-function formaterDate(dateStr) {
-  var d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-}
-
-/* ══════════════════════════════════
-   AFFICHER LES ÉVÈNEMENTS
-   ══════════════════════════════════ */
-function afficherEvenements() {
-  var rech   = document.getElementById('recherche').value.toLowerCase().trim();
-  var type   = document.getElementById('filtre-type').value;
-  var mois   = document.getElementById('filtre-mois').value;
-  var places = document.getElementById('filtre-places').value;
-
-  var filtres = EVENEMENTS.filter(function(ev) {
-    if (rech  && !ev.titre.toLowerCase().includes(rech) && !ev.desc.toLowerCase().includes(rech)) return false;
-    if (type  && ev.type !== type) return false;
-    if (mois) {
-      var m = new Date(ev.date + 'T00:00:00').getMonth() + 1;
-      if (m !== parseInt(mois)) return false;
-    }
-    if (places === 'dispo' && ev.inscrits >= ev.places) return false;
-    if (places === 'plein' && ev.inscrits < ev.places)  return false;
+  const filtres = EVENEMENTS.filter(ev => {
+    if (!isAdmin && ev.statut !== 'approuve') return false;
+    if (recherche && !ev.titre.toLowerCase().includes(recherche)) return false;
+    // Comparaison souple (== au lieu de ===) pour éviter les problèmes de type int/string
+    if (filtreAct && ev.activite_id != parseInt(filtreAct)) return false;
+    if (filtrePl === 'dispo' && ev.places_prises >= ev.places_max) return false;
+    if (filtrePl === 'plein' && ev.places_prises < ev.places_max) return false;
     return true;
   });
 
-  document.getElementById('nb-ev').textContent = filtres.length;
-  var liste = document.getElementById('liste-ev');
+  const conteneur = document.getElementById('liste-evenements');
+  const aucun     = document.getElementById('aucun');
+  conteneur.innerHTML = '';
 
-  if (!filtres.length) {
-    liste.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--texte-pale);font-style:italic">📅 Aucun évènement trouvé.</div>';
-    return;
-  }
+  if (!filtres.length) { aucun.style.display = 'block'; return; }
+  aucun.style.display = 'none';
 
-  liste.innerHTML = filtres.map(function(ev) {
-    var plein    = ev.inscrits >= ev.places;
-    var restants = ev.places - ev.inscrits;
-    var classPl  = plein ? 'rouge' : (restants <= 5 ? 'rouge' : 'vert');
-    var txtPl    = plein ? 'Complet' : restants + ' place' + (restants > 1 ? 's' : '') + ' restante' + (restants > 1 ? 's' : '');
-    var prixTxt  = ev.gratuit ? '<span style="color:var(--succes);font-weight:700;font-size:.78rem">Gratuit</span>'
-                              : '<span style="color:var(--attention);font-weight:700;font-size:.78rem">' + ev.prix + '</span>';
+  const statuts = { approuve: 'badge-vert', en_attente: 'badge-jaune', refuse: 'badge-rouge' };
 
-    return '<div class="carte-evenement">' +
-      '<div class="carte-couleur" style="background:' + ev.couleur + '"></div>' +
-      '<div class="carte-photo">' + ev.emoji + '</div>' +
-      '<div class="carte-infos">' +
-        '<div class="carte-infos-haut">' +
-          '<div style="display:flex;gap:.4rem;margin-bottom:.35rem;flex-wrap:wrap">' +
-            '<span class="badge badge-bleu" style="font-size:.7rem">' + ev.type + '</span>' +
-            prixTxt +
-          '</div>' +
-          '<h3>' + ev.titre + '</h3>' +
-          '<div class="carte-detail">' +
-            '<span>📅 ' + formaterDate(ev.date) + '</span>' +
-            '<span>🕐 ' + ev.heure + '</span>' +
-            '<span>📍 ' + ev.lieu + '</span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="carte-bas">' +
-          '<button class="btn-infos" onclick="ouvrirModal(' + ev.id + ')">Informations</button>' +
-          '<span class="places-restantes ' + classPl + '">👥 ' + txtPl + '</span>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
+  filtres.forEach(ev => {
+    // Utilise les données de la jointure SQL en priorité, puis cherche dans ACTIVITES
+    const actTitre  = ev.activite_titre  || (ACTIVITES.find(a => a.id == ev.activite_id)?.titre  ?? '—');
+    const actCouleur= ev.activite_couleur|| (ACTIVITES.find(a => a.id == ev.activite_id)?.couleur ?? '#6366f1');
+    const plein     = ev.places_prises >= ev.places_max;
 
-/* ══════════════════════════════════
-   MODAL
-   ══════════════════════════════════ */
-function ouvrirModal(id) {
-  evenementCourant = EVENEMENTS.find(function(e) { return e.id === id; });
-  if (!evenementCourant) return;
-
-  var ev    = evenementCourant;
-  var plein = ev.inscrits >= ev.places;
-
-  document.getElementById('modal-entete').style.background = ev.couleur;
-  document.getElementById('modal-titre').textContent       = ev.emoji + ' ' + ev.titre;
-
-  document.getElementById('modal-corps').innerHTML =
-    '<div class="modal-ligne"><span class="icone">📅</span><div><strong>Date</strong><span>' + formaterDate(ev.date) + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">🕐</span><div><strong>Horaires</strong><span>' + ev.heure + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">📍</span><div><strong>Lieu</strong><span>' + ev.lieu + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">💬</span><div><strong>Description</strong><span>' + ev.desc + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">👥</span><div><strong>Places</strong><span>' + ev.inscrits + ' inscrit(s) sur ' + ev.places + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">💶</span><div><strong>Tarif</strong><span>' + (ev.gratuit ? 'Gratuit' : ev.prix) + '</span></div></div>';
-
-  var btnInscr = document.getElementById('btn-inscrire');
-  if (plein) {
-    btnInscr.textContent = 'Liste d\'attente';
-    btnInscr.className   = 'btn btn-gris';
-  } else {
-    btnInscr.textContent = 'S\'inscrire';
-    btnInscr.className   = 'btn btn-primaire';
-  }
-
-  document.getElementById('modal').classList.add('ouvert');
-}
-
-function fermerModal() {
-  document.getElementById('modal').classList.remove('ouvert');
-  evenementCourant = null;
-}
-
-function fermerModalSiDehors(e) {
-  if (e.target.id === 'modal') fermerModal();
-}
-
-function sInscrire() {
-  if (!evenementCourant) return;
-  var plein = evenementCourant.inscrits >= evenementCourant.places;
-  alert(plein
-    ? 'Tu as été ajouté(e) à la liste d\'attente pour "' + evenementCourant.titre + '" !'
-    : 'Inscription confirmée pour "' + evenementCourant.titre + '" ! 🎉');
-  fermerModal();
-}
-
-/* ══════════════════════════════════
-   CALENDRIER
-   ══════════════════════════════════ */
-var calMois = 5; // 0 = janvier → 5 = juin
-var calAnnee = 2026;
-
-var MOIS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-
-function joursAvecEvenements(mois, annee) {
-  var jours = {};
-  EVENEMENTS.forEach(function(ev) {
-    var d = new Date(ev.date + 'T00:00:00');
-    if (d.getMonth() === mois && d.getFullYear() === annee) {
-      jours[d.getDate()] = true;
-    }
+    conteneur.innerHTML += `
+      <a href="evenement.html?id=${ev.id}" style="text-decoration:none;display:block">
+        <div class="carte" style="cursor:pointer;height:100%">
+          <div style="background:${actCouleur};height:5px;border-radius:4px 4px 0 0;margin:-1.5rem -1.5rem 1rem"></div>
+          <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
+            <span class="badge ${plein ? 'badge-rouge' : 'badge-vert'}">${plein ? 'Complet' : (ev.places_max - ev.places_prises) + ' places'}</span>
+            ${isAdmin ? `<span class="badge ${statuts[ev.statut]}">${ev.statut.replace('_',' ')}</span>` : ''}
+          </div>
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:.5rem;color:#1e293b">${e(ev.titre)}</h3>
+          <p style="font-size:.82rem;color:#64748b;margin-bottom:.2rem">📅 ${formatDate(ev.date_debut)}</p>
+          <p style="font-size:.82rem;color:#64748b;margin-bottom:.2rem">📍 ${e(ev.lieu)}</p>
+          <p style="font-size:.82rem;color:#94a3b8">🎯 ${e(actTitre)}</p>
+          <p style="font-size:.82rem;color:#4f46e5;margin-top:.75rem;font-weight:600">Voir le détail →</p>
+        </div>
+      </a>`;
   });
-  return jours;
 }
 
-function afficherCalendrier() {
-  document.getElementById('cal-titre').textContent = MOIS_FR[calMois] + ' ' + calAnnee;
-  var grille = document.getElementById('cal-grille');
-  var today  = new Date();
-
-  var premierJour = new Date(calAnnee, calMois, 1).getDay(); // 0=dim
-  // Convertir : dimanche=0 → 6, lundi=1 → 0
-  var decalage = (premierJour === 0) ? 6 : premierJour - 1;
-  var nbJours  = new Date(calAnnee, calMois + 1, 0).getDate();
-  var avecEv   = joursAvecEvenements(calMois, calAnnee);
-
-  var html = '';
-  for (var i = 0; i < decalage; i++) {
-    html += '<div class="cal-jour vide">-</div>';
-  }
-  for (var j = 1; j <= nbJours; j++) {
-    var estAujourd = (j === today.getDate() && calMois === today.getMonth() && calAnnee === today.getFullYear());
-    var classes = 'cal-jour';
-    if (estAujourd) classes += ' aujourd-hui';
-    else if (avecEv[j]) classes += ' a-evenement';
-    html += '<div class="' + classes + '">' + j + '</div>';
-  }
-  grille.innerHTML = html;
-}
-
-function changerMois(dir) {
-  calMois += dir;
-  if (calMois > 11) { calMois = 0; calAnnee++; }
-  if (calMois < 0)  { calMois = 11; calAnnee--; }
-  afficherCalendrier();
-}
-
-/* Filtres */
-document.getElementById('recherche').addEventListener('input', afficherEvenements);
-document.getElementById('filtre-type').addEventListener('change', afficherEvenements);
-document.getElementById('filtre-mois').addEventListener('change', afficherEvenements);
-document.getElementById('filtre-places').addEventListener('change', afficherEvenements);
-
-/* ══ INIT ══ */
-afficherEvenements();
-afficherCalendrier();
+document.getElementById('recherche').addEventListener('input', afficher);
+document.getElementById('filtre-activite').addEventListener('change', afficher);
+document.getElementById('filtre-places').addEventListener('change', afficher);
+afficher();
 </script>
 
 </body>

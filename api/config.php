@@ -1,10 +1,4 @@
 <?php
-// ⚙️ Modifie DB_PORT selon ta version MAMP :
-//   MAMP (standard) → 8889
-//   MAMP Pro        → 8889 ou 3306
-//   Si ça ne se connecte pas, essaie 3306
-
-
 define('DB_HOST', '127.0.0.1');
 define('DB_PORT', 3306);
 define('DB_NAME', 'projet_info');
@@ -31,6 +25,15 @@ try {
 header('Content-Type: application/json; charset=utf-8');
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
     session_start();
+}
+
+function getAuthUser(PDO $pdo, array $data = []): ?array {
+    if (!empty($_SESSION['user'])) return $_SESSION['user'];
+    $email = $data['_user'] ?? '';
+    if (!$email) return null;
+    $stmt = $pdo->prepare("SELECT id, prenom, nom, email, role FROM comptes WHERE email = ?");
+    $stmt->execute([$email]);
+    $row = $stmt->fetch();
+    return $row ?: null;
 }

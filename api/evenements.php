@@ -2,35 +2,51 @@
 require 'config.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
-$user   = $_SESSION['user'] ?? null;
+$body   = json_decode(file_get_contents('php://input'), true) ?? [];
 
-// ── GET : liste des événements ─────────────────────────────
 if ($method === 'GET') {
     $stmt = $pdo->query(
-        "SELECT e.*, a.titre AS activite_titre, a.couleur AS activite_couleur
+        "SELECT e.*,
+                a.titre  AS activite_titre,
+                a.couleur AS activite_couleur
          FROM evenements e
          LEFT JOIN activites a ON e.activite_id = a.id
          ORDER BY e.date_debut ASC"
     );
-    echo json_encode($stmt->fetchAll());
+    $rows = $stmt->fetchAll();
+    foreach ($rows as &$row) {
+        $row['id']            = (int)$row['id'];
+        $row['activite_id']   = (int)$row['activite_id'];
+        $row['places_max']    = (int)$row['places_max'];
+        $row['places_prises'] = (int)$row['places_prises'];
+    }
+    echo json_encode($rows);
     exit;
 }
 
-// ── POST : créer / changer statut / supprimer ──────────────
 if ($method === 'POST') {
-    if (!$user) { http_response_code(401); echo json_encode(['succes' => false, 'erreur' => 'Non connecté']); exit; }
-    if (!in_array($user['role'], ['admin', 'manager'])) {
-        http_response_code(403); echo json_encode(['succes' => false, 'erreur' => 'Accès refusé']); exit;
+    $authUser = getAuthUser($pdo, $body);
+
+    if (!$authUser) {
+        http_response_code(401);
+        echo json_encode(['succes' => false, 'erreur' => 'Session expirée. Reconnecte-toi.']);
+        exit;
+    }
+    if (!in_array($authUser['role'], ['admin', 'manager'])) {
+        http_response_code(403);
+        echo json_encode(['succes' => false, 'erreur' => 'Accès refusé.']);
+        exit;
     }
 
-    $data   = json_decode(file_get_contents('php://input'), true) ?? [];
-    $action = $data['action'] ?? '';
+    $action = $body['action'] ?? '';
 
     switch ($action) {
-
         case 'creer':
-            if (empty($data['titre']) || empty($data['date_debut']) || empty($data['date_fin'])) {
-                echo json_encode(['succes' => false, 'erreur' => 'Champs obligatoires manquants.']); exit;
+            if (empty($body['titre'])) {
+                echo json_encode(['succes' => false, 'erreur' => 'Le titre est obligatoire.']); exit;
+            }
+            if (empty($body['date_debut']) || empty($body['date_fin'])) {
+                echo json_encode(['succes' => false, 'erreur' => 'Les dates sont obligatoires.']); exit;
             }
             $stmt = $pdo->prepare(
                 "INSERT INTO evenements
@@ -38,30 +54,36 @@ if ($method === 'POST') {
                  VALUES (?, ?, ?, ?, ?, ?, ?, 'approuve')"
             );
             $stmt->execute([
-                $data['titre'],
-                (int)($data['activite_id'] ?? 0),
-                $data['date_debut'],
-                $data['date_fin'],
-                $data['lieu']        ?? '',
-                (int)($data['places_max'] ?? 20),
-                $data['description'] ?? '',
-                            ]);
+                $body['titre'],
+                (int)($body['activite_id'] ?? 0),
+                $body['date_debut'],
+                $body['date_fin'],
+                $body['lieu']        ?? '',
+                (int)($body['places_max'] ?? 20),
+                $body['description'] ?? '',
+            ]);
             echo json_encode(['succes' => true, 'id' => (int)$pdo->lastInsertId()]);
             break;
 
         case 'statut':
-            $statuts_ok = ['approuve', 'refuse', 'en_attente'];
-            $statut = in_array($data['statut'] ?? '', $statuts_ok) ? $data['statut'] : 'en_attente';
-            $pdo->prepare("UPDATE evenements SET statut = ? WHERE id = ?")->execute([$statut, (int)$data['id']]);
+            $ok     = ['approuve', 'refuse', 'en_attente'];
+            $statut = in_array($body['statut'] ?? '', $ok) ? $body['statut'] : 'en_attente';
+            $pdo->prepare("UPDATE evenements SET statut = ? WHERE id = ?")
+                ->execute([$statut, (int)($body['id'] ?? 0)]);
             echo json_encode(['succes' => true]);
             break;
 
         case 'supprimer':
-            $pdo->prepare("DELETE FROM evenements WHERE id = ?")->execute([(int)$data['id']]);
+            $pdo->prepare("DELETE FROM evenements WHERE id = ?")
+                ->execute([(int)($body['id'] ?? 0)]);
             echo json_encode(['succes' => true]);
             break;
 
         default:
-            echo json_encode(['succes' => false, 'erreur' => 'Action inconnue.']);
+            echo json_encode(['succes' => false, 'erreur' => "Action inconnue : $action"]);
     }
+    exit;
 }
+
+http_response_code(405);
+echo json_encode(['erreur' => 'Méthode non autorisée']);
