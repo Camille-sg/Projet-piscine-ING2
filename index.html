@@ -30,6 +30,19 @@
     <button type="submit" class="btn-submit" id="btn-login">🔓 Se connecter</button>
   </form>
 
+  <p style="margin-top:1rem">
+  <a href="#" onclick="toggleReset()">Mot de passe oublié ?</a>
+</p>
+
+<div id="reset-box" style="display:none;margin-top:1rem">
+  <h3>Réinitialiser le mot de passe</h3>
+
+  <input type="email" id="reset-email" placeholder="Email">
+  <input type="password" id="reset-mdp" placeholder="Nouveau mot de passe">
+
+  <button onclick="resetPassword()">Changer le mot de passe</button>
+</div>
+
   <!-- ── Formulaire inscription ── -->
   <form id="form-register" style="display:none" onsubmit="doRegister(event)">
     <div class="grid2">
