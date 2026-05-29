@@ -27,7 +27,7 @@
     </span>
   </div>
 
-  <!-- Statistiques -->
+  <!-- STATISTIQUES -->
   <div class="grille-4" style="margin-bottom:2rem">
     <div class="stat-carte">
       <div class="chiffre" style="color:#4f46e5" id="s-ev"></div>
@@ -50,7 +50,7 @@
     </div>
   </div>
 
-  <!-- Onglets -->
+  <!-- ONGLETS -->
   <div class="onglets">
     <span class="onglet actif" data-tab="evenements">📅 Événements</span>
     <span class="onglet" data-tab="reservations">📦 Réservations</span>
@@ -262,6 +262,20 @@
   </div>
 </div>
 
+<!-- MODAL PARTICIPANTS -->
+<div id="modal-participants" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:600;align-items:center;justify-content:center">
+  <div class="carte" style="width:100%;max-width:700px;margin:1rem;max-height:90vh;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+      <h2 style="font-size:1.1rem;font-weight:700">👥 Participants</h2>
+      <button onclick="fermerParticipants()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b">
+        ✕
+      </button>
+    </div>
+
+    <div id="contenu-participants"></div>
+  </div>
+</div>
+
 <footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
   © 2026 CampusPlay — Tous droits réservés
 </footer>
@@ -283,7 +297,7 @@ document.getElementById('s-att').textContent = EVENEMENTS.filter(function(x) {
 
 document.getElementById('s-res').textContent = RESSOURCES.length;
 
-/* Stat réservation admin */
+/* Stat réservations admin */
 fetch('api/reservations.php', { credentials:'include' })
   .then(function(r) {
     return r.json();
@@ -356,6 +370,7 @@ if (!evAttente.length) {
       + '<button onclick="approuverEv(' + ev.id + ')" class="btn btn-succes" style="font-size:.82rem;padding:.4rem .85rem">✔ Approuver</button>'
       + '<button onclick="refuserEv(' + ev.id + ')" class="btn btn-erreur" style="font-size:.82rem;padding:.4rem .85rem">✖ Refuser</button>'
       + '<button onclick="ouvrirModifEv(' + ev.id + ')" class="btn btn-gris" style="font-size:.82rem;padding:.4rem .85rem">✏️ Modifier</button>'
+      + '<button onclick="voirParticipants(' + ev.id + ')" class="btn btn-primaire" style="font-size:.82rem;padding:.4rem .85rem">👥 Participants</button>'
       + '</div>'
       + '</div>'
       + '</div>';
@@ -385,6 +400,7 @@ document.getElementById('table-ev').innerHTML =
       + '<td><span class="badge ' + (colors[ev.statut] || '') + '">' + (labels[ev.statut] || ev.statut) + '</span></td>'
       + '<td style="white-space:nowrap">'
       + '<button onclick="ouvrirModifEv(' + ev.id + ')" class="btn btn-gris" style="font-size:.8rem;padding:.3rem .6rem;margin-right:.35rem">✏️ Modifier</button>'
+      + '<button onclick="voirParticipants(' + ev.id + ')" class="btn btn-primaire" style="font-size:.8rem;padding:.3rem .6rem;margin-right:.35rem">👥 Participants</button>'
       + '<button onclick="supprimerEv(' + ev.id + ',\'' + e(ev.titre).replace(/'/g, "\\'") + '\')" class="btn btn-erreur" style="font-size:.8rem;padding:.3rem .6rem">🗑 Supprimer</button>'
       + '</td>'
       + '</tr>';
@@ -581,6 +597,79 @@ document.getElementById('form-modif-ev').addEventListener('submit', function(ev)
   });
 });
 
+/* Participants */
+function voirParticipants(idEvenement) {
+  var evenement = EVENEMENTS.find(function(ev) {
+    return ev.id == idEvenement;
+  });
+
+  var inscriptions = getInscriptions().filter(function(i) {
+    return i.evenement_id == idEvenement;
+  });
+
+  var inscrits = inscriptions.filter(function(i) {
+    return (i.statut || 'inscrit') === 'inscrit';
+  });
+
+  var attente = inscriptions.filter(function(i) {
+    return i.statut === 'liste_attente';
+  });
+
+  var html = '';
+
+  html += '<h3 style="font-size:1rem;margin-bottom:.75rem;color:#1e293b">'
+       + e(evenement ? evenement.titre : 'Événement')
+       + '</h3>';
+
+  html += '<p style="font-size:.85rem;color:#64748b;margin-bottom:1rem">'
+       + inscrits.length + ' participant(s) inscrit(s) · '
+       + attente.length + ' en liste d’attente'
+       + '</p>';
+
+  html += '<h4 style="font-size:.9rem;margin-bottom:.5rem">✅ Participants inscrits</h4>';
+
+  if (!inscrits.length) {
+    html += '<p style="color:#64748b;margin-bottom:1rem">Aucun participant inscrit.</p>';
+  } else {
+    html += '<table style="margin-bottom:1.5rem"><thead><tr><th>Email</th><th>Statut</th><th>Date</th></tr></thead><tbody>';
+
+    inscrits.forEach(function(i) {
+      html += '<tr>'
+        + '<td>' + e(i.user_email) + '</td>'
+        + '<td><span class="badge badge-bleu">Inscrit</span></td>'
+        + '<td>' + (i.inscrit_le ? formatDate(i.inscrit_le) : '—') + '</td>'
+        + '</tr>';
+    });
+
+    html += '</tbody></table>';
+  }
+
+  html += '<h4 style="font-size:.9rem;margin-bottom:.5rem">⏳ Liste d’attente</h4>';
+
+  if (!attente.length) {
+    html += '<p style="color:#64748b">Aucune personne en liste d’attente.</p>';
+  } else {
+    html += '<table><thead><tr><th>Email</th><th>Statut</th><th>Date</th></tr></thead><tbody>';
+
+    attente.forEach(function(i) {
+      html += '<tr>'
+        + '<td>' + e(i.user_email) + '</td>'
+        + '<td><span class="badge badge-jaune">Liste d’attente</span></td>'
+        + '<td>' + (i.inscrit_le ? formatDate(i.inscrit_le) : '—') + '</td>'
+        + '</tr>';
+    });
+
+    html += '</tbody></table>';
+  }
+
+  document.getElementById('contenu-participants').innerHTML = html;
+  document.getElementById('modal-participants').style.display = 'flex';
+}
+
+function fermerParticipants() {
+  document.getElementById('modal-participants').style.display = 'none';
+}
+
 /* Actions ressources */
 function supprimerRes(id, nom) {
   if (!confirm('Supprimer définitivement la ressource "' + nom + '" ?')) return;
@@ -746,6 +835,8 @@ window.refuserEv = refuserEv;
 window.supprimerEv = supprimerEv;
 window.ouvrirModifEv = ouvrirModifEv;
 window.fermerModifEv = fermerModifEv;
+window.voirParticipants = voirParticipants;
+window.fermerParticipants = fermerParticipants;
 window.supprimerRes = supprimerRes;
 window.annulerRes = annulerRes;
 </script>

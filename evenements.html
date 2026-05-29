@@ -79,6 +79,7 @@ const filtreAct = document.getElementById('filtre-activite').value;
 const filtrePl  = document.getElementById('filtre-places').value;
 const filtreDate = document.getElementById('filtre-date').value;
 const isAdmin   = getRole() === 'admin' || getRole() === 'manager';
+const mesInscriptions = getInscriptions();
 
 const maintenant = new Date();
 
@@ -126,7 +127,9 @@ filtres.sort(function(a, b) {
     const actCouleur = ev.activite_couleur || (activite ? activite.couleur : '#6366f1');
 
     const plein = ev.places_prises >= ev.places_max;
-    const dejaInscrit = estInscrit(ev.id);
+    const inscriptionUser = mesInscriptions.find(i => i.evenement_id == ev.id);
+const dejaInscrit = inscriptionUser && inscriptionUser.statut === 'inscrit';
+const enAttente = inscriptionUser && inscriptionUser.statut === 'liste_attente';
     const placesRestantes = ev.places_max - ev.places_prises;
 
     conteneur.innerHTML += `
@@ -140,7 +143,8 @@ filtres.sort(function(a, b) {
 
           ${isAdmin ? `<span class="badge ${statuts[ev.statut] || 'badge-jaune'}">${e(ev.statut.replace('_',' '))}</span>` : ''}
 
-          ${dejaInscrit ? `<span class="badge badge-bleu">Déjà inscrit</span>` : ''}
+         ${dejaInscrit ? `<span class="badge badge-bleu">Déjà inscrit</span>` : ''}
+${enAttente ? `<span class="badge badge-jaune">Liste d’attente</span>` : ''}
         </div>
 
         <h3 style="font-size:1rem;font-weight:700;margin-bottom:.5rem;color:#1e293b">
@@ -160,18 +164,22 @@ filtres.sort(function(a, b) {
         </p>
 
         ${
-          dejaInscrit
-            ? `<button onclick="desinscrireEvenement(${ev.id})" class="btn btn-erreur" style="width:100%">
-                 Se désinscrire
-               </button>`
-            : plein
-              ? `<button class="btn btn-gris" disabled style="width:100%;opacity:.6;cursor:not-allowed">
-                   Complet
-                 </button>`
-              : `<button onclick="inscrireEvenement(${ev.id})" class="btn btn-primaire" style="width:100%">
-                   S'inscrire
-                 </button>`
-        }
+  dejaInscrit
+    ? `<button onclick="desinscrireEvenement(${ev.id})" class="btn btn-erreur" style="width:100%">
+         Se désinscrire
+       </button>`
+    : enAttente
+      ? `<button onclick="desinscrireEvenement(${ev.id})" class="btn btn-erreur" style="width:100%">
+           Quitter la liste d’attente
+         </button>`
+      : plein
+        ? `<button onclick="inscrireEvenement(${ev.id})" class="btn btn-gris" style="width:100%">
+             Rejoindre la liste d’attente
+           </button>`
+        : `<button onclick="inscrireEvenement(${ev.id})" class="btn btn-primaire" style="width:100%">
+             S'inscrire
+           </button>`
+}
       </div>
     `;
   });
@@ -188,14 +196,13 @@ async function inscrireEvenement(idEvenement) {
   const reponse = await sInscrireEvenement(idEvenement);
 
   if (reponse.succes) {
-    flash("Inscription confirmée à l'événement !", "succes");
+  flash(reponse.message || "Inscription enregistrée.", "succes");
 
-    /* Recharge les événements depuis la base */
-    window.EVENEMENTS = _sync(API + 'evenements.php');
+  window.EVENEMENTS = _sync(API + 'evenements.php');
 
-    afficher();
-    afficheFlash(document.getElementById('flash-zone'));
-  } else {
+  afficher();
+  afficheFlash(document.getElementById('flash-zone'));
+} else {
     flash(reponse.erreur || "Impossible de s'inscrire à cet événement.", "erreur");
     afficher();
     afficheFlash(document.getElementById('flash-zone'));
