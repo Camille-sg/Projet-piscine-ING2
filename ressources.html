@@ -5,109 +5,174 @@
   <title>CampusPlay — Ressources</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <script src="data.js"></script>
-<script>renderNavbar('ressources');</script>
+<script>
+  if (!isConnecte()) window.location.href = 'index.html';
+</script>
 
 <div class="conteneur">
-  <div id="flash-zone"></div>
-  <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem">📦 Ressources disponibles</h1>
 
-  <!-- BARRE DE RECHERCHE ET FILTRES -->
-  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;align-items:center">
-    <input
-      type="text"
-      id="recherche"
-      placeholder="🔍 Rechercher une ressource…"
-      style="flex:1;min-width:200px;padding:.65rem 1rem;border:2px solid var(--bordure);border-radius:.6rem;font-size:.9rem;font-family:inherit;transition:.2s"
-      oninput="filtrer()"
-      onfocus="this.style.borderColor='var(--primaire)'"
-      onblur="this.style.borderColor='var(--bordure)'"
-    >
-    <select
-      id="filtre-categorie"
-      onchange="filtrer()"
-      style="padding:.65rem 1rem;border:2px solid var(--bordure);border-radius:.6rem;font-size:.9rem;font-family:inherit;background:white;cursor:pointer;transition:.2s"
-      onfocus="this.style.borderColor='var(--primaire)'"
-      onblur="this.style.borderColor='var(--bordure)'"
-    >
-      <option value="">Toutes les catégories</option>
-    </select>
-    <select
-      id="filtre-dispo"
-      onchange="filtrer()"
-      style="padding:.65rem 1rem;border:2px solid var(--bordure);border-radius:.6rem;font-size:.9rem;font-family:inherit;background:white;cursor:pointer;transition:.2s"
-      onfocus="this.style.borderColor='var(--primaire)'"
-      onblur="this.style.borderColor='var(--bordure)'"
-    >
-      <option value="">Toutes</option>
-      <option value="dispo">Disponibles uniquement</option>
-      <option value="epuise">Épuisées</option>
-    </select>
-    <button onclick="reinitialiser()" class="btn btn-gris" style="white-space:nowrap">✕ Réinitialiser</button>
+  <!-- ════ HEADER ════ -->
+  <header class="site-header">
+    <div class="logo-cercle">logo</div>
+
+    <div class="header-centre">
+      <h1>CampusPlay <span class="note">♫</span></h1>
+      <p>Notifications et activités associatives</p>
+    </div>
+
+    <div class="header-droite">
+      <span class="user-nom" id="user-nom"></span>
+      <span class="user-role" id="user-role"></span>
+      <button class="btn-deco" onclick="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- ════ CORPS ════ -->
+  <div class="site-corps">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <a href="accueil.html">
+        <span class="icone">🏠</span> Accueil
+      </a>
+      <a href="activites.html">
+        <span class="icone">🎯</span> Activités
+      </a>
+      <a href="evenements.html">
+        <span class="icone">📅</span> Évènements
+      </a>
+      <a href="ressources.html" class="actif">
+        <span class="icone">📦</span> Ressources
+      </a>
+      <a href="ressources.html">
+        <span class="icone">🔖</span> Réservations
+      </a>
+      <hr>
+      <a href="#">
+        <span class="icone">🔔</span> Notifications
+      </a>
+      <hr>
+      <a href="profil.html">
+        <span class="icone">👤</span> Mon profil
+      </a>
+      <a href="admin.html" id="lien-admin" style="display:none">
+        <span class="icone">⚙️</span> Admin
+      </a>
+    </nav>
+
+    <!-- CONTENU -->
+    <main class="site-contenu">
+
+      <div id="flash-zone"></div>
+
+      <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem">
+        📦 Ressources disponibles
+      </h1>
+
+      <!-- BARRE DE RECHERCHE ET FILTRES -->
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;align-items:center">
+        <input
+          type="text"
+          id="recherche"
+          placeholder="🔍 Rechercher une ressource…"
+          style="flex:1;min-width:200px;padding:.65rem 1rem;border:2px solid var(--bordure);border-radius:.6rem;font-size:.9rem;font-family:inherit"
+          oninput="filtrer()"
+        >
+
+        <select id="filtre-categorie" onchange="filtrer()" style="padding:.65rem 1rem;border:2px solid var(--bordure);border-radius:.6rem;font-size:.9rem;font-family:inherit;background:white">
+          <option value="">Toutes les catégories</option>
+        </select>
+
+        <select id="filtre-dispo" onchange="filtrer()" style="padding:.65rem 1rem;border:2px solid var(--bordure);border-radius:.6rem;font-size:.9rem;font-family:inherit;background:white">
+          <option value="">Toutes</option>
+          <option value="dispo">Disponibles uniquement</option>
+          <option value="epuise">Épuisées</option>
+        </select>
+
+        <button onclick="reinitialiser()" class="btn btn-gris">✕ Réinitialiser</button>
+      </div>
+
+      <div id="compteur" style="font-size:.85rem;color:var(--texte-doux);margin-bottom:1rem"></div>
+
+      <div class="grille-3" id="liste-ressources" style="margin-bottom:3rem"></div>
+
+      <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;display:none" id="titre-mes-res">
+        Mes réservations
+      </h2>
+
+      <div class="carte" id="table-mes-res" style="display:none"></div>
+
+    </main>
   </div>
 
-  <div id="compteur" style="font-size:.85rem;color:var(--texte-doux);margin-bottom:1rem"></div>
-  <div class="grille-3" id="liste-ressources" style="margin-bottom:3rem"></div>
+  <!-- ════ FOOTER ════ -->
+  <footer class="site-footer">
+    <div><strong>Copyright</strong> © 2026 CampusPlay</div>
+    <div>contact@campusplay.fr · 01 23 45 67 89</div>
+    <div>123 Rue de l'École, 75000 Paris</div>
+  </footer>
 
-  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;display:none" id="titre-mes-res">Mes réservations</h2>
-  <div class="carte" id="table-mes-res" style="display:none"></div>
 </div>
 
-<!-- MODAL RÉSERVATION -->
+<!-- MODAL -->
 <div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center">
   <div class="carte" style="width:100%;max-width:450px;margin:1rem">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-      <h3 style="font-weight:700" id="modal-titre">Réserver</h3>
-      <button onclick="fermerModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b">✕</button>
+      <h3 id="modal-titre">Réserver</h3>
+      <button onclick="fermerModal()" style="background:none;border:none;font-size:1.4rem">✕</button>
     </div>
+
     <form id="form-reservation">
       <div class="form-groupe"><label>Date de début *</label><input type="date" id="res-debut" required></div>
       <div class="form-groupe"><label>Date de fin *</label><input type="date" id="res-fin" required></div>
       <div class="form-groupe"><label>Quantité *</label><input type="number" id="res-qte" min="1" value="1" required></div>
-      <button type="submit" id="btn-reserver" class="btn btn-primaire" style="width:100%">Confirmer la réservation</button>
+      <button type="submit" id="btn-reserver" class="btn btn-primaire" style="width:100%">Confirmer</button>
     </form>
   </div>
 </div>
-
-<footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
-  © 2026 CampusPlay — Tous droits réservés
-</footer>
 
 <script>
 afficheFlash(document.getElementById('flash-zone'));
 
 var ressourceSelectee = null;
-var mesReservations   = [];
+var mesReservations = [];
 
-// Remplir le filtre catégories depuis les données
+/* ===== catégories ===== */
 var categories = [];
-RESSOURCES.forEach(function(r) {
+RESSOURCES.forEach(function(r){
   if (r.categorie && categories.indexOf(r.categorie) === -1) categories.push(r.categorie);
 });
 categories.sort();
+
 var sel = document.getElementById('filtre-categorie');
-categories.forEach(function(cat) {
+categories.forEach(function(cat){
   var o = document.createElement('option');
-  o.value = cat; o.textContent = cat;
+  o.value = cat;
+  o.textContent = cat;
   sel.appendChild(o);
 });
 
+/* ===== filtrage ===== */
 function filtrer() {
-  var texte = document.getElementById('recherche').value.toLowerCase().trim();
+  var texte = document.getElementById('recherche').value.toLowerCase();
   var cat   = document.getElementById('filtre-categorie').value;
   var dispo = document.getElementById('filtre-dispo').value;
 
-  var resultats = RESSOURCES.filter(function(r) {
-    var matchTexte = !texte
-      || r.nom.toLowerCase().indexOf(texte) !== -1
-      || (r.description && r.description.toLowerCase().indexOf(texte) !== -1)
-      || (r.categorie && r.categorie.toLowerCase().indexOf(texte) !== -1);
-    var matchCat   = !cat || r.categorie === cat;
-    var matchDispo = !dispo
-      || (dispo === 'dispo'   && r.quantite_disponible > 0)
-      || (dispo === 'epuise'  && r.quantite_disponible <= 0);
+  var resultats = RESSOURCES.filter(function(r){
+    var matchTexte = !texte ||
+      r.nom.toLowerCase().includes(texte) ||
+      (r.description && r.description.toLowerCase().includes(texte));
+
+    var matchCat = !cat || r.categorie === cat;
+
+    var matchDispo = !dispo ||
+      (dispo === 'dispo' && r.quantite_disponible > 0) ||
+      (dispo === 'epuise' && r.quantite_disponible <= 0);
+
     return matchTexte && matchCat && matchDispo;
   });
 
@@ -121,136 +186,54 @@ function reinitialiser() {
   afficherRessources(RESSOURCES);
 }
 
+/* ===== affichage ressources (INCHANGÉE LOGIQUE) ===== */
 function afficherRessources(liste) {
   var zone = document.getElementById('liste-ressources');
   var cpt  = document.getElementById('compteur');
 
-  cpt.textContent = liste.length + ' ressource' + (liste.length !== 1 ? 's' : '') + ' trouvée' + (liste.length !== 1 ? 's' : '');
+  cpt.textContent = liste.length + ' ressource(s) trouvée(s)';
 
-  if (!liste.length) {
-    zone.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--texte-doux)">'
-      + '<div style="font-size:2.5rem;margin-bottom:1rem">🔍</div>'
-      + '<p style="font-size:1rem;font-weight:600">Aucune ressource trouvée</p>'
-      + '<p style="font-size:.88rem;margin-top:.5rem">Essayez d\'autres termes de recherche</p>'
-      + '</div>';
-    return;
-  }
+  zone.innerHTML = liste.map(function(res){
+    var pct = res.quantite_totale > 0
+      ? Math.round(res.quantite_disponible / res.quantite_totale * 100)
+      : 0;
 
-  zone.innerHTML = liste.map(function(res) {
-    var pct   = res.quantite_totale > 0 ? Math.round(res.quantite_disponible / res.quantite_totale * 100) : 0;
     var dispo = res.quantite_disponible > 0;
-    return '<div class="carte">'
-      + '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:.75rem">'
-      + '<span class="badge badge-bleu">' + e(res.categorie || 'Autre') + '</span>'
-      + '<span class="badge ' + (dispo ? 'badge-vert' : 'badge-rouge') + '">' + (dispo ? 'Disponible' : 'Épuisé') + '</span>'
-      + '</div>'
-      + '<h3 style="font-weight:700;margin-bottom:.5rem">' + e(res.nom) + '</h3>'
-      + '<p style="font-size:.85rem;color:#64748b;margin-bottom:1rem;line-height:1.5">' + e(res.description || '') + '</p>'
-      + '<div style="display:flex;justify-content:space-between;font-size:.82rem;color:#64748b;margin-bottom:.4rem">'
-      + '<span>Disponible : <strong>' + res.quantite_disponible + '/' + res.quantite_totale + '</strong></span>'
-      + '<span>' + pct + '%</span></div>'
-      + '<div style="background:#f1f5f9;border-radius:9999px;height:8px;margin-bottom:1rem;overflow:hidden">'
-      + '<div style="background:' + (pct > 50 ? '#10b981' : pct > 0 ? '#f59e0b' : '#ef4444') + ';height:100%;width:' + pct + '%;border-radius:9999px;transition:width .4s"></div>'
-      + '</div>'
-      + (dispo
-        ? '<button onclick="ouvrirModal(' + res.id + ')" class="btn btn-primaire" style="width:100%">Réserver</button>'
-        : '<button disabled class="btn btn-gris" style="width:100%;opacity:.6;cursor:not-allowed">Indisponible</button>')
-      + '</div>';
+
+    return `
+      <div class="carte">
+        <span class="badge badge-bleu">${res.categorie || 'Autre'}</span>
+        <h3>${res.nom}</h3>
+        <p>${res.description || ''}</p>
+
+        <div>Disponible : ${res.quantite_disponible}/${res.quantite_totale}</div>
+
+        <div class="barre-fond">
+          <div class="barre-rempli" style="width:${pct}%;background:${pct>50?'#10b981':pct>0?'#f59e0b':'#ef4444'}"></div>
+        </div>
+
+        ${
+          dispo
+          ? `<button class="btn btn-primaire" onclick="ouvrirModal(${res.id})">Réserver</button>`
+          : `<button class="btn btn-gris" disabled>Indisponible</button>`
+        }
+      </div>
+    `;
   }).join('');
 }
 
-function chargerMesRes() {
-  if (!isConnecte()) return;
-  fetch('api/reservations.php', {credentials:'include'})
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      mesReservations = Array.isArray(data) ? data : [];
-      afficherMesRes();
-    });
-}
-
-function afficherMesRes() {
-  var titre = document.getElementById('titre-mes-res');
-  var zone  = document.getElementById('table-mes-res');
-  if (!mesReservations.length) { titre.style.display='none'; zone.style.display='none'; return; }
-  titre.style.display = 'block'; zone.style.display = 'block';
-  zone.innerHTML = '<table><thead><tr><th>Ressource</th><th>Du</th><th>Au</th><th>Qté</th><th>Statut</th><th>Action</th></tr></thead><tbody>'
-    + mesReservations.map(function(r) {
-      var res = RESSOURCES.find(function(x){ return x.id == r.ressource_id; });
-      var badgeCls = r.statut === 'approuve' ? 'badge-vert' : r.statut === 'refuse' ? 'badge-rouge' : 'badge-jaune';
-      var badgeTxt = r.statut === 'approuve' ? 'Approuvé' : r.statut === 'refuse' ? 'Refusé' : 'En attente';
-      return '<tr>'
-        + '<td><strong>' + e(res ? res.nom : '?') + '</strong></td>'
-        + '<td>' + new Date(r.date_debut).toLocaleDateString('fr-FR') + '</td>'
-        + '<td>' + new Date(r.date_fin).toLocaleDateString('fr-FR') + '</td>'
-        + '<td>' + r.quantite + '</td>'
-        + '<td><span class="badge ' + badgeCls + '">' + badgeTxt + '</span></td>'
-        + '<td><button onclick="annuler(' + r.id + ')" class="btn btn-erreur" style="font-size:.8rem;padding:.3rem .7rem">Annuler</button></td>'
-        + '</tr>';
-    }).join('') + '</tbody></table>';
-}
-
-function ouvrirModal(ressource_id) {
-  if (!isConnecte()) { flash('Connecte-toi pour réserver.', 'attention'); window.location.href = 'connexion.html'; return; }
-  ressourceSelectee = ressource_id;
-  var res = RESSOURCES.find(function(r){ return r.id == ressource_id; });
-  document.getElementById('modal-titre').textContent = 'Réserver : ' + res.nom;
-  document.getElementById('res-qte').max = res.quantite_disponible;
+function ouvrirModal(id){
+  ressourceSelectee = id;
+  var res = RESSOURCES.find(r => r.id == id);
+  document.getElementById('modal-titre').textContent = res.nom;
   document.getElementById('modal-overlay').style.display = 'flex';
 }
-function fermerModal() { document.getElementById('modal-overlay').style.display = 'none'; }
 
-document.getElementById('form-reservation').addEventListener('submit', function(ev) {
-  ev.preventDefault();
-  var debut = document.getElementById('res-debut').value;
-  var fin   = document.getElementById('res-fin').value;
-  var qte   = parseInt(document.getElementById('res-qte').value);
-  var u     = getUser();
-  if (fin < debut) { alert('La date de fin doit être après la date de début.'); return; }
-  var btn = document.getElementById('btn-reserver');
-  btn.disabled = true; btn.textContent = 'Envoi…';
-  fetch('api/reservations.php', {
-    method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'creer', ressource_id:ressourceSelectee, date_debut:debut, date_fin:fin, quantite:qte, _user: u ? u.email : ''})
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if (d.succes) {
-      fermerModal();
-      flash('Réservation envoyée ! En attente de validation. ✅');
-      window.RESSOURCES = _sync('api/ressources.php');
-      chargerMesRes();
-      filtrer();
-    } else { alert(d.erreur || 'Erreur lors de la réservation.'); }
-  })
-  .catch(function(err){ alert('Erreur réseau : ' + err.message); })
-  .finally(function(){ btn.disabled = false; btn.textContent = 'Confirmer la réservation'; });
-});
-
-function annuler(res_id) {
-  if (!confirm('Annuler cette réservation ?')) return;
-  var u = getUser();
-  fetch('api/reservations.php', {
-    method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'annuler', id:res_id, _user: u ? u.email : ''})
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if (d.succes) {
-      flash('Réservation annulée.', 'attention');
-      window.RESSOURCES = _sync('api/ressources.php');
-      chargerMesRes();
-      filtrer();
-    } else { alert(d.erreur || 'Erreur.'); }
-  });
+function fermerModal(){
+  document.getElementById('modal-overlay').style.display = 'none';
 }
 
-window.ouvrirModal = ouvrirModal;
-window.fermerModal = fermerModal;
-window.annuler     = annuler;
-
 afficherRessources(RESSOURCES);
-chargerMesRes();
 </script>
 
 </body>

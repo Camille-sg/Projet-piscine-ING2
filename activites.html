@@ -5,79 +5,195 @@
   <title>CampusPlay — Activités</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <script src="data.js"></script>
-<script>renderNavbar('activites');</script>
+<script>
+  if (!isConnecte()) window.location.href = 'index.html';
+</script>
 
 <div class="conteneur">
-  <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem">🎯 Activités</h1>
 
-  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;background:white;border:1px solid var(--bordure);border-radius:.75rem;padding:1rem">
-    <input type="text" id="recherche" placeholder="🔍 Rechercher…"
-           style="flex:1;min-width:180px;padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
-    <select id="filtre-cat" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
-      <option value="">Toutes catégories</option>
-    </select>
-    <select id="filtre-diff" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
-      <option value="">Toutes difficultés</option>
-      <option value="facile">Facile</option>
-      <option value="moyen">Moyen</option>
-      <option value="difficile">Difficile</option>
-    </select>
+  <!-- ════ HEADER (OBLIGATOIRE pour cohérence globale) ════ -->
+  <header class="site-header">
+    <div class="logo-cercle">logo</div>
+
+    <div class="header-centre">
+      <h1>CampusPlay <span class="note">♫</span></h1>
+      <p>Notifications et activités associatives</p>
+    </div>
+
+    <div class="header-droite">
+      <span class="user-nom" id="user-nom"></span>
+      <span class="user-role" id="user-role"></span>
+      <button class="btn-deco" onclick="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- ════ CORPS ════ -->
+  <div class="site-corps">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <a href="accueil.html">
+        <span class="icone">🏠</span> Accueil
+      </a>
+      <a href="activites.html" class="actif">
+        <span class="icone">🎯</span> Activités
+      </a>
+      <a href="evenements.html">
+        <span class="icone">📅</span> Évènements
+      </a>
+      <a href="ressources.html">
+        <span class="icone">📦</span> Ressources
+      </a>
+      <a href="ressources.html">
+        <span class="icone">🔖</span> Réservations
+      </a>
+      <hr>
+      <a href="#">
+        <span class="icone">🔔</span> Notifications
+        <span class="badge-nb" id="badge-notif"></span>
+      </a>
+      <hr>
+      <a href="profil.html">
+        <span class="icone">👤</span> Mon profil
+      </a>
+    </nav>
+
+    <!-- CONTENU -->
+    <main class="site-contenu">
+
+      <!-- TITRE -->
+      <h1 class="page-titre">🎯 Activités</h1>
+
+      <!-- FILTRES -->
+      <div class="carte" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1.5rem">
+
+        <input type="text" id="recherche" placeholder="🔍 Rechercher…" style="flex:1;min-width:180px">
+
+        <select id="filtre-cat">
+          <option value="">Toutes catégories</option>
+        </select>
+
+        <select id="filtre-diff">
+          <option value="">Toutes difficultés</option>
+          <option value="facile">Facile</option>
+          <option value="moyen">Moyen</option>
+          <option value="difficile">Difficile</option>
+        </select>
+
+      </div>
+
+      <!-- GRILLE -->
+      <div class="grille-3" id="liste"></div>
+
+    </main>
   </div>
 
-  <div class="grille-3" id="liste"></div>
+  <!-- ════ FOOTER ════ -->
+  <footer class="site-footer">
+    <div><strong>Copyright</strong> © 2026 CampusPlay</div>
+    <div>contact@campusplay.fr · 01 23 45 67 89</div>
+    <div>123 Rue de l'École, 75000 Paris</div>
+  </footer>
+
 </div>
 
-<footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
-  © 2026 CampusPlay — Tous droits réservés
-</footer>
-
 <script>
-// Remplir le filtre catégories dynamiquement depuis la BDD
+// ============================
+// USER (comme accueil)
+// ============================
+const user = getUser();
+const rolesLabels = {
+  admin:'Administrateur',
+  manager:'Manager',
+  membre:'Membre',
+  etudiant:'Étudiant'
+};
+
+document.getElementById('user-nom').textContent =
+  user.prenom + ' ' + user.nom;
+
+document.getElementById('user-role').textContent =
+  rolesLabels[user.role] || user.role;
+
+// ============================
+// FILTRES CATÉGORIES
+// ============================
 const cats = [...new Set(ACTIVITES.map(a => a.categorie).filter(Boolean))];
+
 const selCat = document.getElementById('filtre-cat');
 cats.forEach(c => {
-  const o = document.createElement('option');
-  o.value = c; o.textContent = c;
-  selCat.appendChild(o);
+  const opt = document.createElement('option');
+  opt.value = c;
+  opt.textContent = c;
+  selCat.appendChild(opt);
 });
 
+// ============================
+// AFFICHAGE
+// ============================
 function afficher() {
+
   const rech = document.getElementById('recherche').value.toLowerCase();
   const cat  = document.getElementById('filtre-cat').value;
   const diff = document.getElementById('filtre-diff').value;
 
-  const filtres = ACTIVITES.filter(a =>
-    (!rech || a.titre.toLowerCase().includes(rech) || (a.description||'').toLowerCase().includes(rech)) &&
-    (!cat  || a.categorie === cat) &&
+  const resultats = ACTIVITES.filter(a =>
+    (!rech || a.titre.toLowerCase().includes(rech) || (a.description || '').toLowerCase().includes(rech)) &&
+    (!cat || a.categorie === cat) &&
     (!diff || a.difficulte === diff)
   );
 
-  const diff_badges = { facile:'badge-vert', moyen:'badge-jaune', difficile:'badge-rouge' };
+  const diff_badges = {
+    facile: "badge-vert",
+    moyen: "badge-jaune",
+    difficile: "badge-rouge"
+  };
 
-  document.getElementById('liste').innerHTML = filtres.map(a => {
-    // Comparaison souple == pour éviter les problèmes int/string
-    const nb_ev = EVENEMENTS.filter(ev => ev.activite_id == a.id && ev.statut === 'approuve').length;
+  document.getElementById('liste').innerHTML = resultats.map(a => {
+
+    const nb_ev = EVENEMENTS.filter(ev =>
+      ev.activite_id == a.id && ev.statut === 'approuve'
+    ).length;
+
     return `
       <div class="carte">
-        <div style="background:${a.couleur||'#6366f1'};height:5px;border-radius:4px 4px 0 0;margin:-1.5rem -1.5rem 1rem"></div>
-        <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
+
+        <div style="height:5px;background:${a.couleur || '#3b6a9f'};margin:-1.5rem -1.5rem 1rem"></div>
+
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem">
           <span class="badge badge-bleu">${e(a.categorie)}</span>
-          <span class="badge ${diff_badges[a.difficulte]||'badge-jaune'}">${e(a.difficulte)}</span>
+          <span class="badge ${diff_badges[a.difficulte] || 'badge-jaune'}">${e(a.difficulte)}</span>
         </div>
-        <h3 style="font-size:1rem;font-weight:700;margin-bottom:.5rem">${e(a.titre)}</h3>
-        <p style="font-size:.85rem;color:#64748b;margin-bottom:1rem;line-height:1.5">${e(a.description)}</p>
-        <p style="font-size:.82rem;color:#4f46e5;font-weight:600">${nb_ev} événement${nb_ev > 1 ? 's' : ''} à venir</p>
-        <a href="evenements.html" class="btn btn-contour" style="margin-top:.75rem;font-size:.85rem;display:inline-block">Voir les événements</a>
-      </div>`;
+
+        <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:.5rem">
+          ${e(a.titre)}
+        </h3>
+
+        <p style="font-size:.88rem;color:var(--texte-doux);margin-bottom:1rem;line-height:1.5">
+          ${e(a.description)}
+        </p>
+
+        <div style="font-size:.82rem;color:var(--bleu-vif);font-weight:700">
+          ${nb_ev} événement${nb_ev > 1 ? 's' : ''} à venir
+        </div>
+
+        <a href="evenements.html" class="btn btn-primaire btn-grand" style="margin-top:1rem">
+          Voir les événements
+        </a>
+
+      </div>
+    `;
   }).join('');
 }
 
 document.getElementById('recherche').addEventListener('input', afficher);
 document.getElementById('filtre-cat').addEventListener('change', afficher);
 document.getElementById('filtre-diff').addEventListener('change', afficher);
+
 afficher();
 </script>
 
