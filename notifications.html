@@ -118,6 +118,11 @@ afficheFlash(document.getElementById('flash-zone'));
 
 const user = getUser();
 
+if (user.role === 'admin' || user.role === 'manager') {
+  const adminLink = document.getElementById('lien-admin');
+  if (adminLink) adminLink.style.display = 'flex';
+}
+
 /* ── UI USER ── */
 const rolesLabels = {
   admin:'Administrateur',
