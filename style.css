@@ -906,8 +906,8 @@ border-bottom-color: var(--or);
 }
 
 .logo-cercle {
-  width: 58px;
-  height: 58px;
+  width: 95px;
+  height: 95px;
   border-radius: 50%;
   overflow: hidden;
   background: white;
