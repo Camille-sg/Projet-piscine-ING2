@@ -117,6 +117,17 @@ const rolesLabels = {
   etudiant:'Étudiant'
 };
 
+
+const adminLink = document.getElementById('lien-admin');
+
+
+if (adminLink) {
+  adminLink.style.display =
+    (user.role === 'admin' || user.role === 'manager')
+      ? 'flex'
+      : 'none';
+}
+
 document.getElementById('user-nom').textContent =
   user.prenom + ' ' + user.nom;
 
