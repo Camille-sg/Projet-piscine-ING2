@@ -904,3 +904,21 @@ border-bottom-color: var(--or);
 @media (max-width: 480px) {
 .grille-3, .grille-4 { grid-template-columns: 1fr; }
 }
+
+.logo-cercle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-cercle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
