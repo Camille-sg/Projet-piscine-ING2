@@ -352,7 +352,29 @@ function renderNavbar(actif) {
   btn.innerHTML  = '🚪 Déconnexion';
   btn.onclick    = deconnecter;
   sidebar.appendChild(btn);
+var logoHautDroite = document.createElement('div');
 
+logoHautDroite.style.cssText = [
+  'position:fixed',
+  'top:18px',
+  'right:22px',
+  'width:75px',
+  'height:75px',
+  'border-radius:50%',
+  'overflow:hidden',
+  'background:white',
+  'display:flex',
+  'align-items:center',
+  'justify-content:center',
+  'box-shadow:0 4px 16px rgba(0,0,0,.12)',
+  'z-index:300'
+].join(';');
+
+logoHautDroite.innerHTML =
+  '<img src="images/logo.png" alt="Logo CampusPlay" ' +
+  'style="width:100%;height:100%;object-fit:contain;padding:5px">';
+
+document.body.appendChild(logoHautDroite);
   document.body.prepend(sidebar);
   document.body.style.paddingLeft = '228px';
 }
