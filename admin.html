@@ -13,86 +13,284 @@
     flash('Accès refusé.', 'erreur');
     window.location.href = 'index.html';
   }
+
   renderNavbar('admin');
 </script>
 
 <div class="conteneur">
   <div id="flash-zone"></div>
+
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
     <h1 style="font-size:1.8rem;font-weight:700">⚙️ Administration</h1>
-    <span style="font-size:.85rem;color:#64748b">Connecté en tant que <strong id="user-nom"></strong></span>
+    <span style="font-size:.85rem;color:#64748b">
+      Connecté en tant que <strong id="user-nom"></strong>
+    </span>
   </div>
 
+  <!-- STATISTIQUES -->
   <div class="grille-4" style="margin-bottom:2rem">
-    <div class="stat-carte"><div class="chiffre" style="color:#4f46e5" id="s-ev"></div><div class="label">Événements actifs</div></div>
-    <div class="stat-carte"><div class="chiffre" style="color:#f59e0b" id="s-att"></div><div class="label">En attente</div></div>
-    <div class="stat-carte"><div class="chiffre" style="color:#10b981" id="s-res"></div><div class="label">Ressources</div></div>
-    <div class="stat-carte"><div class="chiffre" style="color:#ef4444" id="s-res-att"></div><div class="label">Réservations en attente</div></div>
+    <div class="stat-carte">
+      <div class="chiffre" style="color:#4f46e5" id="s-ev"></div>
+      <div class="label">Événements actifs</div>
+    </div>
+
+    <div class="stat-carte">
+      <div class="chiffre" style="color:#f59e0b" id="s-att"></div>
+      <div class="label">En attente</div>
+    </div>
+
+    <div class="stat-carte">
+      <div class="chiffre" style="color:#10b981" id="s-res"></div>
+      <div class="label">Ressources</div>
+    </div>
+
+    <div class="stat-carte">
+      <div class="chiffre" style="color:#ef4444" id="s-res-att"></div>
+      <div class="label">Réservations en attente</div>
+    </div>
   </div>
 
+  <!-- ONGLETS -->
   <div class="onglets">
     <span class="onglet actif" data-tab="evenements">📅 Événements</span>
     <span class="onglet" data-tab="reservations">📦 Réservations</span>
     <span class="onglet" data-tab="ressources">🗄️ Ressources</span>
+    <span class="onglet" data-tab="utilisateurs">👤 Utilisateurs</span>
     <span class="onglet" data-tab="creer-evenement">➕ Créer événement</span>
     <span class="onglet" data-tab="creer-ressource">➕ Créer ressource</span>
   </div>
 
+  <!-- TAB EVENEMENTS -->
   <div id="tab-evenements">
-    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem;color:#f59e0b">⏳ En attente de validation</h2>
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem;color:#f59e0b">
+      ⏳ En attente de validation
+    </h2>
+
     <div id="ev-attente" style="margin-bottom:2rem"></div>
-    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem">Tous les événements</h2>
-    <div class="carte" style="overflow:auto"><table id="table-ev"></table></div>
+
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem">
+      Tous les événements
+    </h2>
+
+    <div class="carte" style="overflow:auto">
+      <table id="table-ev"></table>
+    </div>
   </div>
 
+  <!-- TAB RESERVATIONS -->
   <div id="tab-reservations" style="display:none">
-    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem">Réservations en cours</h2>
-    <div class="carte" style="overflow:auto"><table id="table-res"></table></div>
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem">
+      Réservations en cours
+    </h2>
+
+    <div class="carte" style="overflow:auto">
+      <table id="table-res"></table>
+    </div>
   </div>
 
+  <!-- TAB RESSOURCES -->
   <div id="tab-ressources" style="display:none">
-    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem">Toutes les ressources</h2>
-    <div class="carte" style="overflow:auto"><table id="table-ress"></table></div>
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem">
+      Toutes les ressources
+    </h2>
+
+    <div class="carte" style="overflow:auto">
+      <table id="table-ress"></table>
+    </div>
   </div>
 
+  <!-- TAB UTILISATEURS -->
+  <div id="tab-utilisateurs" style="display:none">
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem">
+      Gestion des rôles utilisateurs
+    </h2>
+
+    <p style="font-size:.85rem;color:#64748b;margin-bottom:1rem">
+      Ici, tu peux attribuer ou retirer les rôles spéciaux.  
+      Pour retirer un rôle admin ou responsable, remets simplement l’utilisateur en rôle étudiant.
+    </p>
+
+    <div class="carte" style="overflow:auto">
+      <table id="table-users"></table>
+    </div>
+  </div>
+
+  <!-- TAB CREER EVENEMENT -->
   <div id="tab-creer-evenement" style="display:none">
-    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1.5rem">Créer un événement</h2>
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1.5rem">
+      Créer un événement
+    </h2>
+
     <div id="msg-ev" style="margin-bottom:1rem"></div>
+
     <div class="carte" style="max-width:600px">
       <form id="form-creer-ev">
-        <div class="form-groupe"><label>Titre *</label><input type="text" id="nv-titre" required></div>
+        <div class="form-groupe">
+          <label>Titre *</label>
+          <input type="text" id="nv-titre" required>
+        </div>
+
         <div class="form-groupe">
           <label>Activité *</label>
-          <select id="nv-activite" required><option value="">-- Choisir --</option></select>
+          <select id="nv-activite" required>
+            <option value="">-- Choisir --</option>
+          </select>
         </div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-          <div class="form-groupe"><label>Date début *</label><input type="datetime-local" id="nv-debut" required></div>
-          <div class="form-groupe"><label>Date fin *</label><input type="datetime-local" id="nv-fin" required></div>
+          <div class="form-groupe">
+            <label>Date début *</label>
+            <input type="datetime-local" id="nv-debut" required>
+          </div>
+
+          <div class="form-groupe">
+            <label>Date fin *</label>
+            <input type="datetime-local" id="nv-fin" required>
+          </div>
         </div>
+
         <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem">
-          <div class="form-groupe"><label>Lieu</label><input type="text" id="nv-lieu" placeholder="Salle B204…"></div>
-          <div class="form-groupe"><label>Places max *</label><input type="number" id="nv-places" min="1" required></div>
+          <div class="form-groupe">
+            <label>Lieu</label>
+            <input type="text" id="nv-lieu" placeholder="Salle B204…">
+          </div>
+
+          <div class="form-groupe">
+            <label>Places max *</label>
+            <input type="number" id="nv-places" min="1" required>
+          </div>
         </div>
-        <div class="form-groupe"><label>Description</label><textarea id="nv-desc" rows="3"></textarea></div>
-        <button type="submit" id="btn-ev" class="btn btn-primaire" style="width:100%">Créer et approuver l'événement</button>
+
+        <div class="form-groupe">
+          <label>Description</label>
+          <textarea id="nv-desc" rows="3"></textarea>
+        </div>
+
+        <button type="submit" id="btn-ev" class="btn btn-primaire" style="width:100%">
+          Créer et approuver l'événement
+        </button>
       </form>
     </div>
   </div>
 
+  <!-- TAB CREER RESSOURCE -->
   <div id="tab-creer-ressource" style="display:none">
-    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1.5rem">Créer une ressource</h2>
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1.5rem">
+      Créer une ressource
+    </h2>
+
     <div id="msg-res" style="margin-bottom:1rem"></div>
+
     <div class="carte" style="max-width:500px">
       <form id="form-creer-res">
-        <div class="form-groupe"><label>Nom *</label><input type="text" id="r-nom" required placeholder="Vidéoprojecteur…"></div>
-        <div class="form-groupe"><label>Catégorie</label><input type="text" id="r-cat" placeholder="Matériel, Salle…"></div>
-        <div class="form-groupe"><label>Quantité totale *</label><input type="number" id="r-qte" min="1" required></div>
-        <div class="form-groupe"><label>Description</label><textarea id="r-desc" rows="2"></textarea></div>
-        <button type="submit" id="btn-res" class="btn btn-primaire" style="width:100%">Créer la ressource</button>
+        <div class="form-groupe">
+          <label>Nom *</label>
+          <input type="text" id="r-nom" required placeholder="Vidéoprojecteur…">
+        </div>
+
+        <div class="form-groupe">
+          <label>Catégorie</label>
+          <input type="text" id="r-cat" placeholder="Matériel, Salle…">
+        </div>
+
+        <div class="form-groupe">
+          <label>Quantité totale *</label>
+          <input type="number" id="r-qte" min="1" required>
+        </div>
+
+        <div class="form-groupe">
+          <label>Description</label>
+          <textarea id="r-desc" rows="2"></textarea>
+        </div>
+
+        <button type="submit" id="btn-res" class="btn btn-primaire" style="width:100%">
+          Créer la ressource
+        </button>
       </form>
     </div>
   </div>
+</div>
 
+<!-- MODAL MODIFICATION EVENEMENT -->
+<div id="modal-modif-ev" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:500;align-items:center;justify-content:center">
+  <div class="carte" style="width:100%;max-width:650px;margin:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+      <h2 style="font-size:1.1rem;font-weight:700">✏️ Modifier l’événement</h2>
+      <button onclick="fermerModifEv()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b">
+        ✕
+      </button>
+    </div>
+
+    <form id="form-modif-ev">
+      <input type="hidden" id="modif-id">
+
+      <div class="form-groupe">
+        <label>Titre *</label>
+        <input type="text" id="modif-titre" required>
+      </div>
+
+      <div class="form-groupe">
+        <label>Activité *</label>
+        <select id="modif-activite" required></select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="form-groupe">
+          <label>Date début *</label>
+          <input type="datetime-local" id="modif-debut" required>
+        </div>
+
+        <div class="form-groupe">
+          <label>Date fin *</label>
+          <input type="datetime-local" id="modif-fin" required>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem">
+        <div class="form-groupe">
+          <label>Lieu</label>
+          <input type="text" id="modif-lieu">
+        </div>
+
+        <div class="form-groupe">
+          <label>Places max *</label>
+          <input type="number" id="modif-places" min="1" required>
+        </div>
+      </div>
+
+      <div class="form-groupe">
+        <label>Statut</label>
+        <select id="modif-statut">
+          <option value="approuve">Approuvé</option>
+          <option value="en_attente">En attente</option>
+          <option value="refuse">Refusé</option>
+        </select>
+      </div>
+
+      <div class="form-groupe">
+        <label>Description</label>
+        <textarea id="modif-desc" rows="3"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primaire" style="width:100%">
+        Enregistrer les modifications
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL PARTICIPANTS -->
+<div id="modal-participants" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:600;align-items:center;justify-content:center">
+  <div class="carte" style="width:100%;max-width:700px;margin:1rem;max-height:90vh;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+      <h2 style="font-size:1.1rem;font-weight:700">👥 Participants</h2>
+      <button onclick="fermerParticipants()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b">
+        ✕
+      </button>
+    </div>
+
+    <div id="contenu-participants"></div>
+  </div>
 </div>
 
 <footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
@@ -103,80 +301,129 @@
 afficheFlash(document.getElementById('flash-zone'));
 
 var user = getUser();
+
 document.getElementById('user-nom').textContent = user.prenom + ' ' + user.nom;
-document.getElementById('s-ev').textContent  = EVENEMENTS.filter(function(x){ return x.statut === 'approuve'; }).length;
-document.getElementById('s-att').textContent = EVENEMENTS.filter(function(x){ return x.statut === 'en_attente'; }).length;
+
+document.getElementById('s-ev').textContent = EVENEMENTS.filter(function(x) {
+  return x.statut === 'approuve';
+}).length;
+
+document.getElementById('s-att').textContent = EVENEMENTS.filter(function(x) {
+  return x.statut === 'en_attente';
+}).length;
+
 document.getElementById('s-res').textContent = RESSOURCES.length;
 
-fetch('api/reservations.php', {credentials:'include'})
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    var att = Array.isArray(data) ? data.filter(function(r){ return r.statut === 'en_attente'; }).length : 0;
+/* STAT RESERVATIONS ADMIN */
+fetch('api/reservations.php', { credentials:'include' })
+  .then(function(r) {
+    return r.json();
+  })
+  .then(function(data) {
+    var att = Array.isArray(data)
+      ? data.filter(function(r) { return r.statut === 'en_attente'; }).length
+      : 0;
+
     document.getElementById('s-res-att').textContent = att;
+
     var tbody = '';
+
     if (Array.isArray(data) && data.length) {
       data.forEach(function(r) {
-        var res = RESSOURCES.find(function(x){ return x.id == r.ressource_id; });
+        var res = RESSOURCES.find(function(x) {
+          return x.id == r.ressource_id;
+        });
+
         tbody += '<tr>'
-          + '<td><strong>' + e(res ? res.nom : '?') + '</strong></td>'
+          + '<td><strong>' + e(res ? res.nom : r.ressource_nom || '?') + '</strong></td>'
           + '<td>' + e(r.user_email) + '</td>'
           + '<td>' + new Date(r.date_debut).toLocaleDateString('fr-FR') + ' → ' + new Date(r.date_fin).toLocaleDateString('fr-FR') + '</td>'
           + '<td>' + r.quantite + '</td>'
-          + '<td><span class="badge badge-jaune">En attente</span></td>'
-+ '<td style="display:flex;gap:.4rem">'
-+ '<button onclick="approuverRes(' + r.id + ')" class="btn btn-succes" style="font-size:.8rem;padding:.3rem .6rem">✔ Valider</button>'
-+ '<button onclick="refuserRes(' + r.id + ')" class="btn btn-erreur" style="font-size:.8rem;padding:.3rem .6rem">✖ Refuser</button>'
-+ '</td>'
+          + '<td><span class="badge badge-jaune">' + e(r.statut || 'en_attente') + '</span></td>'
+          + '<td><button onclick="annulerRes(' + r.id + ')" class="btn btn-erreur" style="font-size:.8rem;padding:.3rem .6rem">✖ Annuler</button></td>'
           + '</tr>';
       });
     }
+
     document.getElementById('table-res').innerHTML = tbody
       ? '<thead><tr><th>Ressource</th><th>Demandeur</th><th>Dates</th><th>Qté</th><th>Statut</th><th>Action</th></tr></thead><tbody>' + tbody + '</tbody>'
       : '<tr><td colspan="6" style="text-align:center;color:#64748b;padding:1.5rem">Aucune réservation.</td></tr>';
   });
 
+/* ONGLETS */
 document.querySelectorAll('.onglet').forEach(function(o) {
   o.addEventListener('click', function() {
-    document.querySelectorAll('.onglet').forEach(function(x){ x.classList.remove('actif'); });
+    document.querySelectorAll('.onglet').forEach(function(x) {
+      x.classList.remove('actif');
+    });
+
     this.classList.add('actif');
-    ['evenements','reservations','ressources','creer-evenement','creer-ressource'].forEach(function(t){
+
+    ['evenements', 'reservations', 'ressources', 'utilisateurs', 'creer-evenement', 'creer-ressource'].forEach(function(t) {
       document.getElementById('tab-' + t).style.display = 'none';
     });
+
     document.getElementById('tab-' + this.dataset.tab).style.display = 'block';
   });
 });
 
-var enAttente = EVENEMENTS.filter(function(x){ return x.statut === 'en_attente'; });
-var zoneAtt = document.getElementById('ev-attente');
-if (!enAttente.length) {
-  zoneAtt.innerHTML = '<div class="flash flash-succes" style="display:inline-block">✅ Aucun événement en attente.</div>';
+/* EVENEMENTS EN ATTENTE */
+var evAttente = EVENEMENTS.filter(function(ev) {
+  return ev.statut === 'en_attente';
+});
+
+if (!evAttente.length) {
+  document.getElementById('ev-attente').innerHTML =
+    '<p style="color:#64748b;background:white;border:1px solid var(--bordure);padding:1rem;border-radius:.75rem">Aucun événement en attente.</p>';
 } else {
-  zoneAtt.innerHTML = enAttente.map(function(ev) {
-    return '<div style="background:white;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:.75rem;padding:1.1rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem">'
-      + '<div><h3 style="font-size:.95rem;font-weight:700">' + e(ev.titre) + '</h3>'
-      + '<p style="font-size:.82rem;color:#64748b">📅 ' + formatDate(ev.date_debut) + ' — 📍 ' + e(ev.lieu) + '</p></div>'
-      + '<div style="display:flex;gap:.5rem">'
+  document.getElementById('ev-attente').innerHTML = evAttente.map(function(ev) {
+    return '<div class="carte" style="margin-bottom:.75rem">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem">'
+      + '<div>'
+      + '<h3 style="font-size:.95rem;font-weight:700">' + e(ev.titre) + '</h3>'
+      + '<p style="font-size:.82rem;color:#64748b">📅 ' + formatDate(ev.date_debut) + ' — 📍 ' + e(ev.lieu || '') + '</p>'
+      + '</div>'
+      + '<div style="display:flex;gap:.5rem;flex-wrap:wrap">'
       + '<button onclick="approuverEv(' + ev.id + ')" class="btn btn-succes" style="font-size:.82rem;padding:.4rem .85rem">✔ Approuver</button>'
       + '<button onclick="refuserEv(' + ev.id + ')" class="btn btn-erreur" style="font-size:.82rem;padding:.4rem .85rem">✖ Refuser</button>'
-      + '<a href="evenement.html?id=' + ev.id + '" class="btn btn-gris" style="font-size:.82rem;padding:.4rem .85rem">Voir</a>'
-      + '</div></div>';
+      + '<button onclick="ouvrirModifEv(' + ev.id + ')" class="btn btn-gris" style="font-size:.82rem;padding:.4rem .85rem">✏️ Modifier</button>'
+      + '<button onclick="voirParticipants(' + ev.id + ')" class="btn btn-primaire" style="font-size:.82rem;padding:.4rem .85rem">👥 Participants</button>'
+      + '</div>'
+      + '</div>'
+      + '</div>';
   }).join('');
 }
 
-var colors = { approuve:'badge-vert', en_attente:'badge-jaune', refuse:'badge-rouge' };
-var labels = { approuve:'Approuvé', en_attente:'En attente', refuse:'Refusé' };
+/* TABLE EVENEMENTS */
+var colors = {
+  approuve: 'badge-vert',
+  en_attente: 'badge-jaune',
+  refuse: 'badge-rouge'
+};
+
+var labels = {
+  approuve: 'Approuvé',
+  en_attente: 'En attente',
+  refuse: 'Refusé'
+};
+
 document.getElementById('table-ev').innerHTML =
   '<thead><tr><th>Titre</th><th>Date</th><th>Places</th><th>Statut</th><th>Actions</th></tr></thead><tbody>'
   + EVENEMENTS.map(function(ev) {
     return '<tr>'
-      + '<td><a href="evenement.html?id=' + ev.id + '" style="color:#4f46e5">' + e(ev.titre) + '</a></td>'
+      + '<td><strong>' + e(ev.titre) + '</strong></td>'
       + '<td style="color:#64748b">' + formatDate(ev.date_debut) + '</td>'
       + '<td>' + ev.places_prises + '/' + ev.places_max + '</td>'
       + '<td><span class="badge ' + (colors[ev.statut] || '') + '">' + (labels[ev.statut] || ev.statut) + '</span></td>'
-      + '<td><button onclick="supprimerEv(' + ev.id + ',\'' + e(ev.titre) + '\')" class="btn btn-erreur" style="font-size:.8rem;padding:.3rem .6rem">🗑 Supprimer</button></td>'
+      + '<td style="white-space:nowrap">'
+      + '<button onclick="ouvrirModifEv(' + ev.id + ')" class="btn btn-gris" style="font-size:.8rem;padding:.3rem .6rem;margin-right:.35rem">✏️ Modifier</button>'
+      + '<button onclick="voirParticipants(' + ev.id + ')" class="btn btn-primaire" style="font-size:.8rem;padding:.3rem .6rem;margin-right:.35rem">👥 Participants</button>'
+      + '<button onclick="supprimerEv(' + ev.id + ',\'' + e(ev.titre).replace(/'/g, "\\'") + '\')" class="btn btn-erreur" style="font-size:.8rem;padding:.3rem .6rem">🗑 Supprimer</button>'
+      + '</td>'
       + '</tr>';
   }).join('') + '</tbody>';
 
+/* TABLE RESSOURCES */
 document.getElementById('table-ress').innerHTML =
   '<thead><tr><th>Nom</th><th>Catégorie</th><th>Total</th><th>Disponible</th><th>Actions</th></tr></thead><tbody>'
   + RESSOURCES.map(function(r) {
@@ -185,79 +432,114 @@ document.getElementById('table-ress').innerHTML =
       + '<td style="color:#64748b">' + e(r.categorie) + '</td>'
       + '<td>' + r.quantite_totale + '</td>'
       + '<td style="color:' + (r.quantite_disponible > 0 ? '#10b981' : '#ef4444') + ';font-weight:700">' + r.quantite_disponible + '</td>'
-      + '<td><button onclick="supprimerRes(' + r.id + ',\'' + e(r.nom) + '\')" class="btn btn-erreur" style="font-size:.8rem;padding:.3rem .6rem">🗑 Supprimer</button></td>'
+      + '<td><button onclick="supprimerRes(' + r.id + ',\'' + e(r.nom).replace(/'/g, "\\'") + '\')" class="btn btn-erreur" style="font-size:.8rem;padding:.3rem .6rem">🗑 Supprimer</button></td>'
       + '</tr>';
   }).join('') + '</tbody>';
 
+/* TABLE UTILISATEURS */
+function afficherUtilisateurs() {
+  var comptes = getComptes();
+
+  if (!comptes.length) {
+    document.getElementById('table-users').innerHTML =
+      '<tr><td style="text-align:center;color:#64748b;padding:1.5rem">Aucun utilisateur trouvé.</td></tr>';
+    return;
+  }
+
+  var roleLabel = {
+    etudiant: 'Étudiant',
+    manager: 'Responsable',
+    admin: 'Administrateur'
+  };
+
+  var badgeClass = {
+    etudiant: 'badge-bleu',
+    manager: 'badge-vert',
+    admin: 'badge-jaune'
+  };
+
+  document.getElementById('table-users').innerHTML =
+    '<thead><tr><th>Nom</th><th>Email</th><th>Rôle actuel</th><th>Modifier le rôle</th></tr></thead><tbody>'
+    + comptes.map(function(c) {
+      return '<tr>'
+        + '<td><strong>' + e(c.prenom + ' ' + c.nom) + '</strong></td>'
+        + '<td style="color:#64748b">' + e(c.email) + '</td>'
+        + '<td><span class="badge ' + (badgeClass[c.role] || 'badge-bleu') + '">' + e(roleLabel[c.role] || c.role) + '</span></td>'
+        + '<td>'
+        + '<select onchange="changerRoleUtilisateur(' + c.id + ', this.value)" style="padding:.45rem .7rem;border:1px solid var(--bordure);border-radius:.45rem">'
+        + '<option value="etudiant" ' + (c.role === 'etudiant' ? 'selected' : '') + '>Étudiant</option>'
+        + '<option value="manager" ' + (c.role === 'manager' ? 'selected' : '') + '>Responsable</option>'
+        + '<option value="admin" ' + (c.role === 'admin' ? 'selected' : '') + '>Administrateur</option>'
+        + '</select>'
+        + '</td>'
+        + '</tr>';
+    }).join('')
+    + '</tbody>';
+}
+
+afficherUtilisateurs();
+
+/* SELECTS ACTIVITE */
 var selAct = document.getElementById('nv-activite');
+var selModifAct = document.getElementById('modif-activite');
+
 ACTIVITES.forEach(function(a) {
-  var o = document.createElement('option');
-  o.value = a.id; o.textContent = a.titre; selAct.appendChild(o);
+  var o1 = document.createElement('option');
+  o1.value = a.id;
+  o1.textContent = a.titre;
+  selAct.appendChild(o1);
+
+  var o2 = document.createElement('option');
+  o2.value = a.id;
+  o2.textContent = a.titre;
+  selModifAct.appendChild(o2);
 });
 
 function affMsg(id, texte, type) {
-  document.getElementById(id).innerHTML = '<div class="flash ' + (type === 'erreur' ? 'flash-erreur' : 'flash-succes') + '">' + texte + '</div>';
+  document.getElementById(id).innerHTML =
+    '<div class="flash ' + (type === 'erreur' ? 'flash-erreur' : 'flash-succes') + '">' + texte + '</div>';
 }
 
+/* CHANGER ROLE UTILISATEUR */
+async function changerRoleUtilisateur(idCompte, nouveauRole) {
+  var roleAffiche = {
+    etudiant: 'Étudiant',
+    manager: 'Responsable',
+    admin: 'Administrateur'
+  };
+
+  var confirmation = confirm(
+    "Confirmer le changement de rôle ?\n\n" +
+    "Nouveau rôle : " + (roleAffiche[nouveauRole] || nouveauRole)
+  );
+
+  if (!confirmation) {
+    location.reload();
+    return;
+  }
+
+  var reponse = await modifierRoleCompte(idCompte, nouveauRole);
+
+  if (reponse.succes) {
+    if (nouveauRole === 'etudiant') {
+      flash("Rôle spécial retiré : l'utilisateur est maintenant étudiant.", "succes");
+    } else if (nouveauRole === 'manager') {
+      flash("Rôle responsable attribué avec succès.", "succes");
+    } else if (nouveauRole === 'admin') {
+      flash("Rôle administrateur attribué avec succès.", "succes");
+    }
+
+    location.reload();
+  } else {
+    alert(reponse.erreur || "Impossible de modifier le rôle.");
+  }
+}
+
+/* ACTIONS EVENEMENTS */
 function approuverEv(id) {
   var u = getUser();
-  fetch('api/evenements.php', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'statut', id:id, statut:'approuve', _user: u ? u.email : ''})
-  }).then(function(r){ return r.json(); }).then(function(d){
-    if (d.succes) { flash('Événement approuvé !'); location.reload(); }
-    else alert(d.erreur || 'Erreur');
-  });
-}
 
-function refuserEv(id) {
-  var u = getUser();
-  fetch('api/evenements.php', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'statut', id:id, statut:'refuse', _user: u ? u.email : ''})
-  }).then(function(r){ return r.json(); }).then(function(d){
-    if (d.succes) { flash('Événement refusé.', 'attention'); location.reload(); }
-    else alert(d.erreur || 'Erreur');
-  });
-}
-
-function supprimerEv(id, titre) {
-  if (!confirm('Supprimer définitivement "' + titre + '" ?')) return;
-  var u = getUser();
-  fetch('api/evenements.php', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'supprimer', id:id, _user: u ? u.email : ''})
-  }).then(function(r){ return r.json(); }).then(function(d){
-    if (d.succes) { flash('Événement supprimé.', 'attention'); location.reload(); }
-    else alert(d.erreur || 'Erreur');
-  });
-}
-
-function supprimerRes(id, nom) {
-  if (!confirm('Supprimer définitivement la ressource "' + nom + '" ?')) return;
-  var u = getUser();
-  fetch('api/ressources.php', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'supprimer', id:id, _user: u ? u.email : ''})
-  }).then(function(r){ return r.json(); }).then(function(d){
-    if (d.succes) { flash('Ressource supprimée.', 'attention'); location.reload(); }
-    else alert(d.erreur || 'Erreur');
-  });
-}
-
-function annulerRes(id) {
-  if (!confirm('Annuler cette réservation ?')) return;
-  var u = getUser();
-  fetch('api/reservations.php', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'annuler', id:id, _user: u ? u.email : ''})
-  }).then(function(r){ return r.json(); }).then(function(d){
-    if (d.succes) { flash('Réservation annulée.', 'attention'); location.reload(); }
-    else alert(d.erreur || 'Erreur');
-  });
-}
-
-function approuverRes(id) {
-  if (!confirm('Valider cette réservation ?')) return;
-
-  var u = getUser();
-
-  fetch('api/reservations.php', {
+  fetch('api/evenements.php', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     credentials:'include',
@@ -268,10 +550,10 @@ function approuverRes(id) {
       _user: u ? u.email : ''
     })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
     if (d.succes) {
-      flash('✅ Réservation validée !');
+      flash('Événement approuvé !');
       location.reload();
     } else {
       alert(d.erreur || 'Erreur');
@@ -279,12 +561,10 @@ function approuverRes(id) {
   });
 }
 
-function refuserRes(id) {
-  if (!confirm('Refuser cette réservation ?')) return;
-
+function refuserEv(id) {
   var u = getUser();
 
-  fetch('api/reservations.php', {
+  fetch('api/evenements.php', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     credentials:'include',
@@ -295,10 +575,10 @@ function refuserRes(id) {
       _user: u ? u.email : ''
     })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
     if (d.succes) {
-      flash('❌ Réservation refusée.', 'attention');
+      flash('Événement refusé.', 'attention');
       location.reload();
     } else {
       alert(d.erreur || 'Erreur');
@@ -306,61 +586,339 @@ function refuserRes(id) {
   });
 }
 
-window.approuverEv = approuverEv;
-window.refuserEv   = refuserEv;
-window.supprimerEv = supprimerEv;
-window.supprimerRes = supprimerRes;
-window.annulerRes  = annulerRes;
-window.approuverRes = approuverRes;
-window.refuserRes   = refuserRes;
+function supprimerEv(id, titre) {
+  if (!confirm('Supprimer définitivement "' + titre + '" ?')) return;
 
+  var u = getUser();
+
+  fetch('api/evenements.php', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    credentials:'include',
+    body: JSON.stringify({
+      action:'supprimer',
+      id:id,
+      _user: u ? u.email : ''
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.succes) {
+      flash('Événement supprimé.', 'attention');
+      location.reload();
+    } else {
+      alert(d.erreur || 'Erreur');
+    }
+  });
+}
+
+/* MODIFICATION EVENEMENT */
+function versDatetimeLocal(dateStr) {
+  if (!dateStr) return '';
+  return dateStr.replace(' ', 'T').slice(0, 16);
+}
+
+function ouvrirModifEv(id) {
+  var ev = EVENEMENTS.find(function(x) {
+    return x.id == id;
+  });
+
+  if (!ev) {
+    alert("Événement introuvable.");
+    return;
+  }
+
+  document.getElementById('modif-id').value = ev.id;
+  document.getElementById('modif-titre').value = ev.titre || '';
+  document.getElementById('modif-activite').value = ev.activite_id || '';
+  document.getElementById('modif-debut').value = versDatetimeLocal(ev.date_debut);
+  document.getElementById('modif-fin').value = versDatetimeLocal(ev.date_fin);
+  document.getElementById('modif-lieu').value = ev.lieu || '';
+  document.getElementById('modif-places').value = ev.places_max || 20;
+  document.getElementById('modif-desc').value = ev.description || '';
+  document.getElementById('modif-statut').value = ev.statut || 'approuve';
+
+  document.getElementById('modal-modif-ev').style.display = 'flex';
+}
+
+function fermerModifEv() {
+  document.getElementById('modal-modif-ev').style.display = 'none';
+}
+
+document.getElementById('form-modif-ev').addEventListener('submit', function(ev) {
+  ev.preventDefault();
+
+  var u = getUser();
+
+  var donnees = {
+    action: 'modifier',
+    id: parseInt(document.getElementById('modif-id').value),
+    titre: document.getElementById('modif-titre').value,
+    activite_id: parseInt(document.getElementById('modif-activite').value),
+    date_debut: document.getElementById('modif-debut').value,
+    date_fin: document.getElementById('modif-fin').value,
+    lieu: document.getElementById('modif-lieu').value,
+    places_max: parseInt(document.getElementById('modif-places').value),
+    description: document.getElementById('modif-desc').value,
+    statut: document.getElementById('modif-statut').value,
+    _user: u ? u.email : ''
+  };
+
+  fetch('api/evenements.php', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    credentials:'include',
+    body: JSON.stringify(donnees)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.succes) {
+      flash('Événement modifié avec succès !');
+      location.reload();
+    } else {
+      alert(d.erreur || 'Erreur lors de la modification.');
+    }
+  })
+  .catch(function(err) {
+    alert('Erreur réseau : ' + err.message);
+  });
+});
+
+/* PARTICIPANTS */
+function voirParticipants(idEvenement) {
+  var evenement = EVENEMENTS.find(function(ev) {
+    return ev.id == idEvenement;
+  });
+
+  var inscriptions = getInscriptions().filter(function(i) {
+    return i.evenement_id == idEvenement;
+  });
+
+  var inscrits = inscriptions.filter(function(i) {
+    return (i.statut || 'inscrit') === 'inscrit';
+  });
+
+  var attente = inscriptions.filter(function(i) {
+    return i.statut === 'liste_attente';
+  });
+
+  var html = '';
+
+  html += '<h3 style="font-size:1rem;margin-bottom:.75rem;color:#1e293b">'
+       + e(evenement ? evenement.titre : 'Événement')
+       + '</h3>';
+
+  html += '<p style="font-size:.85rem;color:#64748b;margin-bottom:1rem">'
+       + inscrits.length + ' participant(s) inscrit(s) · '
+       + attente.length + ' en liste d’attente'
+       + '</p>';
+
+  html += '<h4 style="font-size:.9rem;margin-bottom:.5rem">✅ Participants inscrits</h4>';
+
+  if (!inscrits.length) {
+    html += '<p style="color:#64748b;margin-bottom:1rem">Aucun participant inscrit.</p>';
+  } else {
+    html += '<table style="margin-bottom:1.5rem"><thead><tr><th>Email</th><th>Statut</th><th>Date</th></tr></thead><tbody>';
+
+    inscrits.forEach(function(i) {
+      html += '<tr>'
+        + '<td>' + e(i.user_email) + '</td>'
+        + '<td><span class="badge badge-bleu">Inscrit</span></td>'
+        + '<td>' + (i.inscrit_le ? formatDate(i.inscrit_le) : '—') + '</td>'
+        + '</tr>';
+    });
+
+    html += '</tbody></table>';
+  }
+
+  html += '<h4 style="font-size:.9rem;margin-bottom:.5rem">⏳ Liste d’attente</h4>';
+
+  if (!attente.length) {
+    html += '<p style="color:#64748b">Aucune personne en liste d’attente.</p>';
+  } else {
+    html += '<table><thead><tr><th>Email</th><th>Statut</th><th>Date</th></tr></thead><tbody>';
+
+    attente.forEach(function(i) {
+      html += '<tr>'
+        + '<td>' + e(i.user_email) + '</td>'
+        + '<td><span class="badge badge-jaune">Liste d’attente</span></td>'
+        + '<td>' + (i.inscrit_le ? formatDate(i.inscrit_le) : '—') + '</td>'
+        + '</tr>';
+    });
+
+    html += '</tbody></table>';
+  }
+
+  document.getElementById('contenu-participants').innerHTML = html;
+  document.getElementById('modal-participants').style.display = 'flex';
+}
+
+function fermerParticipants() {
+  document.getElementById('modal-participants').style.display = 'none';
+}
+
+/* ACTIONS RESSOURCES */
+function supprimerRes(id, nom) {
+  if (!confirm('Supprimer définitivement la ressource "' + nom + '" ?')) return;
+
+  var u = getUser();
+
+  fetch('api/ressources.php', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    credentials:'include',
+    body: JSON.stringify({
+      action:'supprimer',
+      id:id,
+      _user: u ? u.email : ''
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.succes) {
+      flash('Ressource supprimée.', 'attention');
+      location.reload();
+    } else {
+      alert(d.erreur || 'Erreur');
+    }
+  });
+}
+
+/* ACTIONS RESERVATIONS */
+function annulerRes(id) {
+  if (!confirm('Annuler cette réservation ?')) return;
+
+  var u = getUser();
+
+  fetch('api/reservations.php', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    credentials:'include',
+    body: JSON.stringify({
+      action:'annuler',
+      id:id,
+      _user: u ? u.email : ''
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.succes) {
+      flash('Réservation annulée.', 'attention');
+      location.reload();
+    } else {
+      alert(d.erreur || 'Erreur');
+    }
+  });
+}
+
+/* CREATION EVENEMENT */
 document.getElementById('form-creer-ev').addEventListener('submit', function(ev) {
   ev.preventDefault();
-  var titre  = document.getElementById('nv-titre').value;
-  var actId  = parseInt(document.getElementById('nv-activite').value);
-  var debut  = document.getElementById('nv-debut').value;
-  var fin    = document.getElementById('nv-fin').value;
-  var lieu   = document.getElementById('nv-lieu').value;
+
+  var titre = document.getElementById('nv-titre').value;
+  var actId = parseInt(document.getElementById('nv-activite').value);
+  var debut = document.getElementById('nv-debut').value;
+  var fin = document.getElementById('nv-fin').value;
+  var lieu = document.getElementById('nv-lieu').value;
   var places = parseInt(document.getElementById('nv-places').value);
-  var desc   = document.getElementById('nv-desc').value;
-  var u      = getUser();
-  var btn    = document.getElementById('btn-ev');
-  btn.disabled = true; btn.textContent = 'Création…';
+  var desc = document.getElementById('nv-desc').value;
+  var u = getUser();
+  var btn = document.getElementById('btn-ev');
+
+  btn.disabled = true;
+  btn.textContent = 'Création…';
+
   fetch('api/evenements.php', {
-    method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'creer', titre:titre, activite_id:actId, date_debut:debut,
-      date_fin:fin, lieu:lieu, places_max:places, description:desc, statut:'approuve', _user: u ? u.email : ''})
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    credentials:'include',
+    body: JSON.stringify({
+      action:'creer',
+      titre:titre,
+      activite_id:actId,
+      date_debut:debut,
+      date_fin:fin,
+      lieu:lieu,
+      places_max:places,
+      description:desc,
+      statut:'approuve',
+      _user: u ? u.email : ''
+    })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if (d.succes) { affMsg('msg-ev', '✅ Événement "' + titre + '" créé (ID : ' + d.id + ') !', 'succes'); document.getElementById('form-creer-ev').reset(); }
-    else affMsg('msg-ev', '❌ ' + (d.erreur || 'Erreur serveur'), 'erreur');
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.succes) {
+      affMsg('msg-ev', '✅ Événement "' + e(titre) + '" créé (ID : ' + d.id + ') !', 'succes');
+      document.getElementById('form-creer-ev').reset();
+    } else {
+      affMsg('msg-ev', '❌ ' + (d.erreur || 'Erreur serveur'), 'erreur');
+    }
   })
-  .catch(function(err){ affMsg('msg-ev', '❌ Erreur réseau : ' + err.message, 'erreur'); })
-  .finally(function(){ btn.disabled = false; btn.textContent = "Créer et approuver l'événement"; });
+  .catch(function(err) {
+    affMsg('msg-ev', '❌ Erreur réseau : ' + err.message, 'erreur');
+  })
+  .finally(function() {
+    btn.disabled = false;
+    btn.textContent = "Créer et approuver l'événement";
+  });
 });
 
+/* CREATION RESSOURCE */
 document.getElementById('form-creer-res').addEventListener('submit', function(ev) {
   ev.preventDefault();
-  var nom  = document.getElementById('r-nom').value;
-  var cat  = document.getElementById('r-cat').value;
-  var qte  = parseInt(document.getElementById('r-qte').value);
+
+  var nom = document.getElementById('r-nom').value;
+  var cat = document.getElementById('r-cat').value;
+  var qte = parseInt(document.getElementById('r-qte').value);
   var desc = document.getElementById('r-desc').value;
-  var u    = getUser();
-  var btn  = document.getElementById('btn-res');
-  btn.disabled = true; btn.textContent = 'Création…';
+  var u = getUser();
+  var btn = document.getElementById('btn-res');
+
+  btn.disabled = true;
+  btn.textContent = 'Création…';
+
   fetch('api/ressources.php', {
-    method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({action:'creer', nom:nom, categorie:cat, quantite_totale:qte, description:desc, _user: u ? u.email : ''})
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    credentials:'include',
+    body: JSON.stringify({
+      action:'creer',
+      nom:nom,
+      categorie:cat,
+      quantite_totale:qte,
+      description:desc,
+      _user: u ? u.email : ''
+    })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if (d.succes) { affMsg('msg-res', '✅ Ressource "' + nom + '" créée !', 'succes'); document.getElementById('form-creer-res').reset(); }
-    else affMsg('msg-res', '❌ ' + (d.erreur || 'Erreur serveur'), 'erreur');
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.succes) {
+      affMsg('msg-res', '✅ Ressource "' + e(nom) + '" créée !', 'succes');
+      document.getElementById('form-creer-res').reset();
+    } else {
+      affMsg('msg-res', '❌ ' + (d.erreur || 'Erreur serveur'), 'erreur');
+    }
   })
-  .catch(function(err){ affMsg('msg-res', '❌ Erreur réseau : ' + err.message, 'erreur'); })
-  .finally(function(){ btn.disabled = false; btn.textContent = 'Créer la ressource'; });
+  .catch(function(err) {
+    affMsg('msg-res', '❌ Erreur réseau : ' + err.message, 'erreur');
+  })
+  .finally(function() {
+    btn.disabled = false;
+    btn.textContent = 'Créer la ressource';
+  });
 });
+
+/* EXPOSER LES FONCTIONS */
+window.approuverEv = approuverEv;
+window.refuserEv = refuserEv;
+window.supprimerEv = supprimerEv;
+window.ouvrirModifEv = ouvrirModifEv;
+window.fermerModifEv = fermerModifEv;
+window.voirParticipants = voirParticipants;
+window.fermerParticipants = fermerParticipants;
+window.supprimerRes = supprimerRes;
+window.annulerRes = annulerRes;
+window.changerRoleUtilisateur = changerRoleUtilisateur;
 </script>
 
 </body>
