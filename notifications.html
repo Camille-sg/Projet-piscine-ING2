@@ -5,211 +5,280 @@
   <title>CampusPlay — Notifications</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <script src="data.js"></script>
 <script>
-  if (!isConnecte()) { window.location.href = 'connexion.html'; }
-  renderNavbar('');
+  if (!isConnecte()) window.location.href = 'index.html';
 </script>
 
 <div class="conteneur">
-  <div id="flash-zone"></div>
 
-  <!-- En-tête -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.75rem;flex-wrap:wrap;gap:1rem">
-    <h1 style="font-size:1.8rem;font-weight:700">🔔 Notifications</h1>
-    <button onclick="toutMarquerLu()" class="btn btn-gris" style="font-size:.85rem">✓ Tout marquer comme lu</button>
+  <!-- ════ HEADER ════ -->
+  <header class="site-header">
+    <div class="logo-cercle">logo</div>
+
+    <div class="header-centre">
+      <h1>CampusPlay <span class="note">♫</span></h1>
+      <p>Notifications et activités associatives</p>
+    </div>
+
+    <div class="header-droite">
+      <span class="user-nom" id="user-nom"></span>
+      <span class="user-role" id="user-role"></span>
+      <button class="btn-deco" onclick="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- ════ CORPS ════ -->
+  <div class="site-corps">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <a href="accueil.html">
+        <span class="icone">🏠</span> Accueil
+      </a>
+      <a href="activites.html">
+        <span class="icone">🎯</span> Activités
+      </a>
+      <a href="evenements.html">
+        <span class="icone">📅</span> Évènements
+      </a>
+      <a href="ressources.html">
+        <span class="icone">📦</span> Ressources
+      </a>
+      <a href="reservations.html">
+        <span class="icone">🔖</span> Réservations
+      </a>
+
+      <hr>
+
+      <a href="notifications.html" class="actif">
+        <span class="icone">🔔</span> Notifications
+        <span class="badge-nb" id="badge-notif"></span>
+      </a>
+
+      <hr>
+
+      <a href="profil.html">
+        <span class="icone">👤</span> Mon profil
+      </a>
+
+      <a href="admin.html" id="lien-admin" style="display:none">
+        <span class="icone">⚙️</span> Admin
+      </a>
+    </nav>
+
+    <!-- CONTENU -->
+    <main class="site-contenu">
+
+      <div id="flash-zone"></div>
+
+      <!-- HEADER PAGE -->
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+        <h2 class="page-titre">🔔 Notifications</h2>
+
+        <button onclick="toutMarquerLu()" class="btn btn-gris">
+          ✓ Tout marquer comme lu
+        </button>
+      </div>
+
+      <!-- FILTRES -->
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
+        <button onclick="filtrer('toutes')" class="btn btn-primaire filtre-btn" data-filtre="toutes">Toutes</button>
+
+        <button onclick="filtrer('non-lues')" class="btn btn-gris filtre-btn" data-filtre="non-lues">
+          Non lues
+          <span id="badge-non-lues" style="display:none;background:#ef4444;color:white;border-radius:9999px;padding:.05rem .4rem;font-size:.72rem;font-weight:700;margin-left:.3rem"></span>
+        </button>
+
+        <button onclick="filtrer('evenements')" class="btn btn-gris filtre-btn" data-filtre="evenements">🎵 Événements</button>
+        <button onclick="filtrer('reservations')" class="btn btn-gris filtre-btn" data-filtre="reservations">📦 Réservations</button>
+        <button onclick="filtrer('systeme')" class="btn btn-gris filtre-btn" data-filtre="systeme">⚙️ Système</button>
+      </div>
+
+      <!-- LISTE -->
+      <div id="liste-notifs"></div>
+
+    </main>
   </div>
 
-  <!-- Filtres -->
-  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
-    <button onclick="filtrer('toutes')"       class="btn btn-primaire filtre-btn" data-filtre="toutes"       style="font-size:.82rem">Toutes</button>
-    <button onclick="filtrer('non-lues')"     class="btn btn-gris     filtre-btn" data-filtre="non-lues"     style="font-size:.82rem">
-      Non lues <span id="badge-non-lues" style="display:none;background:#ef4444;color:white;border-radius:9999px;padding:.05rem .4rem;font-size:.72rem;font-weight:700;margin-left:.3rem"></span>
-    </button>
-    <button onclick="filtrer('evenements')"   class="btn btn-gris     filtre-btn" data-filtre="evenements"   style="font-size:.82rem">🎵 Événements</button>
-    <button onclick="filtrer('reservations')" class="btn btn-gris     filtre-btn" data-filtre="reservations" style="font-size:.82rem">📦 Réservations</button>
-    <button onclick="filtrer('systeme')"      class="btn btn-gris     filtre-btn" data-filtre="systeme"      style="font-size:.82rem">⚙️ Système</button>
-  </div>
+  <!-- ════ FOOTER ════ -->
+  <footer class="site-footer">
+    <div><strong>Copyright</strong> © 2026 CampusPlay</div>
+    <div>contact@campusplay.fr · 01 23 45 67 89</div>
+    <div>123 Rue de l'École, 75000 Paris</div>
+  </footer>
 
-  <!-- Liste -->
-  <div id="liste-notifs"></div>
 </div>
-
-<footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
-  © 2026 CampusPlay — Tous droits réservés
-</footer>
 
 <script>
 afficheFlash(document.getElementById('flash-zone'));
 
 const user = getUser();
 
-/* ── Génération des notifications ──────────────────────── */
+/* ── UI USER ── */
+const rolesLabels = {
+  admin:'Administrateur',
+  manager:'Manager',
+  membre:'Membre',
+  etudiant:'Étudiant'
+};
+
+document.getElementById('user-nom').textContent =
+  user.prenom + ' ' + user.nom;
+
+document.getElementById('user-role').textContent =
+  rolesLabels[user.role] || user.role;
+
+/* ── NOTIFICATIONS ── */
 function genererNotifications() {
+
   const sauvegardees = JSON.parse(localStorage.getItem('cp_notifs_' + user.email) || 'null');
-  if (sauvegardees !== null) return sauvegardees;
+  if (sauvegardees) return sauvegardees;
 
   const liste = [];
-  const now   = new Date();
-  let   idx   = 1;
+  let idx = 1;
+  const now = new Date();
 
-  /* --- Notifications basées sur les inscriptions --- */
   const mesInscrits = getInscriptions().filter(i => i.user_email === user.email);
+
+  /* EVENEMENTS */
   mesInscrits.forEach(i => {
     const ev = EVENEMENTS.find(x => x.id === i.evenement_id);
     if (!ev) return;
-    const dateEv   = new Date(ev.date_debut);
-    const diffJour = Math.ceil((dateEv - now) / 86400000);
-    const passe    = diffJour < 0;
 
-    // Confirmation
+    const dateEv = new Date(ev.date_debut);
+    const diffJour = Math.ceil((dateEv - now) / 86400000);
+
     liste.push({
-      id: idx++, type: 'evenements', lue: false,
-      icone: '📅', couleur: '#dcfce7',
+      id: idx++,
+      type: 'evenements',
+      lue: false,
+      icone: '📅',
+      couleur: '#dcfce7',
       titre: 'Inscription confirmée',
-      desc:  `Tu es inscrit(e) à "${ev.titre}" le ${dateEv.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long' })}.`,
-      meta:  'Il y a quelques instants',
-      lien:  'evenements.html',
+      desc: `Tu es inscrit(e) à "${ev.titre}" le ${dateEv.toLocaleDateString('fr-FR')}.`,
+      meta: 'Récemment',
+      lien: 'evenements.html'
     });
 
-    // Rappel (dans les 3 jours)
     if (diffJour >= 0 && diffJour <= 3) {
       liste.push({
-        id: idx++, type: 'evenements', lue: false,
-        icone: '⏰', couleur: '#fef3c7',
-        titre: `Rappel — "${ev.titre}"`,
+        id: idx++,
+        type: 'evenements',
+        lue: false,
+        icone: '⏰',
+        couleur: '#fef3c7',
+        titre: `Rappel — ${ev.titre}`,
         desc: diffJour === 0
-          ? `C'est aujourd'hui ! Ton événement est à ${dateEv.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}. Lieu : ${ev.lieu}.`
-          : `L'événement commence dans ${diffJour} jour${diffJour>1?'s':''}. Lieu : ${ev.lieu}.`,
-        meta:  'Rappel automatique',
-        lien:  'evenements.html',
-      });
-    }
-
-    // Passé
-    if (passe) {
-      liste.push({
-        id: idx++, type: 'evenements', lue: true,
-        icone: '✅', couleur: '#dbeafe',
-        titre: 'Événement terminé',
-        desc:  `"${ev.titre}" s'est tenu le ${dateEv.toLocaleDateString('fr-FR')}. Merci d'y avoir participé ! 🎶`,
-        meta:  new Date(ev.date_fin).toLocaleDateString('fr-FR'),
-        lien:  null,
+          ? `C’est aujourd’hui à ${dateEv.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`
+          : `Dans ${diffJour} jour(s)`,
+        meta: 'Rappel automatique',
+        lien: 'evenements.html'
       });
     }
   });
 
-  /* --- Notifications basées sur les réservations --- */
+  /* RESERVATIONS */
   const mesRes = getReservations().filter(r => r.user_email === user.email);
+
   mesRes.forEach(r => {
-    const res    = RESSOURCES.find(x => x.id === r.ressource_id);
-    const statut = r.statut || 'en_attente';
-    const map = {
-      en_attente: { icone:'⏳', couleur:'#fef3c7', lue: false,
-        titre: 'Réservation en attente de validation',
-        desc:  `Ta demande de "${res?.nom??'?'}" est en cours d'examen par l'équipe.` },
-      approuve:   { icone:'✅', couleur:'#dcfce7', lue: true,
-        titre: 'Réservation approuvée !',
-        desc:  `Bonne nouvelle ! Ta réservation de "${res?.nom??'?'}" a été acceptée. À récupérer dès le ${new Date(r.date_debut).toLocaleDateString('fr-FR')}.` },
-      refuse:     { icone:'❌', couleur:'#fee2e2', lue: true,
-        titre: 'Réservation refusée',
-        desc:  `Ta demande de "${res?.nom??'?'}" a été refusée. Contacte un responsable pour plus d'infos.` },
-      annule:     { icone:'🚫', couleur:'#f1f5f9', lue: true,
-        titre: 'Réservation annulée',
-        desc:  `Ta réservation de "${res?.nom??'?'}" a bien été annulée.` },
-    };
-    const m = map[statut] || map.en_attente;
+    const res = RESSOURCES.find(x => x.id === r.ressource_id);
+
     liste.push({
-      id: idx++, type: 'reservations',
-      lue: m.lue, icone: m.icone, couleur: m.couleur,
-      titre: m.titre, desc: m.desc,
-      meta:  new Date(r.date_debut).toLocaleDateString('fr-FR'),
-      lien:  'reservations.html',
+      id: idx++,
+      type: 'reservations',
+      lue: false,
+      icone: '📦',
+      couleur: '#fef3c7',
+      titre: 'Réservation',
+      desc: `Statut de "${res?.nom ?? '?'}" : ${r.statut}`,
+      meta: new Date(r.date_debut).toLocaleDateString('fr-FR'),
+      lien: 'reservations.html'
     });
   });
 
+  /* SYSTEME */
+  liste.push(
+    {
+      id: idx++,
+      type: 'systeme',
+      lue: true,
+      icone: '🎉',
+      couleur: '#ede9fe',
+      titre: 'Bienvenue',
+      desc: `Bonjour ${user.prenom}, bienvenue sur CampusPlay.`,
+      meta: 'Système',
+      lien: 'accueil.html'
+    }
+  );
 
-  // Non lues en premier, puis par ID croissant
-  liste.sort((a, b) => a.lue === b.lue ? a.id - b.id : a.lue ? 1 : -1);
   return liste;
 }
 
-let NOTIFS        = genererNotifications();
-let filtreActuel  = 'toutes';
+let NOTIFS = genererNotifications();
+let filtreActuel = 'toutes';
 
-/* ── Affichage ─────────────────────────────────────────── */
+/* ── AFFICHAGE ── */
 function afficher() {
-  const filtrées = filtreActuel === 'toutes'    ? NOTIFS
-                 : filtreActuel === 'non-lues'  ? NOTIFS.filter(n => !n.lue)
-                 : NOTIFS.filter(n => n.type === filtreActuel);
 
-  // Badge non-lues
-  const nbNL  = NOTIFS.filter(n => !n.lue).length;
-  const badge = document.getElementById('badge-non-lues');
-  if (nbNL > 0) { badge.style.display = 'inline'; badge.textContent = nbNL; }
-  else           { badge.style.display = 'none'; }
+  const filtrées =
+    filtreActuel === 'toutes'
+      ? NOTIFS
+      : NOTIFS.filter(n => n.type === filtreActuel);
 
   const zone = document.getElementById('liste-notifs');
 
   if (!filtrées.length) {
-    zone.innerHTML = `
-      <div class="vide-notif">
-        <div class="vide-ico">🔕</div>
-        <p>Aucune notification dans cette catégorie.</p>
-      </div>`;
+    zone.innerHTML = `<div class="vide-notif">Aucune notification</div>`;
     return;
   }
 
   zone.innerHTML = filtrées.map(n => `
-    <div class="notif-item ${n.lue ? '' : 'non-lue'}" onclick="marquerLu(${n.id})" id="notif-${n.id}">
+    <div class="notif-item ${n.lue ? '' : 'non-lue'}" onclick="marquerLu(${n.id})">
       <div class="notif-icone" style="background:${n.couleur}">${n.icone}</div>
+
       <div class="notif-corps">
-        <div class="notif-titre">
-          ${e(n.titre)}
-          ${!n.lue ? '<span class="dot-lue"></span>' : ''}
-        </div>
-        <div class="notif-desc">${e(n.desc)}</div>
-        <div class="notif-meta">${e(n.meta)}</div>
-        ${n.lien ? `<div class="notif-action"><a href="${n.lien}" class="btn btn-gris" style="font-size:.78rem;padding:.25rem .6rem" onclick="event.stopPropagation()">Voir →</a></div>` : ''}
+        <div class="notif-titre">${n.titre}</div>
+        <div class="notif-desc">${n.desc}</div>
+        <div class="notif-meta">${n.meta}</div>
+
+        ${n.lien ? `<a href="${n.lien}" class="btn btn-gris">Voir</a>` : ''}
       </div>
-      ${!n.lue ? `<button class="btn-lu-rapide" title="Marquer comme lu" onclick="marquerLu(${n.id});event.stopPropagation()">✓</button>` : ''}
-    </div>`).join('');
+    </div>
+  `).join('');
 }
 
-/* ── Marquer comme lu ──────────────────────────────────── */
+/* ── ACTIONS ── */
 function marquerLu(id) {
   const n = NOTIFS.find(x => x.id === id);
-  if (n && !n.lue) { n.lue = true; sauvegarder(); afficher(); }
+  if (n) n.lue = true;
+  sauvegarder();
+  afficher();
 }
-window.marquerLu = marquerLu;
 
 function toutMarquerLu() {
   NOTIFS.forEach(n => n.lue = true);
   sauvegarder();
   afficher();
-  flash('Toutes les notifications ont été marquées comme lues. ✓', 'succes');
-  afficheFlash(document.getElementById('flash-zone'));
 }
-window.toutMarquerLu = toutMarquerLu;
 
 function sauvegarder() {
-  localStorage.setItem('campusplayer_notifs_' + user.email, JSON.stringify(NOTIFS));
+  localStorage.setItem('cp_notifs_' + user.email, JSON.stringify(NOTIFS));
 }
 
-/* ── Filtres ───────────────────────────────────────────── */
 function filtrer(val) {
   filtreActuel = val;
-  document.querySelectorAll('.filtre-btn').forEach(b => {
-    b.classList.toggle('btn-primaire', b.dataset.filtre === val);
-    b.classList.toggle('btn-gris',     b.dataset.filtre !== val);
-  });
   afficher();
 }
+
+window.marquerLu = marquerLu;
+window.toutMarquerLu = toutMarquerLu;
 window.filtrer = filtrer;
 
-/* ── Init ──────────────────────────────────────────────── */
+/* INIT */
 afficher();
 </script>
 
