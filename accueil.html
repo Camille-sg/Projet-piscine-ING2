@@ -12,7 +12,7 @@
   if (!isConnecte()) window.location.href = 'index.html';
 </script>
 
-<div class="page-wrapper">
+<div class="conteneur">
 
   <!-- ════ HEADER ════ -->
   <header class="site-header">
@@ -76,6 +76,7 @@
 
         <!-- Réservations -->
         <a href="ressources.html" class="grande-carte carte-reservations">
+          <img src="images/reservation.png" alt="Réservations" style="width:100%;height:150px;object-fit:cover;display:block" onerror="this.style.display='none'">
           <div class="carte-tete">📦 Réservations</div>
           <div class="carte-corps" id="corps-res">
             <p class="carte-vide">Aucune réservation</p>
@@ -84,6 +85,7 @@
 
         <!-- Évènements -->
         <a href="evenements.html" class="grande-carte carte-evenements">
+          <img src="images/evenement.png" alt="Évènements" style="width:100%;height:150px;object-fit:cover;display:block" onerror="this.style.display='none'">
           <div class="carte-tete">📅 Évènements</div>
           <div class="carte-corps" id="corps-ev">
             <p class="carte-vide">Aucune inscription</p>
@@ -92,6 +94,7 @@
 
         <!-- Demandes -->
         <a href="admin.html" class="grande-carte carte-demandes" id="lien-carte-demandes">
+          <img src="images/demande.png" alt="Demandes" style="width:100%;height:150px;object-fit:cover;display:block" onerror="this.style.display='none'">
           <div class="carte-tete">📋 Demandes</div>
           <div class="carte-corps" id="corps-dem">
             <p class="carte-vide">Aucune demande</p>
@@ -194,7 +197,6 @@ if (user.role === 'admin' || user.role === 'manager') {
     document.getElementById('corps-dem').innerHTML = html;
   }
 } else {
-  // Étudiant → demandes = ses inscriptions liste d'attente
   document.getElementById('lien-carte-demandes').href = 'evenements.html';
   const attente = mesInscrits.filter(i => i.statut === 'liste_attente');
   if (attente.length) {
@@ -216,14 +218,12 @@ const notifs = [
 ];
 const nbNonLues = notifs.filter(n => !n.lue).length;
 
-// Badge sidebar
 if (nbNonLues > 0) {
   const badge = document.getElementById('badge-notif');
   badge.style.display = 'inline';
   badge.textContent   = nbNonLues;
 }
 
-// Section notifications
 if (notifs.length) {
   document.getElementById('notif-section').style.display = 'block';
   if (nbNonLues > 0) {
