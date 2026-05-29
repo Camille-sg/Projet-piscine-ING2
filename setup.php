@@ -12,7 +12,7 @@ $comptes = [
 
 $inseres = 0;
 $stmt = $pdo->prepare(
-    "INSERT IGNORE INTO comptes (prenom, nom, email, mdp, role) VALUES (?, ?, ?, ?, ?)"
+    "INSERT IGNORE INTO cogptes (prenom, nom, email, mdp, role) VALUES (?, ?, ?, ?, ?)"
 );
 
 foreach ($comptes as $c) {
