@@ -3,51 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>CampusPlay — Connexion</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
-      font-family: system-ui, sans-serif;
-    }
-    .card {
-      background: white; border-radius: 1.25rem;
-      padding: 2.5rem 2.25rem; width: 100%; max-width: 420px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.35);
-    }
-    .logo { text-align: center; margin-bottom: 1.75rem; }
-    .logo .ico { font-size: 2.75rem; }
-    .logo h1 { font-size: 1.65rem; font-weight: 800; color: #1e293b; margin: .35rem 0 .2rem; }
-    .logo p  { color: #64748b; font-size: .88rem; }
-    .tabs { display: flex; background: #f1f5f9; border-radius: .6rem; padding: .2rem; margin-bottom: 1.5rem; }
-    .tab  { flex: 1; text-align: center; padding: .45rem; border-radius: .45rem;
-            cursor: pointer; font-size: .85rem; font-weight: 600; color: #64748b; transition: .15s; }
-    .tab.actif { background: white; color: #4f46e5; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
-    label { display: block; font-size: .82rem; font-weight: 600; color: #374151; margin-bottom: .3rem; }
-    input {
-      width: 100%; padding: .65rem .85rem;
-      border: 1.5px solid #e2e8f0; border-radius: .5rem;
-      font-size: .9rem; margin-bottom: 1rem; transition: border .15s;
-    }
-    input:focus { outline: none; border-color: #4f46e5; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-    .btn-submit {
-      width: 100%; padding: .75rem; background: #4f46e5; color: white;
-      border: none; border-radius: .6rem; font-size: .95rem;
-      font-weight: 700; cursor: pointer; transition: background .15s;
-    }
-    .btn-submit:hover { background: #3730a3; }
-    .btn-submit:disabled { background: #a5b4fc; cursor: not-allowed; }
-    .erreur {
-      background: #fee2e2; color: #991b1b;
-      border: 1px solid #fecaca; border-radius: .5rem;
-      padding: .6rem .9rem; font-size: .85rem;
-      margin-bottom: 1rem; display: none;
-    }
-    .hint { text-align:center; font-size:.75rem; color:#94a3b8; margin-top:1.25rem; line-height:1.6; }
-    code { background:#f1f5f9; padding:.1rem .3rem; border-radius:.25rem; font-size:.78rem; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
