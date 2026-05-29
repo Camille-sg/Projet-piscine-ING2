@@ -5,8 +5,8 @@
 
 /* ── VARIABLES ── */
 :root {
-  --bleu-nuit:   #1364c1;   /* fond sombre, sidebar */
-  --bleu-marine: #901818;   /* header, accents foncés */
+  --bleu-nuit:   #3b6a9f;   /* fond sombre, sidebar */
+  --bleu-marine: #213875;   /* header, accents foncés */
   --bleu-vif:    #ffe209;   /* boutons principaux */
   --bleu-clair:  #082547;   /* highlights bleus */
   --bleu-pale:   #fbe5ca;   /* fonds légers */
