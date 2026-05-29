@@ -281,6 +281,7 @@ body {
 .btn-primaire {
   background: var(--bleu-vif);
   color: var(--blanc);
+  margin-top: 15px;
 }
 .btn-primaire:hover {
   background: #1d4ed8;
