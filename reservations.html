@@ -2,846 +2,369 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>CampusPlay — Réservations</title>
+  <title>CampusPlay — Mes réservations</title>
   <link rel="stylesheet" href="style.css">
+
   <style>
-
-    /* ══ 3 COLONNES ══ */
-    .reservations-layout {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      align-items: start;
+    .section-reservation {
+      margin-bottom: 2rem;
     }
 
-    .colonne-titre {
-      font-size: .8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--bleu-nuit);
-      padding-bottom: .6rem;
-      border-bottom: 2px solid var(--or);
+    .section-titre {
+      font-size: 1.2rem;
+      font-weight: 700;
       margin-bottom: 1rem;
+      color: #1e293b;
     }
 
-    /* ── Carte matériel ── */
-    .carte-mat {
-      background: var(--blanc);
-      border: 1px solid var(--beige-bord);
-      border-radius: .75rem;
-      overflow: hidden;
-      margin-bottom: .85rem;
-      transition: .2s;
-    }
-    .carte-mat:hover {
-      box-shadow: 0 6px 24px rgba(13,27,62,.12);
-      transform: translateY(-2px);
-      border-color: var(--bleu-clair);
+    .bloc-vide {
+      color: #64748b;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: .9rem;
     }
 
-    .mat-bande { height: 5px; flex-shrink: 0; }
-
-    .mat-photo {
-      height: 90px;
-      background: var(--beige);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.6rem;
-      border-bottom: 1px solid var(--beige-bord);
-      position: relative;
-    }
-    .mat-cat-badge {
-      position: absolute; top: .4rem; left: .4rem;
-      background: rgba(13,27,62,.72); color: white;
-      font-size: .6rem; font-weight: 700;
-      padding: .1rem .45rem; border-radius: 9999px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
 
-    .mat-body { padding: .75rem .9rem .85rem; }
-    .mat-nom  { font-size: .9rem; font-weight: 800; color: var(--bleu-nuit); margin-bottom: .45rem; }
-
-    .mat-detail {
-      display: flex; flex-direction: column;
-      gap: .2rem; margin-bottom: .7rem;
-    }
-    .mat-detail span {
-      font-size: .8rem; color: var(--texte-doux);
-      display: flex; align-items: center; gap: .35rem;
+    th {
+      text-align: left;
+      font-size: .82rem;
+      color: #475569;
+      background: #f8fafc;
+      padding: .75rem;
+      border-bottom: 1px solid var(--bordure);
     }
 
-    .mat-bas {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid var(--beige-bord);
-      padding-top: .55rem;
-    }
-    .mat-prix-loc { font-size: .92rem; font-weight: 800; color: var(--bleu-vif); }
-    .mat-prix-ach { font-size: .92rem; font-weight: 800; color: var(--succes); }
-    .mat-prix-grat { font-size: .92rem; font-weight: 800; color: var(--succes); }
-
-    .btn-mat {
-      padding: .38rem .95rem;
-      border-radius: .45rem;
-      font-size: .8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: .15s;
-      border: 1.5px solid transparent;
-    }
-    .btn-louer     { background: var(--bleu-pale); color: var(--bleu-marine); border-color: var(--bleu-clair); }
-    .btn-louer:hover { background: var(--bleu-marine); color: var(--blanc); }
-    .btn-acheter   { background: #dcfce7; color: #166534; border-color: #86efac; }
-    .btn-acheter:hover { background: #166534; color: var(--blanc); }
-    .btn-participer { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-    .btn-participer:hover { background: #92400e; color: var(--blanc); }
-    .btn-complet   { background: var(--beige); color: var(--texte-pale); border-color: var(--beige-bord); cursor: not-allowed; }
-
-    /* ── Filtres ── */
-    .barre-filtres {
-      background: var(--blanc);
-      border: 1px solid var(--beige-bord);
-      border-radius: .75rem;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.25rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: .75rem;
-      align-items: flex-end;
-    }
-    .filtre-gr { display: flex; flex-direction: column; gap: .25rem; }
-    .filtre-gr label {
-      font-size: .7rem; font-weight: 700;
-      color: var(--bleu-marine);
-      text-transform: uppercase; letter-spacing: .07em;
-    }
-    .filtre-gr input,
-    .filtre-gr select {
-      padding: .5rem .85rem;
-      border: 1.5px solid var(--beige-bord);
-      border-radius: .45rem;
-      font-size: .85rem; font-family: inherit;
-      background: var(--beige-clair); color: var(--texte);
-      transition: .15s;
-    }
-    .filtre-gr input:focus,
-    .filtre-gr select:focus { outline: none; border-color: var(--bleu-vif); background: var(--blanc); }
-    .filtre-gr.large input { min-width: 210px; }
-
-    /* ── Modal ── */
-    .modal-bg {
-      display: none; position: fixed; inset: 0;
-      background: rgba(13,27,62,.55); z-index: 400;
-      align-items: center; justify-content: center;
-      backdrop-filter: blur(2px);
-    }
-    .modal-bg.ouvert { display: flex; }
-
-    .modal-boite {
-      background: var(--blanc); border-radius: .9rem;
-      width: 100%; max-width: 520px; margin: 1rem;
-      box-shadow: 0 20px 60px rgba(13,27,62,.3); overflow: hidden;
-    }
-    .modal-entete {
-      padding: 1.25rem 1.5rem;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .modal-entete h2 { font-size: 1.05rem; font-weight: 800; color: var(--blanc); }
-    .modal-fermer {
-      background: none; border: none;
-      color: rgba(255,255,255,.65); font-size: 1.4rem; cursor: pointer;
-    }
-    .modal-fermer:hover { color: var(--blanc); }
-
-    .modal-contenu { padding: 1.5rem; }
-    .modal-ligne {
-      display: flex; gap: .75rem; align-items: flex-start;
-      padding: .55rem 0; border-bottom: 1px solid var(--beige-bord); font-size: .88rem;
-    }
-    .modal-ligne:last-child { border-bottom: none; }
-    .modal-ligne .icone { width: 1.4rem; text-align: center; flex-shrink: 0; }
-    .modal-ligne strong { color: var(--bleu-nuit); display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
-    .modal-ligne span   { color: var(--texte-doux); }
-
-    .modal-pied {
-      padding: 1rem 1.5rem; background: var(--beige);
-      display: flex; gap: .75rem; justify-content: flex-end;
-    }
-
-    /* Champs formulaire dans modal */
-    .champ { margin-bottom: .85rem; }
-    .champ label {
-      display: block; font-size: .78rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .05em;
-      color: var(--bleu-marine); margin-bottom: .3rem;
-    }
-    .champ input, .champ select {
-      width: 100%; padding: .55rem .85rem;
-      border: 1.5px solid var(--beige-bord); border-radius: .45rem;
-      font-size: .88rem; font-family: inherit;
-      background: var(--beige-clair);
-    }
-    .champ input:focus, .champ select:focus { outline: none; border-color: var(--bleu-vif); background: var(--blanc); }
-
-    .prix-estime {
-      display: flex; justify-content: space-between; align-items: center;
-      background: var(--beige); border-radius: .5rem;
-      padding: .65rem 1rem; margin-bottom: .5rem;
+    td {
+      padding: .75rem;
+      border-bottom: 1px solid var(--bordure);
       font-size: .88rem;
+      color: #334155;
+      vertical-align: middle;
     }
-    .prix-estime span { color: var(--texte-doux); }
-    .prix-estime b    { color: var(--bleu-vif); font-size: .95rem; }
 
-    @media (max-width: 900px) { .reservations-layout { grid-template-columns: 1fr; } }
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .reservation-card-mobile {
+      display: none;
+    }
+
+    @media (max-width: 760px) {
+      table {
+        display: none;
+      }
+
+      .reservation-card-mobile {
+        display: block;
+      }
+
+      .mini-carte {
+        border: 1px solid var(--bordure);
+        border-radius: .75rem;
+        padding: 1rem;
+        margin-bottom: .75rem;
+        background: white;
+      }
+
+      .mini-carte h3 {
+        font-size: .95rem;
+        margin-bottom: .5rem;
+        color: #1e293b;
+      }
+
+      .mini-carte p {
+        font-size: .84rem;
+        color: #64748b;
+        margin-bottom: .25rem;
+      }
+    }
   </style>
 </head>
+
 <body>
 
+<script src="data.js"></script>
 <script>
-  var sessionUser = null;
-  try { sessionUser = JSON.parse(localStorage.getItem('campusplay_user')); } catch(e) {}
-  if (!sessionUser) window.location.href = 'index.html';
-  function deconnecter() {
-    localStorage.removeItem('campusplay_user');
+  if (!isConnecte()) {
     window.location.href = 'index.html';
   }
+
+  renderNavbar('reservations');
 </script>
 
-<div class="page-wrapper">
+<div class="conteneur">
+  <div id="flash-zone"></div>
 
-  <!-- ════ HEADER ════ -->
-  <header class="site-header">
-    <div class="logo-cercle">🎵</div>
-    <div class="site-header-centre">
-      <h1>CampusPlay</h1>
-      <p class="sous-titre">Participation et inscriptions aux évènements</p>
-    </div>
-    <div class="header-user">
-      <span class="user-nom"  id="user-nom"></span>
-      <span class="user-role" id="user-role"></span>
-      <button class="btn-deconnexion" onclick="deconnecter()">Déconnexion</button>
-    </div>
-  </header>
+  <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem">
+    🔖 Mes réservations
+  </h1>
 
-  <!-- ════ CORPS ════ -->
-  <div class="site-corps">
+  <!-- SECTION RESSOURCES -->
+  <section class="section-reservation">
+    <h2 class="section-titre">📦 Mes réservations de ressources</h2>
+    <div class="carte" id="zone-ressources"></div>
+  </section>
 
-    <!-- SIDEBAR -->
-    <nav class="sidebar">
-      <a href="accueil.html">
-        <span class="icone">🏠</span> Accueil
-      </a>
-      <a href="activites.html">
-        <span class="icone">🎵</span> Activités
-      </a>
-      <a href="evenements.html">
-        <span class="icone">📅</span> Évènements
-      </a>
-      <a href="ressources.html">
-        <span class="icone">📦</span> Ressources
-      </a>
-      <a href="reservations.html" class="actif">
-        <span class="icone">🔖</span> Réservations
-      </a>
-      <hr>
-      <a href="notifications.html">
-        <span class="icone">🔔</span> Notifications
-      </a>
-      <hr>
-      <a href="profil.html">
-        <span class="icone">👤</span> Mon profil
-      </a>
-      <a href="admin.html" id="lien-admin" style="display:none">
-        <span class="icone">⚙️</span> Admin
-      </a>
-    </nav>
-
-    <!-- CONTENU -->
-    <main class="site-contenu">
-
-      <h1 class="page-titre">🔖 Réservations</h1>
-
-      <!-- FILTRES -->
-      <div class="barre-filtres">
-        <div class="filtre-gr large">
-          <label>🔍 Rechercher</label>
-          <input type="text" id="recherche" placeholder="Guitare, DJ, concert…">
-        </div>
-        <div class="filtre-gr">
-          <label>Catégorie</label>
-          <select id="filtre-cat">
-            <option value="">Toutes</option>
-            <option value="instrument">🎸 Instrument</option>
-            <option value="son">🔊 Son</option>
-            <option value="dj">🎛️ DJ</option>
-            <option value="accessoire">🎵 Accessoire</option>
-            <option value="evenement">📅 Évènement</option>
-          </select>
-        </div>
-        <div class="filtre-gr">
-          <label>Disponibilité</label>
-          <select id="filtre-dispo">
-            <option value="">Toutes</option>
-            <option value="dispo">Disponible</option>
-            <option value="indispo">Indisponible</option>
-          </select>
-        </div>
-        <div class="filtre-gr">
-          <label>&nbsp;</label>
-          <button onclick="reinitFiltres()" class="btn btn-gris" style="font-size:.82rem">✕ Réinitialiser</button>
-        </div>
-      </div>
-
-      <p style="font-size:.82rem;color:var(--texte-pale);margin-bottom:1.25rem">
-        <span id="nb-res" style="color:var(--bleu-vif);font-weight:700">0</span> élément(s) affiché(s)
-      </p>
-
-      <!-- 3 COLONNES -->
-      <div class="reservations-layout">
-
-        <!-- COLONNE 1 : LOUER -->
-        <div>
-          <div class="colonne-titre">📦 Louer matériel</div>
-          <div id="col-location"></div>
-        </div>
-
-        <!-- COLONNE 2 : ACHETER -->
-        <div>
-          <div class="colonne-titre">🛒 Achat matériel</div>
-          <div id="col-achat"></div>
-        </div>
-
-        <!-- COLONNE 3 : PARTICIPER -->
-        <div>
-          <div class="colonne-titre">📅 Participation à un évènement</div>
-          <div id="col-evenements"></div>
-        </div>
-
-      </div>
-
-    </main>
-  </div>
-
-  <!-- ════ FOOTER ════ -->
-  <footer class="site-footer">
-    <strong>Copyright</strong> © 2026 CampusPlay &nbsp;·&nbsp; contact@campusplay.fr &nbsp;·&nbsp; 01 23 45 67 89 &nbsp;·&nbsp; 123 Rue de l'École, 75000 Paris
-  </footer>
-
+  <!-- SECTION ÉVÉNEMENTS -->
+  <section class="section-reservation">
+    <h2 class="section-titre">📅 Mes événements</h2>
+    <div class="carte" id="zone-evenements"></div>
+  </section>
 </div>
 
-<!-- ════ MODAL LOUER ════ -->
-<div class="modal-bg" id="modal-louer" onclick="fermerSiDehors(event,'modal-louer')">
-  <div class="modal-boite">
-    <div class="modal-entete" id="ml-entete">
-      <h2 id="ml-titre">Louer</h2>
-      <button class="modal-fermer" onclick="fermerModal('modal-louer')">✕</button>
-    </div>
-    <div class="modal-contenu" id="ml-corps"></div>
-    <div class="modal-pied">
-      <button onclick="fermerModal('modal-louer')" class="btn btn-gris" style="font-size:.85rem">Fermer</button>
-      <button onclick="validerLocation()" class="btn btn-primaire" style="font-size:.85rem">Confirmer la location</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════ MODAL ACHETER ════ -->
-<div class="modal-bg" id="modal-acheter" onclick="fermerSiDehors(event,'modal-acheter')">
-  <div class="modal-boite">
-    <div class="modal-entete" id="ma-entete">
-      <h2 id="ma-titre">Acheter</h2>
-      <button class="modal-fermer" onclick="fermerModal('modal-acheter')">✕</button>
-    </div>
-    <div class="modal-contenu" id="ma-corps"></div>
-    <div class="modal-pied">
-      <button onclick="fermerModal('modal-acheter')" class="btn btn-gris" style="font-size:.85rem">Fermer</button>
-      <button onclick="validerAchat()" class="btn btn-succes" style="font-size:.85rem" id="btn-acheter-confirm">Confirmer l'achat</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════ MODAL PARTICIPER ════ -->
-<div class="modal-bg" id="modal-part" onclick="fermerSiDehors(event,'modal-part')">
-  <div class="modal-boite">
-    <div class="modal-entete" id="mp-entete">
-      <h2 id="mp-titre">Participer</h2>
-      <button class="modal-fermer" onclick="fermerModal('modal-part')">✕</button>
-    </div>
-    <div class="modal-contenu" id="mp-corps"></div>
-    <div class="modal-pied">
-      <button onclick="fermerModal('modal-part')" class="btn btn-gris" style="font-size:.85rem">Fermer</button>
-      <button onclick="sInscrire()" class="btn btn-primaire" style="font-size:.85rem" id="btn-inscrire">S'inscrire</button>
-    </div>
-  </div>
-</div>
+<footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
+  © 2026 CampusPlay — Tous droits réservés
+</footer>
 
 <script>
-/* ══════════════════════════════════════════════
-   AFFICHAGE UTILISATEUR
-══════════════════════════════════════════════ */
-var rolesLabels = { admin:'Administrateur', manager:'Manager', membre:'Membre', etudiant:'Étudiant' };
-document.getElementById('user-nom').textContent  = sessionUser.prenom + ' ' + sessionUser.nom;
-document.getElementById('user-role').textContent = rolesLabels[sessionUser.role] || sessionUser.role;
-if (sessionUser.role === 'admin' || sessionUser.role === 'manager') {
-  document.getElementById('lien-admin').style.display = 'flex';
+afficheFlash(document.getElementById('flash-zone'));
+
+const user = getUser();
+
+function badgeStatut(statut) {
+  if (statut === 'approuve') {
+    return '<span class="badge badge-vert">Approuvée</span>';
+  }
+
+  if (statut === 'refuse') {
+    return '<span class="badge badge-rouge">Refusée</span>';
+  }
+
+  if (statut === 'annule') {
+    return '<span class="badge badge-rouge">Annulée</span>';
+  }
+
+  return '<span class="badge badge-jaune">En attente</span>';
 }
 
-/* ══════════════════════════════════════════════
-   DONNÉES MATÉRIEL — LOCATION
-══════════════════════════════════════════════ */
-var LOCATION = [
-  { id:'L1', emoji:'🎸', cat:'instrument', couleur:'#f59e0b',
-    nom:'Guitare acoustique Yamaha F310',
-    etat:'Disponible', dispo:3, total:4, prix_j:10,
-    desc:'Guitare folk idéale pour débuter ou répéter. Médiators et housse de transport inclus.' },
-  { id:'L2', emoji:'🎹', cat:'instrument', couleur:'#3b82f6',
-    nom:'Clavier numérique Yamaha P-45 (88 touches)',
-    etat:'Disponible', dispo:2, total:2, prix_j:18,
-    desc:'88 touches lestées, expressive et compacte. Câble et adaptateur secteur inclus.' },
-  { id:'L3', emoji:'🥁', cat:'instrument', couleur:'#ef4444',
-    nom:'Batterie électronique Roland TD-07',
-    etat:'Stock limité', dispo:1, total:1, prix_j:25,
-    desc:'Kit batterie complet, baguettes et casque inclus. Réservation 1 jour minimum.' },
-  { id:'L4', emoji:'🎻', cat:'instrument', couleur:'#8b5cf6',
-    nom:'Violon 4/4 avec archet',
-    etat:'Disponible', dispo:2, total:3, prix_j:15,
-    desc:'Violon taille adulte, archet et colophane fournis. Étui de transport inclus.' },
-  { id:'L5', emoji:'🎷', cat:'instrument', couleur:'#10b981',
-    nom:'Saxophone alto Yamaha YAS-280',
-    etat:'Disponible', dispo:2, total:2, prix_j:20,
-    desc:'Saxophone alto professionnel. Bec, anche et ligature inclus. Étui rigide fourni.' },
-  { id:'L6', emoji:'🎺', cat:'instrument', couleur:'#f97316',
-    nom:'Trompette Yamaha YTR-2330',
-    etat:'Disponible', dispo:2, total:2, prix_j:18,
-    desc:'Trompette en si♭. Sourdines et huile de pistons incluses.' },
-  { id:'L7', emoji:'🔊', cat:'son', couleur:'#06b6d4',
-    nom:'Enceinte JBL SRX812P 300W',
-    etat:'Disponible', dispo:2, total:3, prix_j:30,
-    desc:'Enceinte active 300W. Entrées XLR et Jack. Idéale concerts et répétitions.' },
-  { id:'L8', emoji:'🎛️', cat:'dj', couleur:'#7c3aed',
-    nom:'Platines DJ Pioneer DDJ-400',
-    etat:'Stock limité', dispo:1, total:1, prix_j:35,
-    desc:'Contrôleur DJ 2 voies Pioneer, compatible Rekordbox. Câble USB inclus.' },
-  { id:'L9', emoji:'🎙️', cat:'son', couleur:'#d97706',
-    nom:'Microphone Shure SM58',
-    etat:'Disponible', dispo:4, total:5, prix_j:10,
-    desc:'Micro dynamique cardioïde professionnel. Standard de l\'industrie. Câble XLR 6m inclus.' },
-];
-
-/* ══════════════════════════════════════════════
-   DONNÉES MATÉRIEL — ACHAT
-══════════════════════════════════════════════ */
-var ACHAT = [
-  { id:'A1', emoji:'🎸', cat:'accessoire', couleur:'#f59e0b',
-    nom:'Cordes guitare acoustique (jeu)',
-    stock:15, prix:12,
-    desc:'Jeu 6 cordes bronze phosphoreux Ernie Ball. Calibre 12-54, medium.' },
-  { id:'A2', emoji:'🥁', cat:'accessoire', couleur:'#ef4444',
-    nom:'Baguettes de batterie 5A',
-    stock:20, prix:15,
-    desc:'Baguettes Vic Firth 5A en érable américain. Format standard, tous styles.' },
-  { id:'A3', emoji:'🎵', cat:'accessoire', couleur:'#8b5cf6',
-    nom:'Médiators Dunlop (lot de 12)',
-    stock:30, prix:4,
-    desc:'12 médiators Dunlop Nylon 0.88mm. Épaisseur médium, guitare et basse.' },
-  { id:'A4', emoji:'🔌', cat:'accessoire', couleur:'#3b82f6',
-    nom:'Câble Jack 6.35mm — 6 mètres',
-    stock:12, prix:8,
-    desc:'Câble Jack mâle/mâle blindé 6m. Connecteurs dorés, marque Stagg.' },
-  { id:'A5', emoji:'🎤', cat:'son', couleur:'#10b981',
-    nom:'Microphone USB Samson Go Mic',
-    stock:5, prix:45,
-    desc:'Condensateur USB plug & play. Idéal pour enregistrement et streaming.' },
-  { id:'A6', emoji:'📚', cat:'accessoire', couleur:'#f97316',
-    nom:'Partition musicale (au choix)',
-    stock:25, prix:5,
-    desc:'Piano, guitare ou violon. Niveaux débutant à avancé. Précisez l\'instrument.' },
-  { id:'A7', emoji:'🥁', cat:'accessoire', couleur:'#dc2626',
-    nom:'Peau caisse claire Remo 14"',
-    stock:8, prix:22,
-    desc:'Peau Remo Ambassador Coated 14". Frappe standard caisse claire.' },
-  { id:'A8', emoji:'🎧', cat:'son', couleur:'#7c3aed',
-    nom:'Casque audio Sony MDR-7506',
-    stock:3, prix:85,
-    desc:'Casque professionnel studio. Réponse 10Hz–20kHz, câble 3m.' },
-];
-
-/* ══════════════════════════════════════════════
-   DONNÉES ÉVÈNEMENTS
-══════════════════════════════════════════════ */
-var PART_EVENEMENTS = [
-  { id:101, emoji:'🎤', couleur:'#ec4899',
-    titre:'Concert acoustique mensuel',
-    date:'2026-06-06', heure:'19h00 – 22h00', lieu:'Salle des fêtes — Campus B',
-    places:50, inscrits:28,
-    desc:'Scène ouverte à tous les musiciens. Guitare, voix, piano. Ambiance intimiste garantie.' },
-  { id:102, emoji:'🥊', couleur:'#dc2626',
-    titre:'Battle de Rap — Édition Juin',
-    date:'2026-06-13', heure:'18h30 – 21h00', lieu:'Amphi 200 — Bâtiment C',
-    places:16, inscrits:12,
-    desc:'Freestyle ou texte écrit. Jury de 3 membres. Lots pour les 3 premiers.' },
-  { id:103, emoji:'🎶', couleur:'#10b981',
-    titre:'Soirée Karaoké',
-    date:'2026-06-19', heure:'20h00 – 23h00', lieu:'Foyer étudiant — RDC',
-    places:30, inscrits:30,
-    desc:'Catalogue +500 titres. Boissons au bar. Micro ouvert toute la soirée.' },
-  { id:104, emoji:'🎧', couleur:'#1d5ce4',
-    titre:'Masterclass DJ — Pioneer DDJ',
-    date:'2026-06-21', heure:'14h00 – 17h00', lieu:'Studio musique — Salle 12',
-    places:10, inscrits:7,
-    desc:'Atelier animé par DJ Marco. Techniques de mix, harmonic mixing et gestion de set live.' },
-  { id:105, emoji:'🎤', couleur:'#ec4899',
-    titre:'Concert de fin d\'année',
-    date:'2026-06-27', heure:'17h00 – 22h00', lieu:'Auditorium principal',
-    places:200, inscrits:143,
-    desc:'Grand concert annuel avec tous les élèves des cours. Artistes invités surprise.' },
-  { id:106, emoji:'🎸', couleur:'#4f46e5',
-    titre:'Cours de guitare — Démo gratuite',
-    date:'2026-07-02', heure:'10h00 – 11h30', lieu:'Salle de musique — A108',
-    places:12, inscrits:4,
-    desc:'Séance de découverte ouverte à tous. Guitares prêtées sur place. Sans engagement.' },
-  { id:107, emoji:'🎙️', couleur:'#7c3aed',
-    titre:'Battle Beatbox',
-    date:'2026-07-10', heure:'19h00 – 21h00', lieu:'Foyer étudiant — RDC',
-    places:12, inscrits:5,
-    desc:'Percussions vocales, basses et effets. Format 1 vs 1, tirage au sort. Jury public.' },
-  { id:108, emoji:'🎷', couleur:'#b45309',
-    titre:'Jam Session Jazz',
-    date:'2026-07-17', heure:'18h30 – 21h30', lieu:'Cour intérieure — Bâtiment A',
-    places:40, inscrits:18,
-    desc:'Jam session jazz en plein air. Musiciens de tous niveaux bienvenus.' },
-];
-
-var itemCourant = null;
-var typeCourant = null; // 'location' | 'achat' | 'evenement'
-
-/* ══════════════════════════════════════════════
-   RENDU DES COLONNES
-══════════════════════════════════════════════ */
-function etatHtml(dispo, total) {
-  if (dispo === 0) return '<span style="color:var(--erreur);font-weight:700">● Indisponible</span>';
-  if (dispo <= 2)  return '<span style="color:var(--attention);font-weight:700">● Limité (' + dispo + '/' + total + ')</span>';
-  return '<span style="color:var(--succes);font-weight:700">● Disponible (' + dispo + '/' + total + ')</span>';
-}
-function stockHtml(stock) {
-  if (stock === 0) return '<span style="color:var(--erreur);font-weight:700">● Rupture de stock</span>';
-  if (stock <= 3)  return '<span style="color:var(--attention);font-weight:700">● Limité (' + stock + ')</span>';
-  return '<span style="color:var(--succes);font-weight:700">● En stock (' + stock + ')</span>';
-}
-function formaterDate(dateStr) {
-  var d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+function dateSimple(date) {
+  if (!date) return '—';
+  return new Date(date).toLocaleDateString('fr-FR');
 }
 
-function afficher() {
-  var rech  = document.getElementById('recherche').value.toLowerCase().trim();
-  var cat   = document.getElementById('filtre-cat').value;
-  var dispo = document.getElementById('filtre-dispo').value;
-  var total = 0;
+function afficherMesReservations() {
+  const zoneRessources = document.getElementById('zone-ressources');
+  const zoneEvenements = document.getElementById('zone-evenements');
 
-  /* ── Colonne LOCATION ── */
-  var filtLoc = LOCATION.filter(function(m) {
-    if (rech && !m.nom.toLowerCase().includes(rech)) return false;
-    if (cat && cat !== 'evenement' && m.cat !== cat) return false;
-    if (cat === 'evenement') return false;
-    if (dispo === 'dispo'   && m.dispo === 0) return false;
-    if (dispo === 'indispo' && m.dispo > 0)   return false;
-    return true;
+  const reservations = getReservations();
+  const inscriptions = getInscriptions();
+
+  const mesReservations = reservations.filter(function(r) {
+    return r.user_email === user.email;
   });
-  total += filtLoc.length;
-  document.getElementById('col-location').innerHTML = filtLoc.length
-    ? filtLoc.map(function(m) {
-        return '<div class="carte-mat">' +
-          '<div class="mat-bande" style="background:' + m.couleur + '"></div>' +
-          '<div class="mat-photo">' +
-            '<span class="mat-cat-badge">' + m.cat + '</span>' +
-            m.emoji +
-          '</div>' +
-          '<div class="mat-body">' +
-            '<div class="mat-nom">' + m.nom + '</div>' +
-            '<div class="mat-detail">' +
-              '<span>Etat : ' + etatHtml(m.dispo, m.total) + '</span>' +
-              '<span>Durée : <b>sur réservation</b></span>' +
-              '<span>Prix : <b style="color:var(--bleu-vif)">' + (m.prix_j === 0 ? 'Gratuit' : m.prix_j + ' €/jour') + '</b></span>' +
-            '</div>' +
-            '<div class="mat-bas">' +
-              '<span class="mat-prix-loc">' + (m.prix_j === 0 ? 'Gratuit' : m.prix_j + ' €/j') + '</span>' +
-              '<button class="btn-mat ' + (m.dispo > 0 ? 'btn-louer' : 'btn-complet') + '" ' +
-                (m.dispo > 0 ? 'onclick="ouvrirLouer(\'' + m.id + '\')"' : 'disabled') + '>' +
-                (m.dispo > 0 ? 'Louer' : 'Indisponible') +
-              '</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('')
-    : '<div style="text-align:center;padding:2rem;color:var(--texte-pale);font-style:italic">Aucun résultat.</div>';
 
-  /* ── Colonne ACHAT ── */
-  var filtAch = ACHAT.filter(function(m) {
-    if (rech && !m.nom.toLowerCase().includes(rech)) return false;
-    if (cat && cat !== 'evenement' && m.cat !== cat) return false;
-    if (cat === 'evenement') return false;
-    if (dispo === 'dispo'   && m.stock === 0) return false;
-    if (dispo === 'indispo' && m.stock > 0)   return false;
-    return true;
+  const mesInscriptions = inscriptions.filter(function(i) {
+    return i.user_email === user.email;
   });
-  total += filtAch.length;
-  document.getElementById('col-achat').innerHTML = filtAch.length
-    ? filtAch.map(function(m) {
-        return '<div class="carte-mat">' +
-          '<div class="mat-bande" style="background:' + m.couleur + '"></div>' +
-          '<div class="mat-photo">' +
-            '<span class="mat-cat-badge">' + m.cat + '</span>' +
-            m.emoji +
-          '</div>' +
-          '<div class="mat-body">' +
-            '<div class="mat-nom">' + m.nom + '</div>' +
-            '<div class="mat-detail">' +
-              '<span>Etat : ' + stockHtml(m.stock) + '</span>' +
-              '<span>Prix : <b style="color:var(--succes)">' + m.prix + ' €</b></span>' +
-            '</div>' +
-            '<div class="mat-bas">' +
-              '<span class="mat-prix-ach">' + m.prix + ' €</span>' +
-              '<button class="btn-mat ' + (m.stock > 0 ? 'btn-acheter' : 'btn-complet') + '" ' +
-                (m.stock > 0 ? 'onclick="ouvrirAcheter(\'' + m.id + '\')"' : 'disabled') + '>' +
-                (m.stock > 0 ? 'Acheter' : 'Rupture') +
-              '</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('')
-    : '<div style="text-align:center;padding:2rem;color:var(--texte-pale);font-style:italic">Aucun résultat.</div>';
 
-  /* ── Colonne ÉVÉNEMENTS ── */
-  var filtEv = PART_EVENEMENTS.filter(function(ev) {
-    if (rech && !ev.titre.toLowerCase().includes(rech)) return false;
-    if (cat && cat !== 'evenement' && cat !== '') return false;
-    var plein = ev.inscrits >= ev.places;
-    if (dispo === 'dispo'   && plein)  return false;
-    if (dispo === 'indispo' && !plein) return false;
-    return true;
-  });
-  total += filtEv.length;
-  document.getElementById('col-evenements').innerHTML = filtEv.length
-    ? filtEv.map(function(ev) {
-        var plein    = ev.inscrits >= ev.places;
-        var restants = ev.places - ev.inscrits;
-        var placeTxt = plein
-          ? '<span style="color:var(--erreur);font-weight:700">Complet</span>'
-          : '<span style="color:' + (restants <= 5 ? 'var(--attention)' : 'var(--succes)') + ';font-weight:700">' + restants + ' place' + (restants > 1 ? 's' : '') + '</span>';
-        return '<div class="carte-mat">' +
-          '<div class="mat-bande" style="background:' + ev.couleur + '"></div>' +
-          '<div class="mat-photo">' +
-            '<span class="mat-cat-badge">évènement</span>' +
-            ev.emoji +
-          '</div>' +
-          '<div class="mat-body">' +
-            '<div class="mat-nom">' + ev.titre + '</div>' +
-            '<div class="mat-detail">' +
-              '<span>📅 <b>' + formaterDate(ev.date) + '</b></span>' +
-              '<span>🕐 <b>' + ev.heure + '</b></span>' +
-              '<span>📍 <b>' + ev.lieu + '</b></span>' +
-              '<span>👥 Nombre de places : ' + placeTxt + '</span>' +
-            '</div>' +
-            '<div class="mat-bas">' +
-              '<span class="mat-prix-grat">Gratuit</span>' +
-              '<button class="btn-mat ' + (plein ? 'btn-complet' : 'btn-participer') + '" ' +
-                (plein ? 'disabled' : 'onclick="ouvrirEvenement(' + ev.id + ')"') + '>' +
-                (plein ? 'Complet' : 'Participer') +
-              '</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('')
-    : '<div style="text-align:center;padding:2rem;color:var(--texte-pale);font-style:italic">Aucun résultat.</div>';
-
-  document.getElementById('nb-res').textContent = total;
+  afficherReservationsRessources(zoneRessources, mesReservations);
+  afficherEvenementsInscrits(zoneEvenements, mesInscriptions);
 }
 
-/* ══════════════════════════════════════════════
-   MODALS — UTILITAIRES
-══════════════════════════════════════════════ */
-function ouvrirModal(id) { document.getElementById(id).classList.add('ouvert'); }
-function fermerModal(id) { document.getElementById(id).classList.remove('ouvert'); }
-function fermerSiDehors(e, id) { if (e.target.id === id) fermerModal(id); }
+function afficherReservationsRessources(zone, liste) {
+  if (!liste.length) {
+    zone.innerHTML = `
+      <div class="bloc-vide">
+        Tu n’as aucune réservation de ressource pour le moment.
+      </div>
+    `;
+    return;
+  }
 
-/* ══════════════════════════════════════════════
-   MODAL LOUER
-══════════════════════════════════════════════ */
-function ouvrirLouer(id) {
-  itemCourant = LOCATION.find(function(x) { return x.id === id; });
-  if (!itemCourant) return;
-  typeCourant = 'location';
+  let lignes = '';
+  let cartesMobile = '';
 
-  document.getElementById('ml-entete').style.background = itemCourant.couleur;
-  document.getElementById('ml-titre').textContent = itemCourant.emoji + ' ' + itemCourant.nom;
-
-  var today = new Date().toISOString().split('T')[0];
-  document.getElementById('ml-corps').innerHTML =
-    '<div class="modal-ligne"><span class="icone">📦</span><div><strong>Matériel</strong><span>' + itemCourant.nom + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">🔵</span><div><strong>État</strong><span>' + itemCourant.etat + ' — ' + itemCourant.dispo + '/' + itemCourant.total + ' disponible(s)</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">💶</span><div><strong>Tarif</strong><span>' + (itemCourant.prix_j === 0 ? 'Gratuit' : itemCourant.prix_j + ' €/jour') + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">💬</span><div><strong>Description</strong><span>' + itemCourant.desc + '</span></div></div>' +
-    '<div class="champ" style="margin-top:.75rem">' +
-      '<label>Date de début *</label>' +
-      '<input type="date" id="loc-debut" min="' + today + '" value="' + today + '">' +
-    '</div>' +
-    '<div class="champ">' +
-      '<label>Date de fin *</label>' +
-      '<input type="date" id="loc-fin" min="' + today + '" value="' + today + '">' +
-    '</div>' +
-    '<div class="champ">' +
-      '<label>Quantité *</label>' +
-      '<input type="number" id="loc-qte" min="1" max="' + itemCourant.dispo + '" value="1">' +
-    '</div>' +
-    '<div class="prix-estime"><span>💰 Prix estimé</span><b id="loc-prix">' + (itemCourant.prix_j === 0 ? 'Gratuit' : itemCourant.prix_j + ' €') + '</b></div>';
-
-  // Calcul prix dynamique
-  setTimeout(function() {
-    var inputs = ['loc-debut','loc-fin','loc-qte'];
-    inputs.forEach(function(i) {
-      var el = document.getElementById(i);
-      if (el) el.addEventListener('input', majPrixLocation);
+  liste.forEach(function(r) {
+    const ressource = RESSOURCES.find(function(x) {
+      return x.id == r.ressource_id;
     });
-  }, 50);
 
-  ouvrirModal('modal-louer');
+    const nomRessource = ressource ? ressource.nom : (r.ressource_nom || 'Ressource');
+    const statut = r.statut || 'en_attente';
+
+    lignes += `
+      <tr>
+        <td><strong>${e(nomRessource)}</strong></td>
+        <td>${dateSimple(r.date_debut)}</td>
+        <td>${dateSimple(r.date_fin)}</td>
+        <td>${e(r.quantite)}</td>
+        <td>${badgeStatut(statut)}</td>
+        <td>
+          ${
+            statut === 'refuse' || statut === 'annule'
+              ? '<span style="color:#94a3b8;font-size:.82rem">Aucune action</span>'
+              : `<button onclick="annulerMaReservation(${r.id})" class="btn btn-erreur" style="font-size:.8rem;padding:.35rem .7rem">
+                   Annuler
+                 </button>`
+          }
+        </td>
+      </tr>
+    `;
+
+    cartesMobile += `
+      <div class="mini-carte">
+        <h3>${e(nomRessource)}</h3>
+        <p>📅 Du ${dateSimple(r.date_debut)} au ${dateSimple(r.date_fin)}</p>
+        <p>📦 Quantité : ${e(r.quantite)}</p>
+        <p>Statut : ${badgeStatut(statut)}</p>
+        ${
+          statut === 'refuse' || statut === 'annule'
+            ? ''
+            : `<button onclick="annulerMaReservation(${r.id})" class="btn btn-erreur" style="width:100%;margin-top:.7rem">
+                 Annuler
+               </button>`
+        }
+      </div>
+    `;
+  });
+
+  zone.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Ressource</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Qté</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${lignes}
+      </tbody>
+    </table>
+
+    <div class="reservation-card-mobile">
+      ${cartesMobile}
+    </div>
+  `;
 }
 
-function majPrixLocation() {
-  if (!itemCourant || itemCourant.prix_j === 0) return;
-  var debut = new Date(document.getElementById('loc-debut').value);
-  var fin   = new Date(document.getElementById('loc-fin').value);
-  var qte   = parseInt(document.getElementById('loc-qte').value) || 1;
-  var jours = Math.max(1, Math.ceil((fin - debut) / 86400000) + 1);
-  var el    = document.getElementById('loc-prix');
-  if (el) el.textContent = (itemCourant.prix_j * jours * qte) + ' € (' + jours + ' j × ' + qte + ')';
-}
+function afficherEvenementsInscrits(zone, liste) {
+  if (!liste.length) {
+    zone.innerHTML = `
+      <div class="bloc-vide">
+        Tu n’es inscrite à aucun événement pour le moment.
+      </div>
+    `;
+    return;
+  }
 
-function validerLocation() {
-  var debut = document.getElementById('loc-debut').value;
-  var fin   = document.getElementById('loc-fin').value;
-  var qte   = parseInt(document.getElementById('loc-qte').value);
-  if (!debut || !fin) { alert('Veuillez sélectionner les dates.'); return; }
-  if (fin < debut)    { alert('La date de fin doit être après la date de début.'); return; }
-  if (qte > itemCourant.dispo) { alert('Quantité supérieure au stock disponible.'); return; }
+  let lignes = '';
+  let cartesMobile = '';
 
-  var ress = JSON.parse(localStorage.getItem('cp_reservations') || '[]');
-  ress.push({ id:Date.now(), user_email:sessionUser.email, nom:itemCourant.nom, type:'location', date_debut:debut, date_fin:fin, quantite:qte, statut:'en_attente' });
-  localStorage.setItem('cp_reservations', JSON.stringify(ress));
-  itemCourant.dispo -= qte;
-
-  fermerModal('modal-louer');
-  alert('Demande de location envoyée ! ✅\nElle sera validée par un administrateur.');
-  afficher();
-}
-
-/* ══════════════════════════════════════════════
-   MODAL ACHETER
-══════════════════════════════════════════════ */
-function ouvrirAcheter(id) {
-  itemCourant = ACHAT.find(function(x) { return x.id === id; });
-  if (!itemCourant) return;
-  typeCourant = 'achat';
-
-  document.getElementById('ma-entete').style.background = itemCourant.couleur;
-  document.getElementById('ma-titre').textContent = itemCourant.emoji + ' ' + itemCourant.nom;
-
-  document.getElementById('ma-corps').innerHTML =
-    '<div class="modal-ligne"><span class="icone">📦</span><div><strong>Article</strong><span>' + itemCourant.nom + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">🔵</span><div><strong>Stock</strong><span>' + itemCourant.stock + ' disponible(s)</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">💶</span><div><strong>Prix unitaire</strong><span>' + itemCourant.prix + ' €</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">💬</span><div><strong>Description</strong><span>' + itemCourant.desc + '</span></div></div>' +
-    '<div class="champ" style="margin-top:.75rem">' +
-      '<label>Quantité *</label>' +
-      '<input type="number" id="ach-qte" min="1" max="' + itemCourant.stock + '" value="1">' +
-    '</div>' +
-    '<div class="prix-estime" style="background:#dcfce7"><span style="color:#166534">🛒 Total à payer</span><b id="ach-total" style="color:#166534">' + itemCourant.prix + ' €</b></div>';
-
-  setTimeout(function() {
-    var el = document.getElementById('ach-qte');
-    if (el) el.addEventListener('input', function() {
-      var t = document.getElementById('ach-total');
-      if (t) t.textContent = (itemCourant.prix * (parseInt(this.value)||1)) + ' €';
+  liste.forEach(function(i) {
+    const evenement = EVENEMENTS.find(function(x) {
+      return x.id == i.evenement_id;
     });
-  }, 50);
 
-  ouvrirModal('modal-acheter');
+    if (!evenement) return;
+
+    lignes += `
+      <tr>
+        <td><strong>${e(evenement.titre)}</strong></td>
+        <td>${formatDate(evenement.date_debut)}</td>
+        <td>${e(evenement.lieu || '—')}</td>
+        <td><span class="badge badge-bleu">Inscrit</span></td>
+        <td>
+          <button onclick="desinscrireDepuisReservations(${evenement.id})" class="btn btn-erreur" style="font-size:.8rem;padding:.35rem .7rem">
+            Se désinscrire
+          </button>
+        </td>
+      </tr>
+    `;
+
+    cartesMobile += `
+      <div class="mini-carte">
+        <h3>${e(evenement.titre)}</h3>
+        <p>📅 ${formatDate(evenement.date_debut)}</p>
+        <p>📍 ${e(evenement.lieu || '—')}</p>
+        <p><span class="badge badge-bleu">Inscrit</span></p>
+        <button onclick="desinscrireDepuisReservations(${evenement.id})" class="btn btn-erreur" style="width:100%;margin-top:.7rem">
+          Se désinscrire
+        </button>
+      </div>
+    `;
+  });
+
+  if (!lignes) {
+    zone.innerHTML = `
+      <div class="bloc-vide">
+        Tu n’es inscrite à aucun événement pour le moment.
+      </div>
+    `;
+    return;
+  }
+
+  zone.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Événement</th>
+          <th>Date</th>
+          <th>Lieu</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${lignes}
+      </tbody>
+    </table>
+
+    <div class="reservation-card-mobile">
+      ${cartesMobile}
+    </div>
+  `;
 }
 
-function validerAchat() {
-  var qte = parseInt(document.getElementById('ach-qte').value);
-  if (qte > itemCourant.stock) { alert('Stock insuffisant.'); return; }
+async function annulerMaReservation(idReservation) {
+  if (!confirm("Tu veux vraiment annuler cette réservation ?")) {
+    return;
+  }
 
-  var ress  = JSON.parse(localStorage.getItem('cp_reservations') || '[]');
-  var today = new Date().toISOString().split('T')[0];
-  ress.push({ id:Date.now(), user_email:sessionUser.email, nom:itemCourant.nom, type:'achat', date_debut:today, date_fin:today, quantite:qte, statut:'en_attente' });
-  localStorage.setItem('cp_reservations', JSON.stringify(ress));
-  itemCourant.stock -= qte;
+  const reponse = await annulerReservation(idReservation);
 
-  fermerModal('modal-acheter');
-  alert('Commande de ' + qte + '× "' + itemCourant.nom + '" enregistrée ! 🛒\nUn administrateur va traiter votre achat.');
-  afficher();
+  if (reponse.succes) {
+    flash("Réservation annulée.", "succes");
+
+    window.RESSOURCES = _sync(API + 'ressources.php');
+
+    afficherMesReservations();
+    afficheFlash(document.getElementById('flash-zone'));
+  } else {
+    flash(reponse.erreur || "Impossible d’annuler la réservation.", "erreur");
+    afficheFlash(document.getElementById('flash-zone'));
+  }
 }
 
-/* ══════════════════════════════════════════════
-   MODAL PARTICIPER
-══════════════════════════════════════════════ */
-function ouvrirEvenement(id) {
-  itemCourant = PART_EVENEMENTS.find(function(x) { return x.id === id; });
-  if (!itemCourant) return;
-  typeCourant = 'evenement';
+async function desinscrireDepuisReservations(idEvenement) {
+  if (!confirm("Tu veux vraiment te désinscrire de cet événement ?")) {
+    return;
+  }
 
-  var plein    = itemCourant.inscrits >= itemCourant.places;
-  var restants = itemCourant.places - itemCourant.inscrits;
+  const reponse = await seDesinscrire(idEvenement);
 
-  document.getElementById('mp-entete').style.background = itemCourant.couleur;
-  document.getElementById('mp-titre').textContent = itemCourant.emoji + ' ' + itemCourant.titre;
+  if (reponse.succes) {
+    flash("Tu es bien désinscrite de l’événement.", "succes");
 
-  document.getElementById('mp-corps').innerHTML =
-    '<div class="modal-ligne"><span class="icone">📅</span><div><strong>Date</strong><span>' + formaterDate(itemCourant.date) + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">🕐</span><div><strong>Heure</strong><span>' + itemCourant.heure + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">📍</span><div><strong>Lieu</strong><span>' + itemCourant.lieu + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">👥</span><div><strong>Nombre de places</strong><span>' + itemCourant.inscrits + ' inscrit(s) sur ' + itemCourant.places + ' — ' + (plein ? 'Complet' : restants + ' place(s) restante(s)') + '</span></div></div>' +
-    '<div class="modal-ligne"><span class="icone">💬</span><div><strong>Description</strong><span>' + itemCourant.desc + '</span></div></div>';
+    window.EVENEMENTS = _sync(API + 'evenements.php');
 
-  var btn = document.getElementById('btn-inscrire');
-  btn.textContent = plein ? 'Liste d\'attente' : 'S\'inscrire';
-  btn.className   = plein ? 'btn btn-gris' : 'btn btn-primaire';
-  btn.style.fontSize = '.85rem';
-
-  ouvrirModal('modal-part');
+    afficherMesReservations();
+    afficheFlash(document.getElementById('flash-zone'));
+  } else {
+    flash(reponse.erreur || "Impossible de se désinscrire.", "erreur");
+    afficheFlash(document.getElementById('flash-zone'));
+  }
 }
 
-function sInscrire() {
-  if (!itemCourant) return;
-  var plein = itemCourant.inscrits >= itemCourant.places;
-  var ins   = JSON.parse(localStorage.getItem('cp_inscriptions') || '[]');
-  ins.push({ id:Date.now(), user_email:sessionUser.email, evenement_id:itemCourant.id, titre:itemCourant.titre, statut: plein ? 'liste_attente' : 'inscrit', date:new Date().toISOString() });
-  localStorage.setItem('campusplay_inscriptions', JSON.stringify(ins));
-  if (!plein) itemCourant.inscrits++;
-  fermerModal('modal-part');
-  alert(plein
-    ? 'Tu as été ajouté(e) à la liste d\'attente pour "' + itemCourant.titre + '" !'
-    : 'Inscription confirmée pour "' + itemCourant.titre + '" ! 🎉');
-  afficher();
-}
-
-/* ══════════════════════════════════════════════
-   FILTRES & INIT
-══════════════════════════════════════════════ */
-function reinitFiltres() {
-  document.getElementById('recherche').value = '';
-  document.getElementById('filtre-cat').value = '';
-  document.getElementById('filtre-dispo').value = '';
-  afficher();
-}
-
-document.getElementById('recherche').addEventListener('input', afficher);
-document.getElementById('filtre-cat').addEventListener('change', afficher);
-document.getElementById('filtre-dispo').addEventListener('change', afficher);
-
-afficher();
+afficherMesReservations();
 </script>
 
 </body>

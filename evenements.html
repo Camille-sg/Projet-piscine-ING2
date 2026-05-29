@@ -8,20 +8,33 @@
 <body>
 
 <script src="data.js"></script>
-<script>renderNavbar('evenements');</script>
+<script>
+  if (!isConnecte()) {
+    window.location.href = 'index.html';
+  }
+
+  renderNavbar('evenements');
+</script>
 
 <div class="conteneur">
-  <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem">📅 Événements</h1>
+  <div id="flash-zone"></div>
+
+  <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem">
+    📅 Événements
+  </h1>
 
   <!-- Filtres -->
   <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;background:white;border:1px solid var(--bordure);border-radius:.75rem;padding:1rem">
+    
     <div style="flex:1;min-width:200px">
       <input type="text" id="recherche" placeholder="🔍 Rechercher un événement…"
              style="width:100%;padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
     </div>
+
     <select id="filtre-activite" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
       <option value="">Toutes les activités</option>
     </select>
+
     <select id="filtre-places" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
       <option value="">Toutes les places</option>
       <option value="dispo">Places disponibles</option>
@@ -30,7 +43,10 @@
   </div>
 
   <div class="grille-3" id="liste-evenements"></div>
-  <p id="aucun" style="display:none;color:#64748b;text-align:center;padding:2rem">Aucun événement trouvé.</p>
+
+  <p id="aucun" style="display:none;color:#64748b;text-align:center;padding:2rem">
+    Aucun événement trouvé.
+  </p>
 </div>
 
 <footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
@@ -38,25 +54,28 @@
 </footer>
 
 <script>
-// Remplir le filtre activités
+afficheFlash(document.getElementById('flash-zone'));
+
+/* Remplir le filtre activités */
 const sel = document.getElementById('filtre-activite');
+
 ACTIVITES.forEach(a => {
-  const o = document.createElement('option');
-  o.value = a.id;
-  o.textContent = a.titre;
-  sel.appendChild(o);
+  const option = document.createElement('option');
+  option.value = a.id;
+  option.textContent = a.titre;
+  sel.appendChild(option);
 });
 
+/* Affichage des événements */
 function afficher() {
-  const recherche  = document.getElementById('recherche').value.toLowerCase();
-  const filtreAct  = document.getElementById('filtre-activite').value;
-  const filtrePl   = document.getElementById('filtre-places').value;
-  const isAdmin    = getRole() === 'admin' || getRole() === 'manager';
+  const recherche = document.getElementById('recherche').value.toLowerCase();
+  const filtreAct = document.getElementById('filtre-activite').value;
+  const filtrePl  = document.getElementById('filtre-places').value;
+  const isAdmin   = getRole() === 'admin' || getRole() === 'manager';
 
   const filtres = EVENEMENTS.filter(ev => {
     if (!isAdmin && ev.statut !== 'approuve') return false;
     if (recherche && !ev.titre.toLowerCase().includes(recherche)) return false;
-    // Comparaison souple (== au lieu de ===) pour éviter les problèmes de type int/string
     if (filtreAct && ev.activite_id != parseInt(filtreAct)) return false;
     if (filtrePl === 'dispo' && ev.places_prises >= ev.places_max) return false;
     if (filtrePl === 'plein' && ev.places_prises < ev.places_max) return false;
@@ -64,41 +83,135 @@ function afficher() {
   });
 
   const conteneur = document.getElementById('liste-evenements');
-  const aucun     = document.getElementById('aucun');
+  const aucun = document.getElementById('aucun');
+
   conteneur.innerHTML = '';
 
-  if (!filtres.length) { aucun.style.display = 'block'; return; }
+  if (!filtres.length) {
+    aucun.style.display = 'block';
+    return;
+  }
+
   aucun.style.display = 'none';
 
-  const statuts = { approuve: 'badge-vert', en_attente: 'badge-jaune', refuse: 'badge-rouge' };
+  const statuts = {
+    approuve: 'badge-vert',
+    en_attente: 'badge-jaune',
+    refuse: 'badge-rouge'
+  };
 
   filtres.forEach(ev => {
-    // Utilise les données de la jointure SQL en priorité, puis cherche dans ACTIVITES
-    const actTitre  = ev.activite_titre  || (ACTIVITES.find(a => a.id == ev.activite_id)?.titre  ?? '—');
-    const actCouleur= ev.activite_couleur|| (ACTIVITES.find(a => a.id == ev.activite_id)?.couleur ?? '#6366f1');
-    const plein     = ev.places_prises >= ev.places_max;
+    const activite = ACTIVITES.find(a => a.id == ev.activite_id);
+
+    const actTitre = ev.activite_titre || (activite ? activite.titre : '—');
+    const actCouleur = ev.activite_couleur || (activite ? activite.couleur : '#6366f1');
+
+    const plein = ev.places_prises >= ev.places_max;
+    const dejaInscrit = estInscrit(ev.id);
+    const placesRestantes = ev.places_max - ev.places_prises;
 
     conteneur.innerHTML += `
-      <a href="evenement.html?id=${ev.id}" style="text-decoration:none;display:block">
-        <div class="carte" style="cursor:pointer;height:100%">
-          <div style="background:${actCouleur};height:5px;border-radius:4px 4px 0 0;margin:-1.5rem -1.5rem 1rem"></div>
-          <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
-            <span class="badge ${plein ? 'badge-rouge' : 'badge-vert'}">${plein ? 'Complet' : (ev.places_max - ev.places_prises) + ' places'}</span>
-            ${isAdmin ? `<span class="badge ${statuts[ev.statut]}">${ev.statut.replace('_',' ')}</span>` : ''}
-          </div>
-          <h3 style="font-size:1rem;font-weight:700;margin-bottom:.5rem;color:#1e293b">${e(ev.titre)}</h3>
-          <p style="font-size:.82rem;color:#64748b;margin-bottom:.2rem">📅 ${formatDate(ev.date_debut)}</p>
-          <p style="font-size:.82rem;color:#64748b;margin-bottom:.2rem">📍 ${e(ev.lieu)}</p>
-          <p style="font-size:.82rem;color:#94a3b8">🎯 ${e(actTitre)}</p>
-          <p style="font-size:.82rem;color:#4f46e5;margin-top:.75rem;font-weight:600">Voir le détail →</p>
+      <div class="carte" style="height:100%">
+        <div style="background:${actCouleur};height:5px;border-radius:4px 4px 0 0;margin:-1.5rem -1.5rem 1rem"></div>
+
+        <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
+          <span class="badge ${plein ? 'badge-rouge' : 'badge-vert'}">
+            ${plein ? 'Complet' : placesRestantes + ' place' + (placesRestantes > 1 ? 's' : '')}
+          </span>
+
+          ${isAdmin ? `<span class="badge ${statuts[ev.statut] || 'badge-jaune'}">${e(ev.statut.replace('_',' '))}</span>` : ''}
+
+          ${dejaInscrit ? `<span class="badge badge-bleu">Déjà inscrit</span>` : ''}
         </div>
-      </a>`;
+
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:.5rem;color:#1e293b">
+          ${e(ev.titre)}
+        </h3>
+
+        <p style="font-size:.82rem;color:#64748b;margin-bottom:.2rem">
+          📅 ${formatDate(ev.date_debut)}
+        </p>
+
+        <p style="font-size:.82rem;color:#64748b;margin-bottom:.2rem">
+          📍 ${e(ev.lieu || 'Lieu non précisé')}
+        </p>
+
+        <p style="font-size:.82rem;color:#94a3b8;margin-bottom:1rem">
+          🎯 ${e(actTitre)}
+        </p>
+
+        ${
+          dejaInscrit
+            ? `<button onclick="desinscrireEvenement(${ev.id})" class="btn btn-erreur" style="width:100%">
+                 Se désinscrire
+               </button>`
+            : plein
+              ? `<button class="btn btn-gris" disabled style="width:100%;opacity:.6;cursor:not-allowed">
+                   Complet
+                 </button>`
+              : `<button onclick="inscrireEvenement(${ev.id})" class="btn btn-primaire" style="width:100%">
+                   S'inscrire
+                 </button>`
+        }
+      </div>
+    `;
   });
 }
 
+/* Inscription à un événement */
+async function inscrireEvenement(idEvenement) {
+  if (!isConnecte()) {
+    flash("Tu dois être connecté(e) pour t'inscrire.", "erreur");
+    window.location.href = "index.html";
+    return;
+  }
+
+  const reponse = await sInscrireEvenement(idEvenement);
+
+  if (reponse.succes) {
+    flash("Inscription confirmée à l'événement !", "succes");
+
+    /* Recharge les événements depuis la base */
+    window.EVENEMENTS = _sync(API + 'evenements.php');
+
+    afficher();
+    afficheFlash(document.getElementById('flash-zone'));
+  } else {
+    flash(reponse.erreur || "Impossible de s'inscrire à cet événement.", "erreur");
+    afficher();
+    afficheFlash(document.getElementById('flash-zone'));
+  }
+}
+
+/* Désinscription d'un événement */
+async function desinscrireEvenement(idEvenement) {
+  if (!confirm("Tu veux vraiment te désinscrire de cet événement ?")) {
+    return;
+  }
+
+  const reponse = await seDesinscrire(idEvenement);
+
+  if (reponse.succes) {
+    flash("Tu es bien désinscrit(e) de l'événement.", "succes");
+
+    /* Recharge les événements depuis la base */
+    window.EVENEMENTS = _sync(API + 'evenements.php');
+
+    afficher();
+    afficheFlash(document.getElementById('flash-zone'));
+  } else {
+    flash(reponse.erreur || "Impossible de se désinscrire.", "erreur");
+    afficher();
+    afficheFlash(document.getElementById('flash-zone'));
+  }
+}
+
+/* Événements des filtres */
 document.getElementById('recherche').addEventListener('input', afficher);
 document.getElementById('filtre-activite').addEventListener('change', afficher);
 document.getElementById('filtre-places').addEventListener('change', afficher);
+
+/* Initialisation */
 afficher();
 </script>
 
