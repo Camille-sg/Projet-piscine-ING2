@@ -4,57 +4,6 @@
   <meta charset="UTF-8">
   <title>CampusPlay — Notifications</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    .notif-item {
-      background: white;
-      border: 1px solid var(--bordure);
-      border-radius: .75rem;
-      padding: 1rem 1.25rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      margin-bottom: .6rem;
-      transition: box-shadow .15s;
-      cursor: pointer;
-      position: relative;
-    }
-    .notif-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,.09); }
-    .notif-item.non-lue {
-      background: #eef2ff;
-      border-color: #c7d2fe;
-    }
-    .notif-item.non-lue::before {
-      content: '';
-      position: absolute;
-      left: -.1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 60%;
-      background: #4f46e5;
-      border-radius: 0 4px 4px 0;
-    }
-    .notif-icone {
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.15rem;
-      flex-shrink: 0;
-    }
-    .notif-corps    { flex: 1; min-width: 0; }
-    .notif-titre    { font-size: .9rem;  font-weight: 700; color: #1e293b; margin-bottom: .2rem; }
-    .notif-desc     { font-size: .82rem; color: #64748b;   line-height: 1.5; }
-    .notif-meta     { font-size: .75rem; color: #94a3b8;   margin-top: .3rem; }
-    .notif-action   { margin-top: .5rem; }
-    .dot-lue        { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #4f46e5; margin-left: .35rem; vertical-align: middle; }
-    .btn-lu-rapide  { background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 1rem; padding: .25rem; flex-shrink: 0; transition: color .15s; }
-    .btn-lu-rapide:hover { color: #4f46e5; }
-    .vide-notif     { text-align: center; padding: 3rem; color: #64748b; }
-    .vide-notif .vide-ico { font-size: 2.5rem; margin-bottom: .75rem; }
-  </style>
 </head>
 <body>
 
