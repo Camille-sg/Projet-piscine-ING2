@@ -40,6 +40,13 @@
       <option value="dispo">Places disponibles</option>
       <option value="plein">Complet</option>
     </select>
+
+    <select id="filtre-date" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
+  <option value="avenir">Événements à venir</option>
+  <option value="passes">Événements passés</option>
+  <option value="tous">Tous les événements</option>
+</select>
+
   </div>
 
   <div class="grille-3" id="liste-evenements"></div>
@@ -68,19 +75,32 @@ ACTIVITES.forEach(a => {
 
 /* Affichage des événements */
 function afficher() {
-  const recherche = document.getElementById('recherche').value.toLowerCase();
-  const filtreAct = document.getElementById('filtre-activite').value;
-  const filtrePl  = document.getElementById('filtre-places').value;
-  const isAdmin   = getRole() === 'admin' || getRole() === 'manager';
+const recherche = document.getElementById('recherche').value.toLowerCase();
+const filtreAct = document.getElementById('filtre-activite').value;
+const filtrePl  = document.getElementById('filtre-places').value;
+const filtreDate = document.getElementById('filtre-date').value;
+const isAdmin   = getRole() === 'admin' || getRole() === 'manager';
 
-  const filtres = EVENEMENTS.filter(ev => {
-    if (!isAdmin && ev.statut !== 'approuve') return false;
-    if (recherche && !ev.titre.toLowerCase().includes(recherche)) return false;
-    if (filtreAct && ev.activite_id != parseInt(filtreAct)) return false;
-    if (filtrePl === 'dispo' && ev.places_prises >= ev.places_max) return false;
-    if (filtrePl === 'plein' && ev.places_prises < ev.places_max) return false;
-    return true;
-  });
+const maintenant = new Date();
+
+ const filtres = EVENEMENTS.filter(ev => {
+  const dateEvent = new Date(ev.date_debut);
+
+  if (!isAdmin && ev.statut !== 'approuve') return false;
+  if (recherche && !ev.titre.toLowerCase().includes(recherche)) return false;
+  if (filtreAct && ev.activite_id != parseInt(filtreAct)) return false;
+  if (filtrePl === 'dispo' && ev.places_prises >= ev.places_max) return false;
+  if (filtrePl === 'plein' && ev.places_prises < ev.places_max) return false;
+
+  if (filtreDate === 'avenir' && dateEvent < maintenant) return false;
+  if (filtreDate === 'passes' && dateEvent >= maintenant) return false;
+
+  return true;
+});
+
+filtres.sort(function(a, b) {
+  return new Date(a.date_debut) - new Date(b.date_debut);
+});
 
   const conteneur = document.getElementById('liste-evenements');
   const aucun = document.getElementById('aucun');
@@ -210,6 +230,7 @@ async function desinscrireEvenement(idEvenement) {
 document.getElementById('recherche').addEventListener('input', afficher);
 document.getElementById('filtre-activite').addEventListener('change', afficher);
 document.getElementById('filtre-places').addEventListener('change', afficher);
+document.getElementById('filtre-date').addEventListener('change', afficher);
 
 /* Initialisation */
 afficher();

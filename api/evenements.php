@@ -73,6 +73,57 @@ if ($method === 'POST') {
             echo json_encode(['succes' => true]);
             break;
 
+            case 'modifier':
+    $id = (int)($body['id'] ?? 0);
+
+    if ($id <= 0) {
+        echo json_encode(['succes' => false, 'erreur' => 'ID événement invalide.']);
+        exit;
+    }
+
+    if (empty($body['titre'])) {
+        echo json_encode(['succes' => false, 'erreur' => 'Le titre est obligatoire.']);
+        exit;
+    }
+
+    if (empty($body['date_debut']) || empty($body['date_fin'])) {
+        echo json_encode(['succes' => false, 'erreur' => 'Les dates sont obligatoires.']);
+        exit;
+    }
+
+    $statuts_ok = ['approuve', 'refuse', 'en_attente'];
+    $statut = in_array($body['statut'] ?? '', $statuts_ok)
+        ? $body['statut']
+        : 'approuve';
+
+    $stmt = $pdo->prepare(
+        "UPDATE evenements
+         SET titre = ?,
+             activite_id = ?,
+             date_debut = ?,
+             date_fin = ?,
+             lieu = ?,
+             places_max = ?,
+             description = ?,
+             statut = ?
+         WHERE id = ?"
+    );
+
+    $stmt->execute([
+        $body['titre'],
+        (int)($body['activite_id'] ?? 0),
+        $body['date_debut'],
+        $body['date_fin'],
+        $body['lieu'] ?? '',
+        (int)($body['places_max'] ?? 20),
+        $body['description'] ?? '',
+        $statut,
+        $id
+    ]);
+
+    echo json_encode(['succes' => true]);
+    break;
+
         case 'supprimer':
             $pdo->prepare("DELETE FROM evenements WHERE id = ?")
                 ->execute([(int)($body['id'] ?? 0)]);
