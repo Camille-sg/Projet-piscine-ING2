@@ -142,6 +142,17 @@ afficheFlash(document.getElementById('flash-zone'));
 var ressourceSelectee = null;
 var mesReservations = [];
 
+var user = getUser();
+
+var adminLink = document.getElementById('lien-admin');
+
+if (adminLink) {
+  adminLink.style.display =
+    (user.role === 'admin' || user.role === 'manager')
+      ? 'flex'
+      : 'none';
+}
+
 /* ===== catégories ===== */
 var categories = [];
 RESSOURCES.forEach(function(r){
