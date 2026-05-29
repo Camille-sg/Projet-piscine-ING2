@@ -130,33 +130,6 @@ function genererNotifications() {
     });
   });
 
-  /* --- Notifications système --- */
-  liste.push(
-    {
-      id: idx++, type: 'systeme', lue: true,
-      icone: '🎉', couleur: '#ede9fe',
-      titre: 'Bienvenue sur CampusPlay !',
-      desc:  `Bonjour ${e(user.prenom)} ! Découvre toutes les activités musicales et événements de ton campus. N'hésite pas à t'inscrire et à réserver du matériel ! 🎵`,
-      meta:  'Équipe CampusPlay',
-      lien:  'index.html',
-    },
-    {
-      id: idx++, type: 'systeme', lue: true,
-      icone: '🎸', couleur: '#f0fdf4',
-      titre: 'Nouvelles activités musicales disponibles',
-      desc:  'De nouveaux créneaux pour la guitare, le piano et la batterie ont été ajoutés. Consulte le catalogue des activités !',
-      meta:  'Il y a 2 jours',
-      lien:  'activites.html',
-    },
-    {
-      id: idx++, type: 'systeme', lue: true,
-      icone: '🎤', couleur: '#fff7ed',
-      titre: 'Soirée Karaoké — Inscriptions ouvertes',
-      desc:  'La prochaine soirée karaoké géante est planifiée. Les places partent vite, inscris-toi dès maintenant depuis la page Événements !',
-      meta:  'Il y a 5 jours',
-      lien:  'evenements.html',
-    }
-  );
 
   // Non lues en premier, puis par ID croissant
   liste.sort((a, b) => a.lue === b.lue ? a.id - b.id : a.lue ? 1 : -1);
