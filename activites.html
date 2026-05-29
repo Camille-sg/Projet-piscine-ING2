@@ -10,21 +10,16 @@
 <script src="data.js"></script>
 <script>renderNavbar('activites');</script>
 
-<<<<<<< HEAD
 <div class="conteneur">
 
-=======
-<div class="page-wrapper">
->>>>>>> 4110c368a9993f2efc63b678b9e3c69ec8c44c69
-  <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem">🎯 Activités</h1>
+  <h1>🎯 Activités</h1>
 
-  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;background:white;border:1px solid var(--bordure);border-radius:.75rem;padding:1rem">
-    <input type="text" id="recherche" placeholder="🔍 Rechercher…"
-           style="flex:1;min-width:180px;padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
-    <select id="filtre-cat" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
+  <div>
+    <input type="text" id="recherche" placeholder="🔍 Rechercher…">
+    <select id="filtre-cat">
       <option value="">Toutes catégories</option>
     </select>
-    <select id="filtre-diff" style="padding:.6rem .9rem;border:1.5px solid var(--bordure);border-radius:.5rem;font-size:.9rem">
+    <select id="filtre-diff">
       <option value="">Toutes difficultés</option>
       <option value="facile">Facile</option>
       <option value="moyen">Moyen</option>
@@ -35,7 +30,7 @@
   <div class="grille-3" id="liste"></div>
 </div>
 
-<footer style="background:white;border-top:1px solid var(--bordure);padding:1.5rem;text-align:center;color:var(--texte-doux);font-size:.85rem;margin-top:3rem">
+<footer>
   © 2026 CampusPlay — Tous droits réservés
 </footer>
 
